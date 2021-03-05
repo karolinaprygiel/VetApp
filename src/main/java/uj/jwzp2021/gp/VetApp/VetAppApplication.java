@@ -7,7 +7,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class VetAppApplication {
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(VetAppApplication.class, args);
+
+		System.out.println("Hello!");
 	}
 
 }
