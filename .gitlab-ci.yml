@@ -37,4 +37,5 @@ heroku-deploy:
       --build-arg DB_PASSWORD=${VET_APP_HEROKU_DB_PASSWORD}
       --tag registry.heroku.com/$HEROKU_APP_NAME/web .
     - docker push registry.heroku.com/$HEROKU_APP_NAME/web
+    - chmod -R 0777 release-docker-in-heroku.sh
     - ./release-docker-in-heroku.sh $HEROKU_APP_NAME $HEROKU_API_KEY
