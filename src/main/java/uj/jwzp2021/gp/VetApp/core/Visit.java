@@ -31,7 +31,7 @@ public class Visit {
         id = 0;
         startTime = null;
         duration = Duration.ZERO;
-        animal = Animal.OTHER;
+        animal = Animal.???;
         status = Status.PLANNED;
         price = null;
     }

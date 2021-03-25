@@ -1,10 +1,16 @@
 package uj.jwzp2021.gp.VetApp.core;
 
-public enum Animal {
-    OTHER,
-    DOG,
-    CAT,
-    HAMSTER,
-    RAT,
-    GUINEA_PIG
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity(name = "animal")
+public class Animal {
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    AnimalType type;
+    String name;
+    int yearOfBirth;
 }

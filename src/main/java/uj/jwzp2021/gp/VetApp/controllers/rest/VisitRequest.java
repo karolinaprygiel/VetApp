@@ -1,7 +1,7 @@
 package uj.jwzp2021.gp.VetApp.controllers.rest;
 
 import lombok.Data;
-import uj.jwzp2021.gp.VetApp.core.Animal;
+import uj.jwzp2021.gp.VetApp.core.AnimalType;
 
 import java.math.BigDecimal;
 import java.time.Duration;
