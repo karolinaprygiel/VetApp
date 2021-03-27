@@ -63,7 +63,7 @@ public class VisitService {
         return visitRepository.findById(id);
     }
 
-    @Scheduled(fixedRate = 1200000)
+    @Scheduled(fixedRate = 3600000)
     public void finishOutOfDateVisits(){
         LocalDateTime time = LocalDateTime.now();
         visitRepository.finishOutOfDateVisits(time);
