@@ -1,6 +1,7 @@
 package uj.jwzp2021.gp.VetApp.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import uj.jwzp2021.gp.VetApp.controllers.rest.VisitRequest;
 import uj.jwzp2021.gp.VetApp.core.Visit;
@@ -60,5 +61,13 @@ public class VisitService {
 
     public Optional<Visit> getVisitById(int id) {
         return visitRepository.findById(id);
+    }
+
+    @Scheduled(fixedRate = 1200000)
+    public void finishOutOfDateVisits(){
+        LocalDateTime time = LocalDateTime.now();
+        visitRepository.finishOutOfDateVisits(time);
+        System.out.println("finishOutOfDateVisits function run at " + time);
+
     }
 }
