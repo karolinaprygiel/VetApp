@@ -22,7 +22,7 @@ public class Animal {
 
     private int yearOfBirth;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "client_id")
     private Client owner;
 

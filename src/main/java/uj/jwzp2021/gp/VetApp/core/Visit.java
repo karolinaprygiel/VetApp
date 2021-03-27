@@ -31,15 +31,15 @@ public class Visit {
 
     private BigDecimal price;
 
-    @ManyToOne
+    @ManyToOne(cascade=CascadeType.ALL)
     @JoinColumn(name = "animal_id")
     private Animal animal;
 
-    @ManyToOne
+    @ManyToOne(cascade=CascadeType.ALL)
     @JoinColumn(name = "client_id")
     private Client client;
 
-    @ManyToOne
+    @ManyToOne(cascade=CascadeType.ALL)
     @JoinColumn(name = "vet_id")
     private Vet vet;
 
@@ -47,5 +47,13 @@ public class Visit {
 
     public static Visit newVisit(LocalDateTime startTime, Duration duration, Animal animal, BigDecimal price, Client client, Vet vet) {
         return new Visit(-1, startTime, duration, Status.PLANNED, price, animal, client, vet, null);
+    }
+
+    public void notAppeared(String note) {
+
+    }
+
+    public void notAppeared() {
+
     }
 }

@@ -48,6 +48,8 @@ public class VisitsRestController {
 
     private ResponseEntity<?> visitCreationResultToBadRequest(VisitCreationResult result) {
         switch (result) {
+            case TOO_SOON:
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"reason\": \"Booking for less than an hour in the future is prohibited.\"}");
             case OVERLAP:
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"reason\": \"Overlapping with other visit.\"}");
             case REPOSITORY_PROBLEM:

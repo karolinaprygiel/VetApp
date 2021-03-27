@@ -27,12 +27,19 @@ public class VisitService {
     }
 
     public OpResult<VisitCreationResult, Visit> createVisit(VisitRequest req) {
-        if (!dateAvailable(req.getStartTime(), req.getDuration())) {
+        if (dateTooSoon(req.getStartTime())) {
+            return OpResult.fail(VisitCreationResult.TOO_SOON);
+        } else if (!dateAvailable(req.getStartTime(), req.getDuration())) {
             return OpResult.fail(VisitCreationResult.OVERLAP);
         } else {
             Visit v = visitRepository.save(Visit.newVisit(req.getStartTime(), req.getDuration(), req.getAnimal(), req.getPrice(), req.getClient(), req.getVet()));
             return OpResult.success(v);
         }
+    }
+
+    private boolean dateTooSoon(LocalDateTime startTime) {
+        LocalDateTime now = LocalDateTime.now();
+        return !LocalDateTime.now().plusHours(1).isBefore(startTime);
     }
 
     private boolean dateAvailable(LocalDateTime startTime, Duration duration) {
