@@ -3,6 +3,7 @@ package uj.jwzp2021.gp.VetApp.core;
 import com.vladmihalcea.hibernate.type.interval.PostgreSQLIntervalType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
@@ -11,6 +12,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 @Entity(name="visits")
 @TypeDef(typeClass = PostgreSQLIntervalType.class, defaultForType = Duration.class)
@@ -18,25 +20,32 @@ public class Visit {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    private final int id;
+    private int id;
 
-    private final LocalDateTime startTime;
+    private LocalDateTime startTime;
+
     @Column(columnDefinition = "interval")
-    private final Duration duration;
-    private final Animal animal;
-    private final Status status;
-    private final BigDecimal price;
+    private Duration duration;
 
-    protected Visit() {
-        id = 0;
-        startTime = null;
-        duration = Duration.ZERO;
-        animal = Animal.???;
-        status = Status.PLANNED;
-        price = null;
-    }
+    private Status status;
 
-    public static Visit newVisit(LocalDateTime startTime, Duration duration, Animal animal, BigDecimal price) {
-        return new Visit(-1, startTime, duration, animal, Status.PLANNED, price);
+    private BigDecimal price;
+
+    @ManyToOne
+    @JoinColumn(name = "animal_id")
+    private Animal animal;
+
+    @ManyToOne
+    @JoinColumn(name = "client_id")
+    private Client client;
+
+    @ManyToOne
+    @JoinColumn(name = "vet_id")
+    private Vet vet;
+
+    private String description;
+
+    public static Visit newVisit(LocalDateTime startTime, Duration duration, Animal animal, BigDecimal price, Client client, Vet vet) {
+        return new Visit(-1, startTime, duration, Status.PLANNED, price, animal, client, vet, null);
     }
 }

@@ -1,16 +1,34 @@
 package uj.jwzp2021.gp.VetApp.core;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Entity(name = "animal")
+import javax.persistence.*;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity(name = "animals")
 public class Animal {
+
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    AnimalType type;
-    String name;
-    int yearOfBirth;
+    private AnimalType type;
+
+    private String name;
+
+    private int yearOfBirth;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client_id")
+    private Client owner;
+
+    Animal(String name) {
+        this();
+        this.name = name;
+    }
+
 }

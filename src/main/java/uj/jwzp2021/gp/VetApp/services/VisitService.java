@@ -30,7 +30,7 @@ public class VisitService {
         if (!dateAvailable(req.getStartTime(), req.getDuration())) {
             return OpResult.fail(VisitCreationResult.OVERLAP);
         } else {
-            Visit v = visitRepository.save(Visit.newVisit(req.getStartTime(), req.getDuration(), req.getAnimal(), req.getPrice()));
+            Visit v = visitRepository.save(Visit.newVisit(req.getStartTime(), req.getDuration(), req.getAnimal(), req.getPrice(), req.getClient(), req.getVet()));
             return OpResult.success(v);
         }
     }
