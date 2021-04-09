@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uj.jwzp2021.gp.VetApp.core.Visit;
 import uj.jwzp2021.gp.VetApp.services.VisitCreationResult;
+import uj.jwzp2021.gp.VetApp.services.VisitUpdateResult;
 import uj.jwzp2021.gp.VetApp.services.VisitService;
 
 import java.util.List;
@@ -42,6 +43,14 @@ public class VisitsRestController {
         visitsService.delete(id);
     }
 
+    @PatchMapping(path = "/{id}")
+    ResponseEntity<?> update(@PathVariable int id, @RequestBody VisitRequest visitReq){
+        var result = visitsService.updateVisit(id, visitReq);
+        return result.map(this::visitUpdateResultToBadRequest, this::visitToResult);
+
+    }
+
+
     private ResponseEntity<?> visitToResult(Visit visit) {
         return ResponseEntity.status(HttpStatus.CREATED).body(visit);
     }
@@ -52,6 +61,21 @@ public class VisitsRestController {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"reason\": \"Booking for less than an hour in the future is prohibited.\"}");
             case OVERLAP:
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"reason\": \"Overlapping with other visit.\"}");
+            case REPOSITORY_PROBLEM:
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"reason\": \"Problem with server, please try again later.\"}");
+            default:
+                return ResponseEntity.badRequest().body("{\"reason\": \"Unknown.\"}");
+        }
+    }
+
+    private ResponseEntity<?> visitUpdateResultToBadRequest(VisitUpdateResult result) {
+        switch(result){
+            case VISIT_NOT_FOUND:
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"reason\": \"Visit with such id was not found.\"}");
+            case ILLEGAL_FIELD:
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("{\"reason\": \"You can modify only status and description.\"}");
+            case ILLEGAL_VALUE:
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("{\"reason\": \"You can set status only to FINISHED, CANCELLED and NOT_APPEARD values.\"}");
             case REPOSITORY_PROBLEM:
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"reason\": \"Problem with server, please try again later.\"}");
             default:

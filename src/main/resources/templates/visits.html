@@ -29,7 +29,7 @@
                 <tr th:each="visit : ${visits}">
                     <td th:text="${visit.startTime}"></td>
                     <td th:text="${visit.duration}"></td>
-                    <td th:text="${visit.animal?.name}"></td>
+                    <td th:text="${visit.animal?.type}"></td>
                     <td th:text="${visit.client?.name != null} ? ${visit.client.name} : ' ' + ' ' + (${visit.client?.surname != null} ? ${visit.client.surname} : ' ')" ></td>
                     <td th:text="${visit.status}"></td>
                     <td th:text="${visit.price}"></td>

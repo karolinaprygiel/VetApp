@@ -3,6 +3,7 @@ package uj.jwzp2021.gp.VetApp.controllers.rest;
 import lombok.Data;
 import uj.jwzp2021.gp.VetApp.core.Animal;
 import uj.jwzp2021.gp.VetApp.core.Client;
+import uj.jwzp2021.gp.VetApp.core.Status;
 import uj.jwzp2021.gp.VetApp.core.Vet;
 
 import java.math.BigDecimal;
@@ -17,5 +18,7 @@ public class VisitRequest {
     private final BigDecimal price;
     private final Client client;
     private final Vet vet;
+    private final String description;
+    private final Status status;
 
 }

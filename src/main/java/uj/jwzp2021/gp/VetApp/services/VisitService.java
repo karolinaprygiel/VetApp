@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import uj.jwzp2021.gp.VetApp.controllers.rest.VisitRequest;
+import uj.jwzp2021.gp.VetApp.core.Status;
 import uj.jwzp2021.gp.VetApp.core.Visit;
 import uj.jwzp2021.gp.VetApp.repos.VisitRepository;
 import uj.jwzp2021.gp.VetApp.util.OpResult;
@@ -64,10 +65,37 @@ public class VisitService {
     }
 
     @Scheduled(fixedRate = 3600000)
-    public void finishOutOfDateVisits(){
+    public void finishOutOfDateVisits() {
         LocalDateTime time = LocalDateTime.now();
         visitRepository.finishOutOfDateVisits(time);
         System.out.println("finishOutOfDateVisits function run at " + time);
 
+    }
+
+    public OpResult<VisitUpdateResult, Visit> updateVisit(int id, VisitRequest visitReq) {
+        if (visitReq.getAnimal() != null || visitReq.getClient() != null || visitReq.getPrice() != null
+            || visitReq.getDuration() != null || visitReq.getStartTime() != null || visitReq.getVet() != null){
+
+            return OpResult.fail(VisitUpdateResult.ILLEGAL_FIELD);
+        }
+
+        var visit = visitRepository.findById(id);
+        if (visit.isPresent()) {
+            if (visitReq.getDescription() != null) {
+                visit.get().setDescription(visitReq.getDescription());
+            }
+            if (visitReq.getStatus() != null) {
+                Status status = visitReq.getStatus();
+                if (status != Status.CANCELLED  &&  status != Status.FINISHED && status != Status.NOT_APPEARED){
+                    return OpResult.fail(VisitUpdateResult.ILLEGAL_VALUE);
+                }
+                visit.get().setStatus(visitReq.getStatus());
+            }
+            Visit v = visitRepository.save(visit.get());
+
+            return OpResult.success(v);
+
+        }
+        return OpResult.fail(VisitUpdateResult.VISIT_NOT_FOUND);
     }
 }
