@@ -19,8 +19,10 @@
                     <th>Start time</th>
                     <th>Duration</th>
                     <th>Animal</th>
+                    <th>Owner</th>
                     <th>Status</th>
                     <th>Price</th>
+                    <th>Description</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -28,8 +30,10 @@
                     <td th:text="${visit.startTime}"></td>
                     <td th:text="${visit.duration}"></td>
                     <td th:text="${visit.animal?.name}"></td>
+                    <td th:text="${visit.client?.name != null} ? ${visit.client.name} : ' ' + ' ' + (${visit.client?.surname != null} ? ${visit.client.surname} : ' ')" ></td>
                     <td th:text="${visit.status}"></td>
                     <td th:text="${visit.price}"></td>
+                    <td th:text="${visit.description}"></td>
     <!--                <td><a th:href="@{/edit/{id}(id=${user.id})}">Edit</a></td>-->
     <!--                <td><a th:href="@{/delete/{id}(id=${user.id})}">Delete</a></td>-->
                 </tr>
