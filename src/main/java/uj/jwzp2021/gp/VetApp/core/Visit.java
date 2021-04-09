@@ -49,11 +49,5 @@ public class Visit {
         return new Visit(-1, startTime, duration, Status.PLANNED, price, animal, client, vet, null);
     }
 
-    public void notAppeared(String note) {
 
-    }
-
-    public void notAppeared() {
-
-    }
 }

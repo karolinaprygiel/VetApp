@@ -18,6 +18,6 @@ public interface VisitRepository extends JpaRepository<Visit, Integer> {
 
     @Transactional
     @Modifying
-    @Query("update visits v set v.status = uj.jwzp2021.gp.VetApp.core.Status.FINISHED_AUTOMATICALLY WHERE (v.startTime + v.duration) < :time")
+    @Query("update visits v set v.status = uj.jwzp2021.gp.VetApp.core.Status.FINISHED_AUTOMATICALLY WHERE (v.startTime + v.duration) < :time and v.status = uj.jwzp2021.gp.VetApp.core.Status.PLANNED")
     void finishOutOfDateVisits(LocalDateTime time);
 }
