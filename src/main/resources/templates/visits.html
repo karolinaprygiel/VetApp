@@ -27,7 +27,7 @@
                 <tr th:each="visit : ${visits}">
                     <td th:text="${visit.startTime}"></td>
                     <td th:text="${visit.duration}"></td>
-                    <td th:text="${visit.animal}"></td>
+                    <td th:text="${visit.animal?.name}"></td>
                     <td th:text="${visit.status}"></td>
                     <td th:text="${visit.price}"></td>
     <!--                <td><a th:href="@{/edit/{id}(id=${user.id})}">Edit</a></td>-->
