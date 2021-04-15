@@ -6,8 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uj.jwzp2021.gp.VetApp.core.Visit;
 import uj.jwzp2021.gp.VetApp.services.VisitCreationResult;
-import uj.jwzp2021.gp.VetApp.services.VisitUpdateResult;
 import uj.jwzp2021.gp.VetApp.services.VisitService;
+import uj.jwzp2021.gp.VetApp.services.VisitUpdateResult;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class VisitsRestController {
         this.visitsService = visitsService;
     }
 
-    @GetMapping(path="{id}")
+    @GetMapping(path = "{id}")
     public ResponseEntity<?> getVisit(@PathVariable int id) {
         return visitsService.getVisitById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
@@ -44,7 +44,7 @@ public class VisitsRestController {
     }
 
     @PatchMapping(path = "/{id}")
-    ResponseEntity<?> update(@PathVariable int id, @RequestBody VisitRequest visitReq){
+    ResponseEntity<?> update(@PathVariable int id, @RequestBody VisitRequest visitReq) {
         var result = visitsService.updateVisit(id, visitReq);
         return result.map(this::visitUpdateResultToBadRequest, this::visitToResult);
 
@@ -69,7 +69,7 @@ public class VisitsRestController {
     }
 
     private ResponseEntity<?> visitUpdateResultToBadRequest(VisitUpdateResult result) {
-        switch(result){
+        switch (result) {
             case VISIT_NOT_FOUND:
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"reason\": \"Visit with such id was not found.\"}");
             case ILLEGAL_FIELD:

@@ -20,5 +20,4 @@ public class VisitRequest {
     private final Vet vet;
     private final String description;
     private final Status status;
-
 }

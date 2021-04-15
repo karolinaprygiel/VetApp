@@ -12,7 +12,7 @@ public class VetAppApplication {
 
 		SpringApplication.run(VetAppApplication.class, args);
 
-		System.out.println("Hello world!");
+		System.out.println("I AM ALIVE!!!");
 	}
 
 }

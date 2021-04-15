@@ -74,7 +74,7 @@ public class VisitService {
 
     public OpResult<VisitUpdateResult, Visit> updateVisit(int id, VisitRequest visitReq) {
         if (visitReq.getAnimal() != null || visitReq.getClient() != null || visitReq.getPrice() != null
-            || visitReq.getDuration() != null || visitReq.getStartTime() != null || visitReq.getVet() != null){
+                || visitReq.getDuration() != null || visitReq.getStartTime() != null || visitReq.getVet() != null) {
 
             return OpResult.fail(VisitUpdateResult.ILLEGAL_FIELD);
         }
@@ -86,7 +86,7 @@ public class VisitService {
             }
             if (visitReq.getStatus() != null) {
                 Status status = visitReq.getStatus();
-                if (status != Status.CANCELLED  &&  status != Status.FINISHED && status != Status.NOT_APPEARED){
+                if (status != Status.CANCELLED && status != Status.FINISHED && status != Status.NOT_APPEARED) {
                     return OpResult.fail(VisitUpdateResult.ILLEGAL_VALUE);
                 }
                 visit.get().setStatus(visitReq.getStatus());
