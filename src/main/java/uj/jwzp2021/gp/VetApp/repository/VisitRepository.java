@@ -1,10 +1,10 @@
-package uj.jwzp2021.gp.VetApp.repos;
+package uj.jwzp2021.gp.VetApp.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import uj.jwzp2021.gp.VetApp.core.Visit;
+import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -18,6 +18,6 @@ public interface VisitRepository extends JpaRepository<Visit, Integer> {
 
     @Transactional
     @Modifying
-    @Query("update visits v set v.status = uj.jwzp2021.gp.VetApp.core.Status.FINISHED_AUTOMATICALLY WHERE (v.startTime + v.duration) < :time and v.status = uj.jwzp2021.gp.VetApp.core.Status.PLANNED")
+    @Query("update visits v set v.status = uj.jwzp2021.gp.VetApp.model.entity.Status.FINISHED_AUTOMATICALLY WHERE (v.startTime + v.duration) < :time and v.status = uj.jwzp2021.gp.VetApp.model.entity.Status.PLANNED")
     void finishOutOfDateVisits(LocalDateTime time);
 }

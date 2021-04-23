@@ -1,11 +1,11 @@
-package uj.jwzp2021.gp.VetApp.controllers.thyme;
+package uj.jwzp2021.gp.VetApp.controller.thyme;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import uj.jwzp2021.gp.VetApp.services.VisitService;
+import uj.jwzp2021.gp.VetApp.service.VisitService;
 
 @Controller
 @RequestMapping("/ui")

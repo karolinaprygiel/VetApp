@@ -1,13 +1,15 @@
-package uj.jwzp2021.gp.VetApp.services;
+package uj.jwzp2021.gp.VetApp.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import uj.jwzp2021.gp.VetApp.controllers.rest.VisitRequest;
-import uj.jwzp2021.gp.VetApp.core.Status;
-import uj.jwzp2021.gp.VetApp.core.Visit;
-import uj.jwzp2021.gp.VetApp.repos.VisitRepository;
+import uj.jwzp2021.gp.VetApp.model.dto.VisitRequest;
+import uj.jwzp2021.gp.VetApp.model.entity.Status;
+import uj.jwzp2021.gp.VetApp.model.entity.Visit;
+import uj.jwzp2021.gp.VetApp.repository.VisitRepository;
 import uj.jwzp2021.gp.VetApp.util.OpResult;
+import uj.jwzp2021.gp.VetApp.util.VisitCreationResult;
+import uj.jwzp2021.gp.VetApp.util.VisitUpdateResult;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

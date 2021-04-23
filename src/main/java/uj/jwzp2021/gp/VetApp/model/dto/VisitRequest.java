@@ -1,10 +1,10 @@
-package uj.jwzp2021.gp.VetApp.controllers.rest;
+package uj.jwzp2021.gp.VetApp.model.dto;
 
 import lombok.Data;
-import uj.jwzp2021.gp.VetApp.core.Animal;
-import uj.jwzp2021.gp.VetApp.core.Client;
-import uj.jwzp2021.gp.VetApp.core.Status;
-import uj.jwzp2021.gp.VetApp.core.Vet;
+import uj.jwzp2021.gp.VetApp.model.entity.Animal;
+import uj.jwzp2021.gp.VetApp.model.entity.Client;
+import uj.jwzp2021.gp.VetApp.model.entity.Status;
+import uj.jwzp2021.gp.VetApp.model.entity.Vet;
 
 import java.math.BigDecimal;
 import java.time.Duration;

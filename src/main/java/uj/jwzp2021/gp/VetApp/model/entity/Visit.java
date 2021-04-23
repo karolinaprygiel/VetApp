@@ -1,4 +1,4 @@
-package uj.jwzp2021.gp.VetApp.core;
+package uj.jwzp2021.gp.VetApp.model.entity;
 
 import com.vladmihalcea.hibernate.type.interval.PostgreSQLIntervalType;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package uj.jwzp2021.gp.VetApp.services;
+package uj.jwzp2021.gp.VetApp.util;
 
 public enum VisitUpdateResult {
     REPOSITORY_PROBLEM,
