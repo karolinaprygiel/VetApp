@@ -1,7 +1,9 @@
 package uj.jwzp2021.gp.VetApp.controller.rest;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitRequest;
@@ -10,10 +12,11 @@ import uj.jwzp2021.gp.VetApp.service.VisitService;
 import uj.jwzp2021.gp.VetApp.util.VisitCreationResult;
 import uj.jwzp2021.gp.VetApp.util.VisitUpdateResult;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/api/visits")
+@RequestMapping(path = "/api/visits", produces = MediaType.APPLICATION_JSON_VALUE)
 public class VisitsRestController {
 
   private final VisitService visitsService;
@@ -61,7 +64,7 @@ public class VisitsRestController {
     switch (result) {
       case TOO_SOON:
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
-            .body("Booking for less than an hour in the future is prohibited.");
+            .body(Collections.singletonMap("response", "Booking for less than an hour in the future is prohibited."));
       case OVERLAP:
         return ResponseEntity.status(HttpStatus.CONFLICT).body("Overlapping with other visit.");
       case REPOSITORY_PROBLEM:
