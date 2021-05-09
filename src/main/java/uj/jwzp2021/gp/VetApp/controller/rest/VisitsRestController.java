@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitRequest;
 import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.service.VisitService;
-import uj.jwzp2021.gp.VetApp.util.VisitCreationResult;
-import uj.jwzp2021.gp.VetApp.util.VisitUpdateResult;
+import uj.jwzp2021.gp.VetApp.util.VisitCreationError;
+import uj.jwzp2021.gp.VetApp.util.VisitUpdateError;
 
 import java.util.List;
 
@@ -58,14 +58,17 @@ public class VisitsRestController {
     return ResponseEntity.status(HttpStatus.CREATED).body(visit);
   }
 
-  private ResponseEntity<?> visitCreationResultToBadRequest(VisitCreationResult result) {
+  private ResponseEntity<?> visitCreationResultToBadRequest(VisitCreationError result) {
     switch (result) {
+      case STARTS_IN_PAST:
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(RestUtil.response("Can not book a visit in the past."));
       case TOO_SOON:
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
             .body(RestUtil.response("Booking for less than an hour in the future is prohibited."));
       case OVERLAP:
         return ResponseEntity.status(HttpStatus.CONFLICT)
-            .body(RestUtil.response( "Overlapping with other visit."));
+            .body(RestUtil.response("Overlapping with other visit."));
       case REPOSITORY_PROBLEM:
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(RestUtil.response("Problem with server, please try again later."));
@@ -74,7 +77,7 @@ public class VisitsRestController {
     }
   }
 
-  private ResponseEntity<?> visitUpdateResultToBadRequest(VisitUpdateResult result) {
+  private ResponseEntity<?> visitUpdateResultToBadRequest(VisitUpdateError result) {
     switch (result) {
       case VISIT_NOT_FOUND:
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -85,7 +88,8 @@ public class VisitsRestController {
       case ILLEGAL_VALUE:
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
             .body(
-                RestUtil.response("You can set status only to FINISHED, CANCELLED and NOT_APPEARD values."));
+                RestUtil.response(
+                    "You can set status only to FINISHED, CANCELLED and NOT_APPEARD values."));
       case REPOSITORY_PROBLEM:
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(RestUtil.response("Problem with server, please try again later."));
