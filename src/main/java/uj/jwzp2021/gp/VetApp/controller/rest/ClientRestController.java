@@ -23,14 +23,18 @@ public class ClientRestController {
     }
 
     @GetMapping(path = "{id}")
-    public ResponseEntity<?> getClient(@PathVariable int id){
+    public ResponseEntity<?> getClient(@PathVariable int id) {
         return clientService.getClientById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping
-    public List<Client> getAllClients(){return clientService.getAllClients();}
+    public List<Client> getAllClients() {
+        return clientService.getAllClients();
+    }
 
-
-
+    @DeleteMapping(path = "/{id}")
+    void deleteClient(@PathVariable int id){
+        clientService.deleteClient(id);
+    }
 
 }

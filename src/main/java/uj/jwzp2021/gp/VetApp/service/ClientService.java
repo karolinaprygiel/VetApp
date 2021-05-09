@@ -26,5 +26,13 @@ public class ClientService {
         return clientRepository.findById(id);
     }
 
-
+    public boolean deleteClient(int id) {
+        var client = clientRepository.findById(id);
+        if (client.isPresent()) {
+            clientRepository.deleteById(client.get().getId());
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
