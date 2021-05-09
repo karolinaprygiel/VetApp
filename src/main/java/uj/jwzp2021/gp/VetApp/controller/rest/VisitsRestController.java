@@ -72,6 +72,7 @@ public class VisitsRestController {
     private ResponseEntity<?> visitUpdateResultToBadRequest(VisitUpdateResult result) {
         switch (result) {
             case VISIT_NOT_FOUND:
+                // todo: nicer JSON usage (JSON mapper)
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"reason\": \"Visit with such id was not found.\"}");
             case ILLEGAL_FIELD:
                 return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("{\"reason\": \"You can modify only status and description.\"}");
