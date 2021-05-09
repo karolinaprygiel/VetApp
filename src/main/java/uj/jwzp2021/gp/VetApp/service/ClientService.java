@@ -2,9 +2,12 @@ package uj.jwzp2021.gp.VetApp.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uj.jwzp2021.gp.VetApp.model.dto.ClientRequest;
 import uj.jwzp2021.gp.VetApp.model.entity.Client;
 import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.repository.ClientRepository;
+import uj.jwzp2021.gp.VetApp.util.ClientCreationResult;
+import uj.jwzp2021.gp.VetApp.util.OperationResult;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,5 +37,11 @@ public class ClientService {
         } else {
             return false;
         }
+    }
+
+    public OperationResult<ClientCreationResult, Client> createClient(ClientRequest clientRequest) {
+        Client c = clientRepository.save(Client.newClient(clientRequest.getName(), clientRequest.getSurname()));
+        return OperationResult.success(c);
+
     }
 }

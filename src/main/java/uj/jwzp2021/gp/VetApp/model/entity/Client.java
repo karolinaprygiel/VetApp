@@ -25,4 +25,8 @@ public class Client {
 //    @OneToMany(mappedBy = "clients")
 //    private final List<Animal> animals;
 
+
+    public static Client newClient(String name, String surname){
+        return new Client(-1, name, surname);
+    }
 }
