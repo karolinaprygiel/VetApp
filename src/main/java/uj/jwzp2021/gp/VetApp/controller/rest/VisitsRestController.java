@@ -1,6 +1,5 @@
 package uj.jwzp2021.gp.VetApp.controller.rest;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,7 +11,6 @@ import uj.jwzp2021.gp.VetApp.service.VisitService;
 import uj.jwzp2021.gp.VetApp.util.VisitCreationResult;
 import uj.jwzp2021.gp.VetApp.util.VisitUpdateResult;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -64,14 +62,15 @@ public class VisitsRestController {
     switch (result) {
       case TOO_SOON:
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-            .body(Collections.singletonMap("response", "Booking for less than an hour in the future is prohibited."));
+            .body(RestUtil.response("Booking for less than an hour in the future is prohibited."));
       case OVERLAP:
-        return ResponseEntity.status(HttpStatus.CONFLICT).body("Overlapping with other visit.");
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+            .body(RestUtil.response( "Overlapping with other visit."));
       case REPOSITORY_PROBLEM:
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("Problem with server, please try again later.");
+            .body(RestUtil.response("Problem with server, please try again later."));
       default:
-        return ResponseEntity.badRequest().body("{\"reason\": \"Unknown.\"}");
+        return ResponseEntity.badRequest().body(RestUtil.response("Unknown error."));
     }
   }
 
@@ -79,19 +78,19 @@ public class VisitsRestController {
     switch (result) {
       case VISIT_NOT_FOUND:
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body("{\"reason\": \"Visit with such id was not found.\"}");
+            .body(RestUtil.response("Visit with such id was not found."));
       case ILLEGAL_FIELD:
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
-            .body("{\"reason\": \"You can modify only status and description.\"}");
+            .body(RestUtil.response("You can modify only status and description."));
       case ILLEGAL_VALUE:
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
             .body(
-                "{\"reason\": \"You can set status only to FINISHED, CANCELLED and NOT_APPEARD values.\"}");
+                RestUtil.response("You can set status only to FINISHED, CANCELLED and NOT_APPEARD values."));
       case REPOSITORY_PROBLEM:
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("{\"reason\": \"Problem with server, please try again later.\"}");
+            .body(RestUtil.response("Problem with server, please try again later."));
       default:
-        return ResponseEntity.badRequest().body("{\"reason\": \"Unknown.\"}");
+        return ResponseEntity.badRequest().body(RestUtil.response("Unknown error."));
     }
   }
 }
