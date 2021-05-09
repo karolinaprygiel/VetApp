@@ -48,7 +48,6 @@ public class VisitsRestController {
     ResponseEntity<?> update(@PathVariable int id, @RequestBody VisitRequest visitReq) {
         var result = visitsService.updateVisit(id, visitReq);
         return result.map(this::visitUpdateResultToBadRequest, this::visitToResult);
-
     }
 
 
@@ -59,11 +58,11 @@ public class VisitsRestController {
     private ResponseEntity<?> visitCreationResultToBadRequest(VisitCreationResult result) {
         switch (result) {
             case TOO_SOON:
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"reason\": \"Booking for less than an hour in the future is prohibited.\"}");
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Booking for less than an hour in the future is prohibited.");
             case OVERLAP:
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"reason\": \"Overlapping with other visit.\"}");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Overlapping with other visit.");
             case REPOSITORY_PROBLEM:
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"reason\": \"Problem with server, please try again later.\"}");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Problem with server, please try again later.");
             default:
                 return ResponseEntity.badRequest().body("{\"reason\": \"Unknown.\"}");
         }
