@@ -28,11 +28,12 @@ public class ClientRestController {
 
 
 
-//    @GetMapping
-//    @ResponseBody
-//    public List<ClientDto> getAll() {
-//
-//    }
+    @GetMapping
+    @ResponseBody
+    public ResponseEntity<?> getAll() {
+      var clients = clientService.getAll();
+      return ResponseEntity.ok(clients);
+    }
 
     @PostMapping
     public ResponseEntity<?>createClient(@RequestBody ClientRequestDto clientRequestDto){
