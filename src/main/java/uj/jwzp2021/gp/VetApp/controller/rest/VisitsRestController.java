@@ -15,7 +15,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/visits", produces = MediaType.APPLICATION_JSON_VALUE)
-public class VisitsRestController {
+public class
+VisitsRestController {
 
   private final VisitService visitsService;
 
