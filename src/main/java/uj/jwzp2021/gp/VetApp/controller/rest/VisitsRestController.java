@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uj.jwzp2021.gp.VetApp.model.dto.VisitRequest;
+import uj.jwzp2021.gp.VetApp.model.dto.VisitRequestDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.service.VisitService;
 import uj.jwzp2021.gp.VetApp.util.VisitCreationError;
@@ -38,7 +38,7 @@ public class VisitsRestController {
   }
 
   @PostMapping()
-  public ResponseEntity<?> createVisit(@RequestBody VisitRequest visitReq) {
+  public ResponseEntity<?> createVisit(@RequestBody VisitRequestDto visitReq) {
     var result = visitsService.createVisit(visitReq);
     return result.map(this::visitCreationResultToBadRequest, this::visitToResult);
   }
@@ -49,7 +49,7 @@ public class VisitsRestController {
   }
 
   @PatchMapping(path = "/{id}")
-  ResponseEntity<?> update(@PathVariable int id, @RequestBody VisitRequest visitReq) {
+  ResponseEntity<?> update(@PathVariable int id, @RequestBody VisitRequestDto visitReq) {
     var result = visitsService.updateVisit(id, visitReq);
     return result.map(this::visitUpdateResultToBadRequest, this::visitToResult);
   }

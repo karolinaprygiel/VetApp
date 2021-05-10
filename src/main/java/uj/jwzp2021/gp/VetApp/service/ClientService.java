@@ -2,7 +2,7 @@ package uj.jwzp2021.gp.VetApp.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uj.jwzp2021.gp.VetApp.model.dto.ClientRequest;
+import uj.jwzp2021.gp.VetApp.model.dto.ClientRequestDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Client;
 import uj.jwzp2021.gp.VetApp.repository.ClientRepository;
 import uj.jwzp2021.gp.VetApp.util.ClientCreationError;
@@ -33,10 +33,10 @@ public class ClientService {
       client.ifPresent(value -> clientRepository.deleteById(value.getId()));
   }
 
-  public OperationResult<ClientCreationError, Client> createClient(ClientRequest clientRequest) {
+  public OperationResult<ClientCreationError, Client> createClient(ClientRequestDto clientRequestDto) {
     Client c =
         clientRepository.save(
-            Client.newClient(clientRequest.getName(), clientRequest.getSurname()));
+            Client.newClient(clientRequestDto.getName(), clientRequestDto.getSurname()));
     return OperationResult.success(c);
   }
 }

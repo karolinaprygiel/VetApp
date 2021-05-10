@@ -11,7 +11,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Data
-public class VisitRequest {
+public class VisitRequestDto {
     private final LocalDateTime startTime;
     private final Duration duration;
     private final Animal animal;

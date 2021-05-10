@@ -5,12 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uj.jwzp2021.gp.VetApp.model.dto.ClientRequest;
+import uj.jwzp2021.gp.VetApp.model.dto.ClientRequestDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Client;
 import uj.jwzp2021.gp.VetApp.service.ClientService;
 import uj.jwzp2021.gp.VetApp.util.ClientCreationError;
-
-import java.util.List;
 
 @RequestMapping("api/clients")
 @RestController
@@ -37,8 +35,8 @@ public class ClientRestController {
 //    }
 
     @PostMapping
-    public ResponseEntity<?>createClient(@RequestBody ClientRequest clientRequest){
-        var result = clientService.createClient(clientRequest);
+    public ResponseEntity<?>createClient(@RequestBody ClientRequestDto clientRequestDto){
+        var result = clientService.createClient(clientRequestDto);
         return result.map(this::clientCreationResultBadRequest, this::clientToResult);
     }
 

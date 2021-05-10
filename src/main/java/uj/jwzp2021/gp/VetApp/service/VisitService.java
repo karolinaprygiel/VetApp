@@ -3,7 +3,7 @@ package uj.jwzp2021.gp.VetApp.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import uj.jwzp2021.gp.VetApp.model.dto.VisitRequest;
+import uj.jwzp2021.gp.VetApp.model.dto.VisitRequestDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Status;
 import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.repository.VisitRepository;
@@ -30,7 +30,7 @@ public class VisitService {
     return visitRepository.findAll();
   }
 
-  public OperationResult<VisitCreationError, Visit> createVisit(VisitRequest req) {
+  public OperationResult<VisitCreationError, Visit> createVisit(VisitRequestDto req) {
     if (dateInPast(req.getStartTime())) {
       return OperationResult.fail(VisitCreationError.STARTS_IN_PAST);
     }
@@ -89,7 +89,7 @@ public class VisitService {
     System.out.println("finishOutOfDateVisits function run at " + time);
   }
 
-  public OperationResult<VisitUpdateError, Visit> updateVisit(int id, VisitRequest visitReq) {
+  public OperationResult<VisitUpdateError, Visit> updateVisit(int id, VisitRequestDto visitReq) {
     if (visitReq.getAnimal() != null
         || visitReq.getClient() != null
         || visitReq.getPrice() != null
