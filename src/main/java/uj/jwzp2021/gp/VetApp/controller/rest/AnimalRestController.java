@@ -48,7 +48,7 @@ public class AnimalRestController {
     if (result.isPresent()) {
       return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
-    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
         .body(RestUtil.response("Owner with such id was not found."));
   }
 
