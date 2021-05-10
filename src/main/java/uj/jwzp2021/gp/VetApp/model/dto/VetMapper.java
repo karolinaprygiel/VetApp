@@ -13,6 +13,4 @@ public class VetMapper {
         vet.getShiftEnd()
     );
   }
-
-
 }
