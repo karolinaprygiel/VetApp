@@ -23,10 +23,11 @@ public class ClientService {
     this.clientRepository = clientRepository;
   }
 
-  public List<ClientResponseDto> getAll() {
-    var clients =  clientRepository.findAll();
-    var clientDtis = clients.stream().map(ClientMapper::toClientResponseDto).collect(Collectors.toList());
-    return clientDtis;
+  public List<Client> getAll() {
+//    var clients =  clientRepository.findAll();
+//    var clientDtis = clients.stream().map(ClientMapper::toClientResponseDto).collect(Collectors.toList());
+//    return clientDtis;
+    return clientRepository.findAll();
   }
 
   public Optional<Client> getClientById(int id) {
