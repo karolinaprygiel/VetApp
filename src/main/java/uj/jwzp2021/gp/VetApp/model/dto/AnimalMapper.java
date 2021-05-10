@@ -16,13 +16,4 @@ public class AnimalMapper {
         animal.getOwner().getName(),
         animal.getOwner().getSurname());
   }
-
-  public static Animal toAnimal(AnimalRequestDto animalRequestDto, Client owner) {
-    return new Animal(
-        -1,
-        animalRequestDto.getType(),
-        animalRequestDto.getName(),
-        animalRequestDto.getYearOfBirth(),
-        owner);
-  }
 }

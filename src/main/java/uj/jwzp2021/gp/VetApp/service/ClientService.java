@@ -25,7 +25,8 @@ public class ClientService {
   }
 
   public Optional<Client> getClientById(int id) {
-    return clientRepository.findById(id);
+    var client = clientRepository.findById(id);
+    return client;
   }
 
   public void deleteClient(int id) {
