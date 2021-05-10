@@ -2,7 +2,7 @@ package uj.jwzp2021.gp.VetApp.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uj.jwzp2021.gp.VetApp.model.dto.AnimalDtoMapper;
+import uj.jwzp2021.gp.VetApp.model.dto.AnimalMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.AnimalRequestDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Animal;
 import uj.jwzp2021.gp.VetApp.repository.AnimalRepository;
@@ -42,7 +42,7 @@ public class AnimalService {
     Animal animal = null;
     var owner = clientService.getClientById(animalRequestDto.getOwnerId());
     if (owner.isPresent()) {
-      animal = animalRepository.save(AnimalDtoMapper.toAnimal(animalRequestDto, owner.get()));
+      animal = animalRepository.save(AnimalMapper.toAnimal(animalRequestDto, owner.get()));
     }
     return Optional.ofNullable(animal);
   }

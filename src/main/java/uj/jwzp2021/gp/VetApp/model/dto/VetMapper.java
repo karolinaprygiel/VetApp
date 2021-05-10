@@ -13,4 +13,13 @@ public class VetMapper {
         vet.getShiftEnd()
     );
   }
+
+  public static Vet toVet(VetRequestDto vetRequestDto) {
+    return new Vet(
+            -1,
+            vetRequestDto.getName(),
+            vetRequestDto.getSurname(),
+            vetRequestDto.getShiftStart(),
+            vetRequestDto.getShiftEnd());
+  }
 }
