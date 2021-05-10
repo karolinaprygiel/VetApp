@@ -6,12 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uj.jwzp2021.gp.VetApp.model.dto.ClientRequest;
-import uj.jwzp2021.gp.VetApp.model.dto.VisitRequest;
-import uj.jwzp2021.gp.VetApp.model.entity.Animal;
 import uj.jwzp2021.gp.VetApp.model.entity.Client;
-import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.service.ClientService;
-import uj.jwzp2021.gp.VetApp.util.ClientCreationResult;
+import uj.jwzp2021.gp.VetApp.util.ClientCreationError;
 
 import java.util.List;
 
@@ -26,16 +23,18 @@ public class ClientRestController {
         this.clientService = clientService;
     }
 
-    @GetMapping(path = "{id}")
+    @GetMapping(path = "/{id}")
     public ResponseEntity<?> getClient(@PathVariable int id) {
         return clientService.getClientById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
 
-    @GetMapping
-    public List<Client> getAllClients() {
-        return clientService.getAllClients();
-    }
+
+//    @GetMapping
+//    @ResponseBody
+//    public List<ClientDto> getAll() {
+//
+//    }
 
     @PostMapping
     public ResponseEntity<?>createClient(@RequestBody ClientRequest clientRequest){
@@ -52,7 +51,7 @@ public class ClientRestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(client);
     }
 
-    private ResponseEntity<?> clientCreationResultBadRequest(ClientCreationResult result){
+    private ResponseEntity<?> clientCreationResultBadRequest(ClientCreationError result){
         return ResponseEntity.badRequest().body(RestUtil.response("Unknown error."));
     }
 

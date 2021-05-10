@@ -1,10 +1,13 @@
 package uj.jwzp2021.gp.VetApp.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -18,9 +21,9 @@ public class Client {
 
     private String name;
     private String surname;
-
-//    @OneToMany(mappedBy = "clients")
-//    private final List<Visit> visits;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
+    private final List<Animal> animals = new ArrayList<>();
 //
 //    @OneToMany(mappedBy = "clients")
 //    private final List<Animal> animals;
