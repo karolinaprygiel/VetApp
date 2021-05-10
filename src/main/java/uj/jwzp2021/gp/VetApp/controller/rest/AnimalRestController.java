@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uj.jwzp2021.gp.VetApp.model.dto.AnimalMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.AnimalRequestDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Animal;
 import uj.jwzp2021.gp.VetApp.service.AnimalService;
@@ -26,10 +27,13 @@ public class AnimalRestController {
 
   @GetMapping(path = "{id}")
   public ResponseEntity<?> getAnimal(@PathVariable int id) {
-    return animalService
-        .getAnimalById(id)
-        .map(ResponseEntity::ok)
-        .orElse(ResponseEntity.notFound().build());
+    var animal = animalService.getAnimalById(id);
+    if (animal.isPresent()) {
+      var animalDto = AnimalMapper.toAnimalResponseDto(animal.get());
+      return ResponseEntity.ok(animalDto);
+    }
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        .body(RestUtil.response("No animal with such ID found."));
   }
 
   @GetMapping
