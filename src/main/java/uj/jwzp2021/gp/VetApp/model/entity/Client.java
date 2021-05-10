@@ -1,5 +1,6 @@
 package uj.jwzp2021.gp.VetApp.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "clients")
+@JsonIgnoreProperties({"hibernateLazyInitializer","referenceList", "animals"})
 public class Client {
 
     @Id
@@ -21,7 +23,6 @@ public class Client {
 
     private String name;
     private String surname;
-    @JsonManagedReference
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
     private final List<Animal> animals = new ArrayList<>();
 //

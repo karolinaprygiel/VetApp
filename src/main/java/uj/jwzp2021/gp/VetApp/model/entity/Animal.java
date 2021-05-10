@@ -26,7 +26,6 @@ public class Animal {
     //private int monthOfBirth;
     //private int dayOfBirth;
     //private LocalDateTime birthDate;
-    @JsonBackReference
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "client_id", referencedColumnName = "id", nullable = false)
     private Client owner;

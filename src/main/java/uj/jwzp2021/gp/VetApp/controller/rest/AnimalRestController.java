@@ -11,6 +11,7 @@ import uj.jwzp2021.gp.VetApp.model.entity.Animal;
 import uj.jwzp2021.gp.VetApp.service.AnimalService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/animals")
@@ -37,8 +38,8 @@ public class AnimalRestController {
   }
 
   @GetMapping
-  public List<Animal> getAllAnimals() {
-    return animalService.getAllAnimals();
+  public ResponseEntity<?> getAllAnimals() {
+    return ResponseEntity.ok(animalService.getAllAnimals().stream().map(AnimalMapper::toAnimalResponseDto).collect(Collectors.toList()));
   }
 
   @PostMapping
