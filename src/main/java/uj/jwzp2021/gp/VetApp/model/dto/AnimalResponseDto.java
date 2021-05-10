@@ -11,7 +11,7 @@ public class AnimalResponseDto {
   private String animalType;
   private String name;
   private int yearOfBirth;
-  private int clientId;
-  private String clientName;
-  private String clientSurname;
+  private int ownerId;
+  private String ownerName;
+  private String ownerSurname;
 }
