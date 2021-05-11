@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class Vet {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
     private String name;

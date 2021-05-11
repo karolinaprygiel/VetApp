@@ -19,11 +19,14 @@ repositories {
 }
 
 dependencies {
+    compile 'org.apache.commons:commons-lang3:3.6'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation group: 'org.springframework.hateoas', name: 'spring-hateoas', version: '1.2.5'
 	implementation 'org.flywaydb:flyway-core'
 	implementation 'com.vladmihalcea:hibernate-types-52:2.10.2'
+	implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.4.2'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'

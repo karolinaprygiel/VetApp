@@ -1,6 +1,6 @@
 package uj.jwzp2021.gp.VetApp.model.entity;
 
-public enum Status {
+public enum VisitStatus {
     PLANNED,
     CANCELLED,
     NOT_APPEARED,

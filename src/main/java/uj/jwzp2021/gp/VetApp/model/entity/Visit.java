@@ -22,31 +22,33 @@ public class Visit {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private int id;
 
+    @Column(name = "start_time")
     private LocalDateTime startTime;
 
     @Column(columnDefinition = "interval")
     private Duration duration;
 
-    private Status status;
+    @Column(name = "visit_status")
+    private VisitStatus visitStatus;
 
     private BigDecimal price;
 
     @ManyToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name = "animal_id")
+    @JoinColumn(name = "animal_id", referencedColumnName = "id")
     private Animal animal;
 
     @ManyToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name = "client_id")
+    @JoinColumn(name = "client_id", referencedColumnName = "id")
     private Client client;
 
     @ManyToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name = "vet_id")
+    @JoinColumn(name = "vet_id", referencedColumnName = "id")
     private Vet vet;
 
     private String description;
 
     public static Visit newVisit(LocalDateTime startTime, Duration duration, Animal animal, BigDecimal price, Client client, Vet vet) {
-        return new Visit(-1, startTime, duration, Status.PLANNED, price, animal, client, vet, null);
+        return new Visit(-1, startTime, duration, VisitStatus.PLANNED, price, animal, client, vet, null);
     }
 
 
