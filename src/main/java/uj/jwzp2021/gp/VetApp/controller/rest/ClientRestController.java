@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uj.jwzp2021.gp.VetApp.model.dto.AnimalMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.ClientMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.ClientRequestDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Client;
@@ -26,15 +27,18 @@ public class ClientRestController {
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<?> getClient(@PathVariable int id) {
-        return clientService.getClientById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        var client = clientService.getClientById(id);
+        if (client.isPresent()) {
+            return ResponseEntity.ok(ClientMapper.toClientResponseDto(client.get()));
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(RestUtil.response("No client with such ID found."));
     }
 
 
 
     @GetMapping
     public ResponseEntity<?> getAllClients() {
-//      var clients = clientService.getAll();
-//      return ResponseEntity.ok(clients);
       return ResponseEntity.ok(clientService.getAll().stream().map(ClientMapper::toClientResponseDto).collect(Collectors.toList()));
     }
 
@@ -45,12 +49,17 @@ public class ClientRestController {
     }
 
     @DeleteMapping(path = "/{id}")
-    void deleteClient(@PathVariable int id){
-        clientService.deleteClient(id);
+    public ResponseEntity<?> deleteClient(@PathVariable int id){
+
+        return clientService
+            .deleteClient(id)
+            .map(client -> ResponseEntity.accepted().body(ClientMapper.toClientResponseDto(client)))
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+
     private ResponseEntity<?> clientToResult(Client client) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(client);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ClientMapper.toClientResponseDto(client));
     }
 
     private ResponseEntity<?> clientCreationResultBadRequest(ClientCreationError result){

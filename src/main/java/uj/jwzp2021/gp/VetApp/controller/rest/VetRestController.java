@@ -11,7 +11,6 @@ import uj.jwzp2021.gp.VetApp.model.dto.VetMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.VetRequestDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Client;
 import uj.jwzp2021.gp.VetApp.model.entity.Vet;
-import uj.jwzp2021.gp.VetApp.service.ClientService;
 import uj.jwzp2021.gp.VetApp.service.VetService;
 import uj.jwzp2021.gp.VetApp.util.ClientCreationError;
 
@@ -48,14 +47,14 @@ public class VetRestController {
     @PostMapping
     public ResponseEntity<?> createVet(@RequestBody VetRequestDto vetRequestDto){
         var result = vetService.createVet(vetRequestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+        return ResponseEntity.status(HttpStatus.CREATED).body(VetMapper.toVetResponseDto(result));
     }
 
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<?> deleteVet(@PathVariable int id){
        var result =  vetService.deleteVet(id);
        if (result.isPresent()){
-           return ResponseEntity.accepted().body(result);
+           return ResponseEntity.accepted().body(VetMapper.toVetResponseDto(result.get()));
        }else{
            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                .body(RestUtil.response("No vet with such ID found."));

@@ -35,9 +35,12 @@ public class ClientService {
     return client;
   }
 
-  public void deleteClient(int id) {
+  public Optional<Client> deleteClient(int id) {
     var client = clientRepository.findById(id);
-      client.ifPresent(value -> clientRepository.deleteById(value.getId()));
+    if (client.isPresent()) {
+      clientRepository.deleteById(client.get().getId());
+    }
+    return client;
   }
 
   public OperationResult<ClientCreationError, Client> createClient(ClientRequestDto clientRequestDto) {

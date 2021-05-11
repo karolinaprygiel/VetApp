@@ -46,7 +46,7 @@ public class AnimalRestController {
   public ResponseEntity<?> createAnimal(@RequestBody AnimalRequestDto animalRequestDto) {
     var result = animalService.createAnimal(animalRequestDto);
     if (result.isPresent()) {
-      return ResponseEntity.status(HttpStatus.CREATED).body(result);
+      return ResponseEntity.status(HttpStatus.CREATED).body(AnimalMapper.toAnimalResponseDto(result.get()));
     }
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
         .body(RestUtil.response("Owner with such id was not found."));
@@ -56,7 +56,7 @@ public class AnimalRestController {
   public ResponseEntity<?> deleteAnimal(@PathVariable int id) {
     return animalService
         .deleteAnimal(id)
-        .map(animal -> ResponseEntity.accepted().body(animal))
+        .map(animal -> ResponseEntity.accepted().body(AnimalMapper.toAnimalResponseDto(animal)))
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
 }
