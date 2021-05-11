@@ -22,11 +22,13 @@ public class Visit {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private int id;
 
+    @Column(name = "start_time")
     private LocalDateTime startTime;
 
     @Column(columnDefinition = "interval")
     private Duration duration;
 
+    @Column(name = "visit_status")
     private VisitStatus visitStatus;
 
     private BigDecimal price;
