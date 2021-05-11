@@ -51,9 +51,9 @@ public class VisitService {
       return OperationResult.fail(VisitCreationError.OVERLAP);
     }
     var client = clientService.getClientById(req.getClientId());
-    if (client.isEmpty()){
-      return OperationResult.fail(VisitCreationError.CLIENT_NOT_EXISTS);
-    }
+//    if (client.isEmpty()){
+//      return OperationResult.fail(VisitCreationError.CLIENT_NOT_EXISTS);
+//    }
     var animal = animalService.getAnimalById(req.getAnimalId());
     if (animal.isEmpty()){
       return OperationResult.fail(VisitCreationError.ANIMAL_NOT_EXISTS);
@@ -62,7 +62,8 @@ public class VisitService {
     if (vet.isEmpty()){
       return OperationResult.fail(VisitCreationError.VET_NOT_EXISTS);
     }
-    Visit v = visitRepository.save(VisitMapper.toVisit(req, animal.get(), client.get(), vet.get()));
+    //Visit v = visitRepository.save(VisitMapper.toVisit(req, animal.get(), client.get(), vet.get()));
+    Visit v = visitRepository.save(VisitMapper.toVisit(req, animal.get(), client, vet.get()));
 
     return OperationResult.success(v);
   }

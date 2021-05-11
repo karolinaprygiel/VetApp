@@ -41,9 +41,10 @@ public class AnimalService {
   public Optional<Animal> createAnimal(AnimalRequestDto animalRequestDto) {
     Animal animal = null;
     var owner = clientService.getClientById(animalRequestDto.getOwnerId());
-    if (owner.isPresent()) {
-      animal = animalRepository.save(AnimalMapper.toAnimal(animalRequestDto, owner.get()));
-    }
+//    if (owner.isPresent()) {
+//      animal = animalRepository.save(AnimalMapper.toAnimal(animalRequestDto, owner.get()));
+//    }
+    animal = animalRepository.save(AnimalMapper.toAnimal(animalRequestDto, owner));
     return Optional.ofNullable(animal);
   }
 }

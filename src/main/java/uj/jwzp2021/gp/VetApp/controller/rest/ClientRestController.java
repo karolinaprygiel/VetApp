@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uj.jwzp2021.gp.VetApp.exception.ClientNotFoundException;
 import uj.jwzp2021.gp.VetApp.model.dto.AnimalMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.ClientMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.ClientRequestDto;
@@ -27,15 +28,8 @@ public class ClientRestController {
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<?> getClient(@PathVariable int id) {
-        var client = clientService.getClientById(id);
-        if (client.isPresent()) {
-            return ResponseEntity.ok(ClientMapper.toClientResponseDto(client.get()));
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body(RestUtil.response("No client with such ID found."));
+        return  ResponseEntity.ok(ClientMapper.toClientResponseDto(clientService.getClientById(id)));
     }
-
-
 
     @GetMapping
     public ResponseEntity<?> getAllClients() {
@@ -44,26 +38,13 @@ public class ClientRestController {
 
     @PostMapping
     public ResponseEntity<?>createClient(@RequestBody ClientRequestDto clientRequestDto){
-        var result = clientService.createClient(clientRequestDto);
-        return result.map(this::clientCreationResultBadRequest, this::clientToResult);
+        var client = clientService.createClient(clientRequestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ClientMapper.toClientResponseDto(client));
     }
 
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<?> deleteClient(@PathVariable int id){
-
-        return clientService
-            .deleteClient(id)
-            .map(client -> ResponseEntity.accepted().body(ClientMapper.toClientResponseDto(client)))
-            .orElseGet(() -> ResponseEntity.notFound().build());
+        var client = clientService.deleteClient(id);
+        return ResponseEntity.accepted().body(ClientMapper.toClientResponseDto(client));
     }
-
-
-    private ResponseEntity<?> clientToResult(Client client) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ClientMapper.toClientResponseDto(client));
-    }
-
-    private ResponseEntity<?> clientCreationResultBadRequest(ClientCreationError result){
-        return ResponseEntity.badRequest().body(RestUtil.response("Unknown error."));
-    }
-
 }

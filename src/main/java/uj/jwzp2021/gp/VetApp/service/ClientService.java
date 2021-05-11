@@ -1,7 +1,9 @@
 package uj.jwzp2021.gp.VetApp.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uj.jwzp2021.gp.VetApp.exception.ClientNotFoundException;
 import uj.jwzp2021.gp.VetApp.model.dto.ClientMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.ClientRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.ClientResponseDto;
@@ -23,30 +25,27 @@ public class ClientService {
     this.clientRepository = clientRepository;
   }
 
+
+
+  public Client getClientById(int id) {
+    var client = clientRepository.findById(id);
+    return client.orElseThrow(() -> {
+      throw new ClientNotFoundException("Client with id " + id + " not found");
+    });
+
+  }
+
   public List<Client> getAll() {
-//    var clients =  clientRepository.findAll();
-//    var clientDtis = clients.stream().map(ClientMapper::toClientResponseDto).collect(Collectors.toList());
-//    return clientDtis;
     return clientRepository.findAll();
   }
 
-  public Optional<Client> getClientById(int id) {
-    var client = clientRepository.findById(id);
+  public Client deleteClient(int id) {
+    var client = getClientById(id);
+    clientRepository.delete(client);
     return client;
-  }
-
-  public Optional<Client> deleteClient(int id) {
-    var client = clientRepository.findById(id);
-    if (client.isPresent()) {
-      clientRepository.deleteById(client.get().getId());
-    }
+}
+  public Client createClient(ClientRequestDto clientRequestDto) {
+    var client = clientRepository.save(Client.newClient(clientRequestDto.getName(), clientRequestDto.getSurname()));
     return client;
-  }
-
-  public OperationResult<ClientCreationError, Client> createClient(ClientRequestDto clientRequestDto) {
-    Client c =
-        clientRepository.save(
-            Client.newClient(clientRequestDto.getName(), clientRequestDto.getSurname()));
-    return OperationResult.success(c);
   }
 }
