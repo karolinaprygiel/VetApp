@@ -3,8 +3,10 @@ package uj.jwzp2021.gp.VetApp.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import uj.jwzp2021.gp.VetApp.model.dto.VisitMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitRequestDto;
-import uj.jwzp2021.gp.VetApp.model.entity.Status;
+import uj.jwzp2021.gp.VetApp.model.dto.VisitUpdateRequestDto;
+import uj.jwzp2021.gp.VetApp.model.entity.VisitStatus;
 import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.repository.VisitRepository;
 import uj.jwzp2021.gp.VetApp.util.OperationResult;
@@ -20,10 +22,16 @@ import java.util.Optional;
 public class VisitService {
 
   private final VisitRepository visitRepository;
+  private final AnimalService animalService;
+  private final ClientService clientService;
+  private final VetService vetService;
 
   @Autowired
-  public VisitService(VisitRepository visitRepository) {
+  public VisitService(VisitRepository visitRepository, AnimalService animalService, ClientService clientService, VetService vetService) {
     this.visitRepository = visitRepository;
+    this.animalService = animalService;
+    this.clientService = clientService;
+    this.vetService = vetService;
   }
 
   public List<Visit> getAllVisits() {
@@ -40,15 +48,19 @@ public class VisitService {
     if (!dateAvailable(req.getStartTime(), req.getDuration())) {
       return OperationResult.fail(VisitCreationError.OVERLAP);
     }
-    Visit v =
-        visitRepository.save(
-            Visit.newVisit(
-                req.getStartTime(),
-                req.getDuration(),
-                req.getAnimal(),
-                req.getPrice(),
-                req.getClient(),
-                req.getVet()));
+    var client = clientService.getClientById(req.getClientId());
+    if (client.isEmpty()){
+      return OperationResult.fail(VisitCreationError.CLIENT_NOT_EXISTS);
+    }
+    var animal = animalService.getAnimalById(req.getAnimalId());
+    if (animal.isEmpty()){
+      return OperationResult.fail(VisitCreationError.ANIMAL_NOT_EXISTS);
+    }
+    var vet = vetService.getVetById(req.getVetId());
+    if (vet.isEmpty()){
+      return OperationResult.fail(VisitCreationError.VET_NOT_EXISTS);
+    }
+    Visit v = visitRepository.save(VisitMapper.toVisit(req, animal.get(), client.get(), vet.get()));
 
     return OperationResult.success(v);
   }
@@ -89,30 +101,20 @@ public class VisitService {
     System.out.println("finishOutOfDateVisits function run at " + time);
   }
 
-  public OperationResult<VisitUpdateError, Visit> updateVisit(int id, VisitRequestDto visitReq) {
-    if (visitReq.getAnimal() != null
-        || visitReq.getClient() != null
-        || visitReq.getPrice() != null
-        || visitReq.getDuration() != null
-        || visitReq.getStartTime() != null
-        || visitReq.getVet() != null) {
-
-      return OperationResult.fail(VisitUpdateError.ILLEGAL_FIELD);
-    }
-
+  public OperationResult<VisitUpdateError, Visit> updateVisit(int id, VisitUpdateRequestDto visitReq) {
     var visit = visitRepository.findById(id);
     if (visit.isPresent()) {
       if (visitReq.getDescription() != null) {
         visit.get().setDescription(visitReq.getDescription());
       }
-      if (visitReq.getStatus() != null) {
-        Status status = visitReq.getStatus();
-        if (status != Status.CANCELLED
-            && status != Status.FINISHED
-            && status != Status.NOT_APPEARED) {
+      if (visitReq.getVisitStatus() != null) {
+        VisitStatus visitStatus = visitReq.getVisitStatus();
+        if (visitStatus != VisitStatus.CANCELLED
+            && visitStatus != VisitStatus.FINISHED
+            && visitStatus != VisitStatus.NOT_APPEARED) {
           return OperationResult.fail(VisitUpdateError.ILLEGAL_VALUE);
         }
-        visit.get().setStatus(visitReq.getStatus());
+        visit.get().setVisitStatus(visitReq.getVisitStatus());
       }
       Visit v = visitRepository.save(visit.get());
 

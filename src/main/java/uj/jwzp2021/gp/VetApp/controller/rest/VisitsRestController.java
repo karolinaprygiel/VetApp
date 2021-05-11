@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitRequestDto;
+import uj.jwzp2021.gp.VetApp.model.dto.VisitUpdateRequestDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.service.VisitService;
 import uj.jwzp2021.gp.VetApp.util.VisitCreationError;
@@ -50,8 +51,8 @@ VisitsRestController {
   }
 
   @PatchMapping(path = "/{id}")
-  ResponseEntity<?> update(@PathVariable int id, @RequestBody VisitRequestDto visitReq) {
-    var result = visitsService.updateVisit(id, visitReq);
+  ResponseEntity<?> update(@PathVariable int id, @RequestBody VisitUpdateRequestDto visitUpdateRequestDto) {
+    var result = visitsService.updateVisit(id, visitUpdateRequestDto);
     return result.map(this::visitUpdateResultToBadRequest, this::visitToResult);
   }
 

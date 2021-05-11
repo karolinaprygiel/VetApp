@@ -27,7 +27,7 @@ public class Visit {
     @Column(columnDefinition = "interval")
     private Duration duration;
 
-    private Status status;
+    private VisitStatus visitStatus;
 
     private BigDecimal price;
 
@@ -46,7 +46,7 @@ public class Visit {
     private String description;
 
     public static Visit newVisit(LocalDateTime startTime, Duration duration, Animal animal, BigDecimal price, Client client, Vet vet) {
-        return new Visit(-1, startTime, duration, Status.PLANNED, price, animal, client, vet, null);
+        return new Visit(-1, startTime, duration, VisitStatus.PLANNED, price, animal, client, vet, null);
     }
 
 

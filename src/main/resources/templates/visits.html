@@ -31,7 +31,7 @@
                     <td th:text="${visit.duration}"></td>
                     <td th:text="${visit.animal?.type}"></td>
                     <td th:text="${visit.client?.name != null} ? ${visit.client.name} : ' ' + ' ' + (${visit.client?.surname != null} ? ${visit.client.surname} : ' ')" ></td>
-                    <td th:text="${visit.status}"></td>
+                    <td th:text="${visit.visitStatus}"></td>
                     <td th:text="${visit.price}"></td>
                     <td th:text="${visit.description}"></td>
     <!--                <td><a th:href="@{/edit/{id}(id=${user.id})}">Edit</a></td>-->

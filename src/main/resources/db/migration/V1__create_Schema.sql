@@ -32,7 +32,7 @@ create table visits
     duration interval,
     price numeric(19,2),
     start_time timestamp,
-    status integer,
+    visitStatus integer,
     animal_id INTEGER references animals(id),
     client_id INTEGER references clients(id),
     vet_id INTEGER references vets(id)
