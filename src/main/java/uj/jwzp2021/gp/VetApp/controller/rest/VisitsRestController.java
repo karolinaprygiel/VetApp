@@ -6,11 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uj.jwzp2021.gp.VetApp.controller.rest.hateoas.VisitRepresentation;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitResponseDto;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitUpdateRequestDto;
-import uj.jwzp2021.gp.VetApp.controller.rest.hateoas.VisitRepresentation;
 import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.service.VisitService;
 import uj.jwzp2021.gp.VetApp.util.VisitCreationError;
@@ -22,12 +22,10 @@ import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/api/visits", produces = MediaType.APPLICATION_JSON_VALUE)
-public class
-VisitsRestController {
+public class VisitsRestController {
 
   private final VisitService visitsService;
 
@@ -44,9 +42,10 @@ VisitsRestController {
 
   @GetMapping
   public ResponseEntity<?> getAllVisits() {
-//    return visitsService.getAllVisits();
+    //    return visitsService.getAllVisits();
     var visits = visitsService.getAllVisits();
-    return ResponseEntity.ok(visits.stream().map(VisitMapper::toVisitResponseDto).collect(Collectors.toList()));
+    return ResponseEntity.ok(
+        visits.stream().map(VisitMapper::toVisitResponseDto).collect(Collectors.toList()));
   }
 
   @PostMapping()
@@ -61,7 +60,8 @@ VisitsRestController {
   }
 
   @PatchMapping(path = "/{id}")
-  ResponseEntity<?> update(@PathVariable int id, @RequestBody VisitUpdateRequestDto visitUpdateRequestDto) {
+  ResponseEntity<?> update(
+      @PathVariable int id, @RequestBody VisitUpdateRequestDto visitUpdateRequestDto) {
     var result = visitsService.updateVisit(id, visitUpdateRequestDto);
     return result.map(this::visitUpdateErrorToResponse, this::visitToResponse);
   }
@@ -78,7 +78,7 @@ VisitsRestController {
     switch (result) {
       case STARTS_IN_PAST:
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-                .body(RestUtil.response("Can not book a visit in the past."));
+            .body(RestUtil.response("Can not book a visit in the past."));
       case TOO_SOON:
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
             .body(RestUtil.response("Booking for less than an hour in the future is prohibited."));
@@ -145,5 +145,4 @@ VisitsRestController {
         return ResponseEntity.badRequest().body(RestUtil.response("Unknown error."));
     }
   }
-
 }
