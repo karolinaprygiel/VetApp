@@ -11,7 +11,6 @@ import uj.jwzp2021.gp.VetApp.model.dto.VisitRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitResponseDto;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitUpdateRequestDto;
 import uj.jwzp2021.gp.VetApp.controller.rest.hateoas.VisitRepresentation;
-import uj.jwzp2021.gp.VetApp.model.dto.VisitRequest;
 import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.service.VisitService;
 import uj.jwzp2021.gp.VetApp.util.VisitCreationError;
@@ -131,7 +130,7 @@ VisitsRestController {
   }
 
   private VisitRepresentation represent(Visit v) {
-    Link selfLink = linkTo(methodOn(VisitsRestController.class).getVisitById(v.getId())).withSelfRel();
+    Link selfLink = linkTo(methodOn(VisitsRestController.class).getVisit(v.getId())).withSelfRel();
     var representation = VisitRepresentation.fromVisit(v);
     representation.add(selfLink);
     return representation;
