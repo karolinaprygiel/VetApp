@@ -32,15 +32,15 @@ public class Visit {
     private BigDecimal price;
 
     @ManyToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name = "animal_id")
+    @JoinColumn(name = "animal_id", referencedColumnName = "id")
     private Animal animal;
 
     @ManyToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name = "client_id")
+    @JoinColumn(name = "client_id", referencedColumnName = "id")
     private Client client;
 
     @ManyToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name = "vet_id")
+    @JoinColumn(name = "vet_id", referencedColumnName = "id")
     private Vet vet;
 
     private String description;

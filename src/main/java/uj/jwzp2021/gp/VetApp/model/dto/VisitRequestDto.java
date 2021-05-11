@@ -14,10 +14,8 @@ import java.time.LocalDateTime;
 public class VisitRequestDto {
     private final LocalDateTime startTime;
     private final Duration duration;
-    private final Animal animal;
     private final BigDecimal price;
-    private final Client client;
-    private final Vet vet;
-    private final String description;
-    private final Status status;
+    private final int animalId;
+    private final int clientId;
+    private final int vetId;
 }
