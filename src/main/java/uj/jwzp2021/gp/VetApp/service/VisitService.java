@@ -76,7 +76,6 @@ public class VisitService {
   private boolean dateAvailable(LocalDateTime startTime, Duration duration) {
     List<Visit> overlaps =
         visitRepository.overlaps(startTime, startTime.plusMinutes(duration.toMinutes()));
-    overlaps.forEach(System.out::println);
     return overlaps.size() == 0;
   }
 

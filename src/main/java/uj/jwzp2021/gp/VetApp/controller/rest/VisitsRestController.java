@@ -83,6 +83,15 @@ VisitsRestController {
       case REPOSITORY_PROBLEM:
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(RestUtil.response("Problem with server, please try again later."));
+      case CLIENT_NOT_EXISTS:
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(RestUtil.response("Client with provided id not exists."));
+      case ANIMAL_NOT_EXISTS:
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(RestUtil.response("Animal with provided id not exists."));
+      case VET_NOT_EXISTS:
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(RestUtil.response("Vet with provided id not exists."));
       default:
         return ResponseEntity.badRequest().body(RestUtil.response("Unknown error."));
     }
