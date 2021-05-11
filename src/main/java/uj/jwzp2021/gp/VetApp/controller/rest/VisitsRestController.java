@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uj.jwzp2021.gp.VetApp.model.dto.VisitMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitUpdateRequestDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Visit;
@@ -12,7 +13,7 @@ import uj.jwzp2021.gp.VetApp.service.VisitService;
 import uj.jwzp2021.gp.VetApp.util.VisitCreationError;
 import uj.jwzp2021.gp.VetApp.util.VisitUpdateError;
 
-import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/api/visits", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -28,21 +29,29 @@ VisitsRestController {
 
   @GetMapping(path = "{id}")
   public ResponseEntity<?> getVisit(@PathVariable int id) {
-    return visitsService
-        .getVisitById(id)
-        .map(ResponseEntity::ok)
-        .orElse(ResponseEntity.notFound().build());
+//    return visitsService
+//        .getVisitById(id)
+//        .map(ResponseEntity::ok)
+//        .orElse(ResponseEntity.notFound().build());
+    var visit = visitsService.getVisitById(id);
+    if (visit.isPresent()) {
+      return ResponseEntity.ok(visit);
+    } else {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
   }
 
   @GetMapping
-  public List<Visit> getAllVisits() {
-    return visitsService.getAllVisits();
+  public ResponseEntity<?> getAllVisits() {
+//    return visitsService.getAllVisits();
+    var visits = visitsService.getAllVisits();
+    return ResponseEntity.ok(visits.stream().map(VisitMapper::toVisitResponseDto).collect(Collectors.toList()));
   }
 
   @PostMapping()
   public ResponseEntity<?> createVisit(@RequestBody VisitRequestDto visitReq) {
     var result = visitsService.createVisit(visitReq);
-    return result.map(this::visitCreationResultToBadRequest, this::visitToResult);
+    return result.map(this::visitCreationErrorToResponse, this::visitToResponse);
   }
 
   @DeleteMapping(path = "/{id}")
@@ -53,14 +62,14 @@ VisitsRestController {
   @PatchMapping(path = "/{id}")
   ResponseEntity<?> update(@PathVariable int id, @RequestBody VisitUpdateRequestDto visitUpdateRequestDto) {
     var result = visitsService.updateVisit(id, visitUpdateRequestDto);
-    return result.map(this::visitUpdateResultToBadRequest, this::visitToResult);
+    return result.map(this::visitUpdateErrorToResponse, this::visitToResponse);
   }
 
-  private ResponseEntity<?> visitToResult(Visit visit) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(visit);
+  private ResponseEntity<?> visitToResponse(Visit visit) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(VisitMapper.toVisitResponseDto(visit));
   }
 
-  private ResponseEntity<?> visitCreationResultToBadRequest(VisitCreationError result) {
+  private ResponseEntity<?> visitCreationErrorToResponse(VisitCreationError result) {
     switch (result) {
       case STARTS_IN_PAST:
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
@@ -79,7 +88,7 @@ VisitsRestController {
     }
   }
 
-  private ResponseEntity<?> visitUpdateResultToBadRequest(VisitUpdateError result) {
+  private ResponseEntity<?> visitUpdateErrorToResponse(VisitUpdateError result) {
     switch (result) {
       case VISIT_NOT_FOUND:
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
