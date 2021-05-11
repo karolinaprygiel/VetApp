@@ -32,7 +32,6 @@ public class ClientService {
     return client.orElseThrow(() -> {
       throw new ClientNotFoundException("Client with id " + id + " not found");
     });
-
   }
 
   public List<Client> getAll() {

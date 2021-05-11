@@ -2,6 +2,8 @@ package uj.jwzp2021.gp.VetApp.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uj.jwzp2021.gp.VetApp.exception.AnimalNotFoundException;
+import uj.jwzp2021.gp.VetApp.exception.ClientNotFoundException;
 import uj.jwzp2021.gp.VetApp.model.dto.AnimalMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.AnimalRequestDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Animal;
@@ -22,8 +24,13 @@ public class AnimalService {
     this.clientService = clientService;
   }
 
-  public Optional<Animal> getAnimalById(int id) {
-    return animalRepository.findById(id);
+  public Animal getAnimalById(int id) {
+    var animal = animalRepository.findById(id);
+    return animal.orElseThrow(() -> {
+      throw new AnimalNotFoundException("Animal with id " + id + " not found");
+    });
+
+
   }
 
   public List<Animal> getAllAnimals() {
