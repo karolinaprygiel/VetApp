@@ -1,7 +1,6 @@
 package uj.jwzp2021.gp.VetApp.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uj.jwzp2021.gp.VetApp.exception.ClientNotFoundException;
 import uj.jwzp2021.gp.VetApp.model.dto.ClientMapper;
@@ -9,11 +8,8 @@ import uj.jwzp2021.gp.VetApp.model.dto.ClientRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.ClientResponseDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Client;
 import uj.jwzp2021.gp.VetApp.repository.ClientRepository;
-import uj.jwzp2021.gp.VetApp.util.ClientCreationError;
-import uj.jwzp2021.gp.VetApp.util.OperationResult;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,24 +21,31 @@ public class ClientService {
     this.clientRepository = clientRepository;
   }
 
-  public Client getClientById(int id) {
+  public Client getRawClientById(int id) {
     var client = clientRepository.findById(id);
     return client.orElseThrow(() -> {
       throw new ClientNotFoundException("Client with id " + id + " not found");
     });
   }
 
-  public List<Client> getAll() {
-    return clientRepository.findAll();
+  public ClientResponseDto getClientById(int id) {
+    return ClientMapper.toClientResponseDto(getRawClientById(id));
+
   }
 
-  public Client deleteClient(int id) {
-    var client = getClientById(id);
+  public List<ClientResponseDto> getAll() {
+    return clientRepository.findAll().stream()
+        .map(ClientMapper::toClientResponseDto)
+        .collect(Collectors.toList());
+  }
+
+  public ClientResponseDto deleteClient(int id) {
+    var client = getRawClientById(id);
     clientRepository.delete(client);
-    return client;
+    return ClientMapper.toClientResponseDto(client);
 }
-  public Client createClient(ClientRequestDto clientRequestDto) {
+  public ClientResponseDto createClient(ClientRequestDto clientRequestDto) {
     var client = clientRepository.save(ClientMapper.toClient(clientRequestDto));
-    return client;
+    return ClientMapper.toClientResponseDto(client);
   }
 }

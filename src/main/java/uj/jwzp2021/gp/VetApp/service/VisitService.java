@@ -14,15 +14,12 @@ import uj.jwzp2021.gp.VetApp.model.entity.VisitStatus;
 import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.repository.VisitRepository;
 import uj.jwzp2021.gp.VetApp.util.OperationResult;
-import uj.jwzp2021.gp.VetApp.util.VisitCreationError;
 import uj.jwzp2021.gp.VetApp.util.VisitLookupError;
 import uj.jwzp2021.gp.VetApp.util.VisitUpdateError;
 
-import java.nio.channels.OverlappingFileLockException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class VisitService {
@@ -54,11 +51,12 @@ public class VisitService {
     if (!dateAvailable(req.getStartTime(), req.getDuration())) {
       throw new VisitOverlapsException("Such visit would overlap with another visit.");
     }
-    var client = clientService.getClientById(req.getClientId());
-    var animal = animalService.getAnimalById(req.getAnimalId());
-    var vet = vetService.getVetById(req.getVetId());
+    var client = clientService.getRawClientById(req.getClientId());
+    var animal = animalService.getRawAnimalById(req.getAnimalId());
+    var vet = vetService.getRawVetById(req.getVetId());
 
-    return visitRepository.save(VisitMapper.toVisit(req, animal, client, vet));
+   var visit =  visitRepository.save(VisitMapper.toVisit(req, animal, client, vet));
+   return VisitMapper.toVisitResponseDto(visit);
   }
 
   private static boolean dateTooSoon(LocalDateTime startTime) {

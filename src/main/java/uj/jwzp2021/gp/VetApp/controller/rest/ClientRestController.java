@@ -23,26 +23,24 @@ public class ClientRestController {
 
   @GetMapping(path = "/{id}")
   public ResponseEntity<?> getClient(@PathVariable int id) {
-    return ResponseEntity.ok(ClientMapper.toClientResponseDto(clientService.getClientById(id)));
+    return ResponseEntity.ok(clientService.getClientById(id));
   }
 
   @GetMapping
   public ResponseEntity<?> getAllClients() {
     return ResponseEntity.ok(
-        clientService.getAll().stream()
-            .map(ClientMapper::toClientResponseDto)
-            .collect(Collectors.toList()));
+        clientService.getAll());
   }
 
   @PostMapping
   public ResponseEntity<?> createClient(@RequestBody ClientRequestDto clientRequestDto) {
     var client = clientService.createClient(clientRequestDto);
-    return ResponseEntity.status(HttpStatus.CREATED).body(ClientMapper.toClientResponseDto(client));
+    return ResponseEntity.status(HttpStatus.CREATED).body(client);
   }
 
   @DeleteMapping(path = "/{id}")
   public ResponseEntity<?> deleteClient(@PathVariable int id) {
     var client = clientService.deleteClient(id);
-    return ResponseEntity.accepted().body(ClientMapper.toClientResponseDto(client));
+    return ResponseEntity.accepted().body(client);
   }
 }
