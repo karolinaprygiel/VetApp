@@ -3,6 +3,9 @@ package uj.jwzp2021.gp.VetApp.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import uj.jwzp2021.gp.VetApp.exception.VisitOverlapsException;
+import uj.jwzp2021.gp.VetApp.exception.VisitStartsInPastException;
+import uj.jwzp2021.gp.VetApp.exception.VisitTooSoonException;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitResponseDto;
@@ -15,6 +18,7 @@ import uj.jwzp2021.gp.VetApp.util.VisitCreationError;
 import uj.jwzp2021.gp.VetApp.util.VisitLookupError;
 import uj.jwzp2021.gp.VetApp.util.VisitUpdateError;
 
+import java.nio.channels.OverlappingFileLockException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,32 +44,21 @@ public class VisitService {
     return visitRepository.findAll();
   }
 
-  public OperationResult<VisitCreationError, Visit> createVisit(VisitRequestDto req) {
+  public VisitResponseDto createVisit(VisitRequestDto req) {
     if (dateInPast(req.getStartTime())) {
-      return OperationResult.fail(VisitCreationError.STARTS_IN_PAST);
+      throw new VisitStartsInPastException("Visit can not start in the past.");
     }
     if (dateTooSoon(req.getStartTime())) {
-      return OperationResult.fail(VisitCreationError.TOO_SOON);
+      throw new VisitTooSoonException("Visit cannot be scheduled for less an hour from now on.");
     }
     if (!dateAvailable(req.getStartTime(), req.getDuration())) {
-      return OperationResult.fail(VisitCreationError.OVERLAP);
+      throw new VisitOverlapsException("Such visit would overlap with another visit.");
     }
     var client = clientService.getClientById(req.getClientId());
-//    if (client.isEmpty()){
-//      return OperationResult.fail(VisitCreationError.CLIENT_NOT_EXISTS);
-//    }
     var animal = animalService.getAnimalById(req.getAnimalId());
-    if (animal.isEmpty()){
-      return OperationResult.fail(VisitCreationError.ANIMAL_NOT_EXISTS);
-    }
     var vet = vetService.getVetById(req.getVetId());
-    if (vet.isEmpty()){
-      return OperationResult.fail(VisitCreationError.VET_NOT_EXISTS);
-    }
-    //Visit v = visitRepository.save(VisitMapper.toVisit(req, animal.get(), client.get(), vet.get()));
-    Visit v = visitRepository.save(VisitMapper.toVisit(req, animal.get(), client, vet.get()));
 
-    return OperationResult.success(v);
+    return visitRepository.save(VisitMapper.toVisit(req, animal, client, vet));
   }
 
   private static boolean dateTooSoon(LocalDateTime startTime) {

@@ -50,8 +50,7 @@ public class VisitsRestController {
 
   @PostMapping()
   public ResponseEntity<?> createVisit(@RequestBody VisitRequestDto visitReq) {
-    var result = visitsService.createVisit(visitReq);
-    return result.map(this::visitCreationErrorToResponse, this::visitToResponse);
+    return visitsService.createVisit(visitReq);
   }
 
   @DeleteMapping(path = "/{id}")
