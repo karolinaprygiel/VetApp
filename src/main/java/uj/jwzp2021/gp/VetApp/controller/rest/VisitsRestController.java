@@ -7,10 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitRequestDto;
+import uj.jwzp2021.gp.VetApp.model.dto.VisitResponseDto;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitUpdateRequestDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.service.VisitService;
 import uj.jwzp2021.gp.VetApp.util.VisitCreationError;
+import uj.jwzp2021.gp.VetApp.util.VisitLookupError;
 import uj.jwzp2021.gp.VetApp.util.VisitUpdateError;
 
 import java.util.stream.Collectors;
@@ -29,16 +31,8 @@ VisitsRestController {
 
   @GetMapping(path = "{id}")
   public ResponseEntity<?> getVisit(@PathVariable int id) {
-//    return visitsService
-//        .getVisitById(id)
-//        .map(ResponseEntity::ok)
-//        .orElse(ResponseEntity.notFound().build());
-    var visit = visitsService.getVisitById(id);
-    if (visit.isPresent()) {
-      return ResponseEntity.ok(visit);
-    } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    var result = visitsService.getVisitById(id);
+    return result.map(this::visitLookupErrorToResponse, this::dtoToResponse);
   }
 
   @GetMapping
@@ -67,6 +61,10 @@ VisitsRestController {
 
   private ResponseEntity<?> visitToResponse(Visit visit) {
     return ResponseEntity.status(HttpStatus.CREATED).body(VisitMapper.toVisitResponseDto(visit));
+  }
+
+  private ResponseEntity<?> dtoToResponse(VisitResponseDto visitResponseDto) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(visitResponseDto);
   }
 
   private ResponseEntity<?> visitCreationErrorToResponse(VisitCreationError result) {
@@ -117,4 +115,15 @@ VisitsRestController {
         return ResponseEntity.badRequest().body(RestUtil.response("Unknown error."));
     }
   }
+
+  private ResponseEntity<?> visitLookupErrorToResponse(VisitLookupError result) {
+    switch (result) {
+      case NOT_FOUND:
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(RestUtil.response("Visit with such id was not found."));
+      default:
+        return ResponseEntity.badRequest().body(RestUtil.response("Unknown error."));
+    }
+  }
+
 }

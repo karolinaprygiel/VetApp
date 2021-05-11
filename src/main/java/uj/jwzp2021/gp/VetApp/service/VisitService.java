@@ -5,12 +5,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitRequestDto;
+import uj.jwzp2021.gp.VetApp.model.dto.VisitResponseDto;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitUpdateRequestDto;
 import uj.jwzp2021.gp.VetApp.model.entity.VisitStatus;
 import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.repository.VisitRepository;
 import uj.jwzp2021.gp.VetApp.util.OperationResult;
 import uj.jwzp2021.gp.VetApp.util.VisitCreationError;
+import uj.jwzp2021.gp.VetApp.util.VisitLookupError;
 import uj.jwzp2021.gp.VetApp.util.VisitUpdateError;
 
 import java.time.Duration;
@@ -89,8 +91,12 @@ public class VisitService {
     }
   }
 
-  public Optional<Visit> getVisitById(int id) {
-    return visitRepository.findById(id);
+  public OperationResult<VisitLookupError, VisitResponseDto> getVisitById(int id) {
+    var visit =  visitRepository.findById(id);
+    if (visit.isPresent()) {
+      return OperationResult.success(VisitMapper.toVisitResponseDto(visit.get()));
+    }
+    return OperationResult.fail(VisitLookupError.NOT_FOUND);
   }
 
   @Scheduled(fixedRate = 3600000)
