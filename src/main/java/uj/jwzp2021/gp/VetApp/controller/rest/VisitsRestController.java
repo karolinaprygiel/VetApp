@@ -64,7 +64,7 @@ VisitsRestController {
   }
 
   private ResponseEntity<?> dtoToResponse(VisitResponseDto visitResponseDto) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(visitResponseDto);
+    return ResponseEntity.status(HttpStatus.OK).body(visitResponseDto);
   }
 
   private ResponseEntity<?> visitCreationErrorToResponse(VisitCreationError result) {
