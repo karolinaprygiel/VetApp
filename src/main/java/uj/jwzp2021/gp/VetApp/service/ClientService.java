@@ -25,8 +25,6 @@ public class ClientService {
     this.clientRepository = clientRepository;
   }
 
-
-
   public Client getClientById(int id) {
     var client = clientRepository.findById(id);
     return client.orElseThrow(() -> {
@@ -44,7 +42,7 @@ public class ClientService {
     return client;
 }
   public Client createClient(ClientRequestDto clientRequestDto) {
-    var client = clientRepository.save(Client.newClient(clientRequestDto.getName(), clientRequestDto.getSurname()));
+    var client = clientRepository.save(ClientMapper.toClient(clientRequestDto));
     return client;
   }
 }
