@@ -20,11 +20,9 @@ public class Client {
 
     private String name;
     private String surname;
-    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Animal> animals = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "clients")
-//    private final List<Animal> animals;
+
 
 
     public static Client newClient(String name, String surname){

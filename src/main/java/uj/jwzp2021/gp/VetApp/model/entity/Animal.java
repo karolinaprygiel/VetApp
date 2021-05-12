@@ -26,7 +26,7 @@ public class Animal {
     //private int monthOfBirth;
     //private int dayOfBirth;
     //private LocalDateTime birthDate;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "client_id", referencedColumnName = "id", nullable = false)
     private Client owner;
 
