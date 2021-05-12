@@ -14,7 +14,7 @@ import javax.persistence.Id;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "clinic")
-public class Clinic {
+public class Office {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

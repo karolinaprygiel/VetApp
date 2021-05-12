@@ -10,6 +10,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import uj.jwzp2021.gp.VetApp.controller.rest.RestUtil;
 import uj.jwzp2021.gp.VetApp.exception.animal.AnimalNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.client.ClientNotFoundException;
+import uj.jwzp2021.gp.VetApp.exception.office.OfficeNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.vet.VetNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.visit.VisitNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.visit.VisitOverlapsException;
@@ -26,6 +27,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(AnimalNotFoundException.class)
   protected ResponseEntity<?> handleAnimalNotFoundException(AnimalNotFoundException ex, WebRequest request) {
+    return handleExceptionInternal(ex, RestUtil.response(ex.getMessage()), new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+  }
+
+  @ExceptionHandler(OfficeNotFoundException.class)
+  protected ResponseEntity<?> handleOfficeNotFoundException(OfficeNotFoundException ex, WebRequest request) {
     return handleExceptionInternal(ex, RestUtil.response(ex.getMessage()), new HttpHeaders(), HttpStatus.NOT_FOUND, request);
   }
 

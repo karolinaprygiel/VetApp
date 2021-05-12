@@ -11,8 +11,7 @@ create table animals
     name          VARCHAR(127),
     type          INTEGER,
     year_of_birth INTEGER NOT NULL,
-    month_o
-                  client_id INTEGER REFERENCES clients(id)
+    client_id INTEGER REFERENCES clients(id)
 );
 
 create table vets
