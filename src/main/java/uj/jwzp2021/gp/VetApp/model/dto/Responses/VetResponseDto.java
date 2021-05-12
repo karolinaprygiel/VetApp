@@ -14,5 +14,4 @@ public class VetResponseDto {
   private String surname;
   private String shiftStart;
   private String shiftEnd;
-
 }

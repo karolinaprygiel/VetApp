@@ -1,4 +1,4 @@
-package uj.jwzp2021.gp.VetApp.model.dto.Mappers;
+package uj.jwzp2021.gp.VetApp.mapper;
 
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Responses.VisitResponseDto;
@@ -24,7 +24,7 @@ public class VisitMapper {
         visit.getId(),
         visit.getStartTime(),
         visit.getDuration(),
-        visit.getVisitStatus().toString(),
+        visit.getVisitStatus(),
         visit.getPrice(),
         visit.getAnimal().getId(),
         visit.getClient().getId(),

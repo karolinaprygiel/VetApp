@@ -7,14 +7,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uj.jwzp2021.gp.VetApp.controller.rest.hateoas.VisitRepresentation;
-import uj.jwzp2021.gp.VetApp.model.dto.Mappers.VisitMapper;
+import uj.jwzp2021.gp.VetApp.mapper.VisitMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitRequestDto;
-import uj.jwzp2021.gp.VetApp.model.dto.Responses.VisitResponseDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitUpdateRequestDto;
+import uj.jwzp2021.gp.VetApp.model.dto.Responses.VisitResponseDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.service.VisitService;
 import uj.jwzp2021.gp.VetApp.util.VisitCreationError;
-import uj.jwzp2021.gp.VetApp.util.VisitLookupError;
 import uj.jwzp2021.gp.VetApp.util.VisitUpdateError;
 
 import java.util.List;
@@ -44,8 +43,7 @@ public class VisitsRestController {
   public ResponseEntity<?> getAllVisits() {
     //    return visitsService.getAllVisits();
     var visits = visitsService.getAllVisits();
-    return ResponseEntity.ok(
-        visits.stream().map(VisitMapper::toVisitResponseDto).collect(Collectors.toList()));
+    return ResponseEntity.ok(visits);
   }
 
   @PostMapping()
@@ -128,20 +126,10 @@ public class VisitsRestController {
     return visits.stream().map(this::represent).collect(Collectors.toList());
   }
 
-  private VisitRepresentation represent(Visit v) {
+  private VisitRepresentation represent(VisitResponseDto v) {
     Link selfLink = linkTo(methodOn(VisitsRestController.class).getVisit(v.getId())).withSelfRel();
     var representation = VisitRepresentation.fromVisit(v);
     representation.add(selfLink);
     return representation;
-  }
-
-  private ResponseEntity<?> visitLookupErrorToResponse(VisitLookupError result) {
-    switch (result) {
-      case NOT_FOUND:
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body(RestUtil.response("Visit with such id was not found."));
-      default:
-        return ResponseEntity.badRequest().body(RestUtil.response("Unknown error."));
-    }
   }
 }

@@ -3,7 +3,7 @@ package uj.jwzp2021.gp.VetApp.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uj.jwzp2021.gp.VetApp.exception.vet.VetNotFoundException;
-import uj.jwzp2021.gp.VetApp.model.dto.Mappers.VetMapper;
+import uj.jwzp2021.gp.VetApp.mapper.VetMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VetRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Responses.VetResponseDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Vet;

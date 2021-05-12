@@ -7,11 +7,9 @@ import uj.jwzp2021.gp.VetApp.model.entity.AnimalType;
 @Data
 @AllArgsConstructor
 public class AnimalResponseDto {
-  private int animalId;
-  private String animalType;
+  private int id;
+  private AnimalType type;
   private String name;
   private int yearOfBirth;
   private int ownerId;
-  private String ownerName;
-  private String ownerSurname;
 }

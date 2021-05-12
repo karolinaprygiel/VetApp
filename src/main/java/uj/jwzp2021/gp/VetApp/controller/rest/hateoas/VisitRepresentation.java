@@ -3,7 +3,7 @@ package uj.jwzp2021.gp.VetApp.controller.rest.hateoas;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.hateoas.RepresentationModel;
-import uj.jwzp2021.gp.VetApp.model.entity.Visit;
+import uj.jwzp2021.gp.VetApp.model.dto.Responses.VisitResponseDto;
 import uj.jwzp2021.gp.VetApp.model.entity.VisitStatus;
 
 import java.math.BigDecimal;
@@ -19,12 +19,12 @@ public class VisitRepresentation extends RepresentationModel<VisitRepresentation
   private final VisitStatus status;
   private final BigDecimal price;
 
-  public static VisitRepresentation fromVisit(Visit v) {
+  public static VisitRepresentation fromVisit(VisitResponseDto v) {
     return new VisitRepresentation(
         v.getId(),
         v.getStartTime(),
         v.getDuration(),
-        v.getVisitStatus(),
+        v.getStatus(),
         v.getPrice());
   }
 }

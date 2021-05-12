@@ -1,4 +1,4 @@
-package uj.jwzp2021.gp.VetApp.model.dto.Mappers;
+package uj.jwzp2021.gp.VetApp.mapper;
 
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VetRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Responses.VetResponseDto;

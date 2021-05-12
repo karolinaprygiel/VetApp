@@ -4,16 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import uj.jwzp2021.gp.VetApp.exception.visit.*;
-import uj.jwzp2021.gp.VetApp.model.dto.Mappers.VisitMapper;
+import uj.jwzp2021.gp.VetApp.mapper.VisitMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitRequestDto;
-import uj.jwzp2021.gp.VetApp.model.dto.Responses.VisitResponseDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitUpdateRequestDto;
+import uj.jwzp2021.gp.VetApp.model.dto.Responses.VisitResponseDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.repository.VisitRepository;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class VisitService {
@@ -43,7 +44,12 @@ public class VisitService {
     return !LocalDateTime.now().isBefore(startTime);
   }
 
-  public List<Visit> getAllVisits() {
+  public List<VisitResponseDto> getAllVisits() {
+    var visits = getAllRawVisits();
+    return visits.stream().map(VisitMapper::toVisitResponseDto).collect(Collectors.toList());
+  }
+
+  public List<Visit> getAllRawVisits() {
     return visitRepository.findAll();
   }
 
@@ -93,7 +99,6 @@ public class VisitService {
 
   public VisitResponseDto getVisitById(int id) {
     return VisitMapper.toVisitResponseDto(getRawVisitById(id));
-
   }
 
   @Scheduled(fixedRate = 3600000)
