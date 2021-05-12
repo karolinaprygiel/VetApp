@@ -1,7 +1,6 @@
 package uj.jwzp2021.gp.VetApp.controller.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -58,8 +57,10 @@ public class AnimalRestController {
 
   private AnimalRepresentation represent(AnimalResponseDto a) {
     var representation = AnimalRepresentation.fromAnimal(a);
-    Link selfLink = linkTo(methodOn(AnimalRestController.class).getAnimal(a.getId())).withSelfRel();
-    representation.add(selfLink);
+    representation.add(
+        linkTo(methodOn(AnimalRestController.class).getAnimal(a.getId())).withSelfRel());
+    representation.add(
+        linkTo(methodOn(ClientRestController.class).getClient(a.getId())).withRel("owner"));
     return representation;
   }
 }
