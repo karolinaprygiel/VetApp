@@ -4,11 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uj.jwzp2021.gp.VetApp.model.dto.AnimalMapper;
-import uj.jwzp2021.gp.VetApp.model.dto.AnimalRequestDto;
+import uj.jwzp2021.gp.VetApp.model.dto.Requests.AnimalRequestDto;
 import uj.jwzp2021.gp.VetApp.service.AnimalService;
-
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/animals")

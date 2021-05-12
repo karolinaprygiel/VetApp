@@ -1,4 +1,6 @@
-package uj.jwzp2021.gp.VetApp.exception;
+package uj.jwzp2021.gp.VetApp.exception.animal;
+
+import uj.jwzp2021.gp.VetApp.exception.VeterinaryAppException;
 
 public class AnimalNotExistsException extends VeterinaryAppException {
 

@@ -1,6 +1,8 @@
-package uj.jwzp2021.gp.VetApp.model.dto;
+package uj.jwzp2021.gp.VetApp.model.dto.Mappers;
 
 
+import uj.jwzp2021.gp.VetApp.model.dto.Requests.ClientRequestDto;
+import uj.jwzp2021.gp.VetApp.model.dto.Responses.ClientResponseDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Client;
 
 public class ClientMapper {

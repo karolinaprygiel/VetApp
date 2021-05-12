@@ -5,11 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uj.jwzp2021.gp.VetApp.model.dto.VetMapper;
-import uj.jwzp2021.gp.VetApp.model.dto.VetRequestDto;
+import uj.jwzp2021.gp.VetApp.model.dto.Requests.VetRequestDto;
 import uj.jwzp2021.gp.VetApp.service.VetService;
-
-import java.util.stream.Collectors;
 
 @RequestMapping("api/vets")
 @RestController

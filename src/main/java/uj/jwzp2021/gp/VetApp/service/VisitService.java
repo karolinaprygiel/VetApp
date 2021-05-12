@@ -3,11 +3,11 @@ package uj.jwzp2021.gp.VetApp.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import uj.jwzp2021.gp.VetApp.exception.*;
-import uj.jwzp2021.gp.VetApp.model.dto.VisitMapper;
-import uj.jwzp2021.gp.VetApp.model.dto.VisitRequestDto;
-import uj.jwzp2021.gp.VetApp.model.dto.VisitResponseDto;
-import uj.jwzp2021.gp.VetApp.model.dto.VisitUpdateRequestDto;
+import uj.jwzp2021.gp.VetApp.exception.visit.*;
+import uj.jwzp2021.gp.VetApp.model.dto.Mappers.VisitMapper;
+import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitRequestDto;
+import uj.jwzp2021.gp.VetApp.model.dto.Responses.VisitResponseDto;
+import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitUpdateRequestDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.repository.VisitRepository;
 

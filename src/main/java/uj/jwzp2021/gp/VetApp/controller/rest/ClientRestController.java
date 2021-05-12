@@ -4,11 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uj.jwzp2021.gp.VetApp.model.dto.ClientMapper;
-import uj.jwzp2021.gp.VetApp.model.dto.ClientRequestDto;
+import uj.jwzp2021.gp.VetApp.model.dto.Requests.ClientRequestDto;
 import uj.jwzp2021.gp.VetApp.service.ClientService;
-
-import java.util.stream.Collectors;
 
 @RequestMapping("api/clients")
 @RestController

@@ -1,4 +1,4 @@
-package uj.jwzp2021.gp.VetApp.model.dto;
+package uj.jwzp2021.gp.VetApp.model.dto.Requests;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

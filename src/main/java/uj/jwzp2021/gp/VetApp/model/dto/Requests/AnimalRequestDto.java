@@ -1,4 +1,4 @@
-package uj.jwzp2021.gp.VetApp.model.dto;
+package uj.jwzp2021.gp.VetApp.model.dto.Requests;
 
 import lombok.Data;
 import uj.jwzp2021.gp.VetApp.model.entity.AnimalType;

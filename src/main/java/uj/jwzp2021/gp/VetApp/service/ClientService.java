@@ -2,10 +2,10 @@ package uj.jwzp2021.gp.VetApp.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uj.jwzp2021.gp.VetApp.exception.ClientNotFoundException;
-import uj.jwzp2021.gp.VetApp.model.dto.ClientMapper;
-import uj.jwzp2021.gp.VetApp.model.dto.ClientRequestDto;
-import uj.jwzp2021.gp.VetApp.model.dto.ClientResponseDto;
+import uj.jwzp2021.gp.VetApp.exception.client.ClientNotFoundException;
+import uj.jwzp2021.gp.VetApp.model.dto.Mappers.ClientMapper;
+import uj.jwzp2021.gp.VetApp.model.dto.Requests.ClientRequestDto;
+import uj.jwzp2021.gp.VetApp.model.dto.Responses.ClientResponseDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Client;
 import uj.jwzp2021.gp.VetApp.repository.ClientRepository;
 

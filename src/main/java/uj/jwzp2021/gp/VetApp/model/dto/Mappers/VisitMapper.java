@@ -1,5 +1,7 @@
-package uj.jwzp2021.gp.VetApp.model.dto;
+package uj.jwzp2021.gp.VetApp.model.dto.Mappers;
 
+import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitRequestDto;
+import uj.jwzp2021.gp.VetApp.model.dto.Responses.VisitResponseDto;
 import uj.jwzp2021.gp.VetApp.model.entity.*;
 
 public class VisitMapper {

@@ -2,10 +2,10 @@ package uj.jwzp2021.gp.VetApp.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uj.jwzp2021.gp.VetApp.exception.AnimalNotFoundException;
-import uj.jwzp2021.gp.VetApp.model.dto.AnimalMapper;
-import uj.jwzp2021.gp.VetApp.model.dto.AnimalRequestDto;
-import uj.jwzp2021.gp.VetApp.model.dto.AnimalResponseDto;
+import uj.jwzp2021.gp.VetApp.exception.animal.AnimalNotFoundException;
+import uj.jwzp2021.gp.VetApp.model.dto.Mappers.AnimalMapper;
+import uj.jwzp2021.gp.VetApp.model.dto.Requests.AnimalRequestDto;
+import uj.jwzp2021.gp.VetApp.model.dto.Responses.AnimalResponseDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Animal;
 import uj.jwzp2021.gp.VetApp.repository.AnimalRepository;
 

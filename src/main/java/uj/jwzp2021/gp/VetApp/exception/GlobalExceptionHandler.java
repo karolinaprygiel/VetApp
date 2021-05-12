@@ -8,6 +8,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import uj.jwzp2021.gp.VetApp.controller.rest.RestUtil;
+import uj.jwzp2021.gp.VetApp.exception.animal.AnimalNotFoundException;
+import uj.jwzp2021.gp.VetApp.exception.client.ClientNotFoundException;
+import uj.jwzp2021.gp.VetApp.exception.vet.VetNotFoundException;
+import uj.jwzp2021.gp.VetApp.exception.visit.VisitNotFoundException;
+import uj.jwzp2021.gp.VetApp.exception.visit.VisitOverlapsException;
+import uj.jwzp2021.gp.VetApp.exception.visit.VisitStartsInPastException;
+import uj.jwzp2021.gp.VetApp.exception.visit.VisitTooSoonException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
