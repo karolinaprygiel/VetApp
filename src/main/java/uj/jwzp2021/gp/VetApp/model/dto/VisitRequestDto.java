@@ -1,5 +1,6 @@
 package uj.jwzp2021.gp.VetApp.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
