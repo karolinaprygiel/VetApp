@@ -6,10 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uj.jwzp2021.gp.VetApp.controller.rest.hateoas.VetRepresentation;
-import uj.jwzp2021.gp.VetApp.controller.rest.hateoas.VisitRepresentation;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VetRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Responses.VetResponseDto;
-import uj.jwzp2021.gp.VetApp.model.dto.Responses.VisitResponseDto;
 import uj.jwzp2021.gp.VetApp.service.VetService;
 
 import java.util.List;

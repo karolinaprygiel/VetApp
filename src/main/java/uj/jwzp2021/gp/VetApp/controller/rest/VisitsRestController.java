@@ -127,9 +127,16 @@ public class VisitsRestController {
   }
 
   private VisitRepresentation represent(VisitResponseDto v) {
-    Link selfLink = linkTo(methodOn(VisitsRestController.class).getVisit(v.getId())).withSelfRel();
     var representation = VisitRepresentation.fromVisit(v);
-    representation.add(selfLink);
+    representation.add(
+        linkTo(methodOn(VisitsRestController.class).getVisit(v.getId())).withSelfRel());
+    representation.add(
+        linkTo(methodOn(AnimalRestController.class).getAnimal(v.getAnimalId())).withRel("animal"));
+    representation.add(
+        linkTo(methodOn(ClientRestController.class).getClient(v.getClientId())).withRel("client"));
+    representation.add(
+        linkTo(methodOn(VetRestController.class).getVet(v.getClientId())).withRel("vet"));
     return representation;
   }
+
 }
