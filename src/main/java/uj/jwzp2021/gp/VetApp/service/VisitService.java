@@ -3,6 +3,7 @@ package uj.jwzp2021.gp.VetApp.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import uj.jwzp2021.gp.VetApp.exception.VisitNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.VisitOverlapsException;
 import uj.jwzp2021.gp.VetApp.exception.VisitStartsInPastException;
 import uj.jwzp2021.gp.VetApp.exception.VisitTooSoonException;
@@ -10,12 +11,8 @@ import uj.jwzp2021.gp.VetApp.model.dto.VisitMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitResponseDto;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitUpdateRequestDto;
-import uj.jwzp2021.gp.VetApp.model.entity.VisitStatus;
 import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.repository.VisitRepository;
-import uj.jwzp2021.gp.VetApp.util.OperationResult;
-import uj.jwzp2021.gp.VetApp.util.VisitLookupError;
-import uj.jwzp2021.gp.VetApp.util.VisitUpdateError;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -30,11 +27,23 @@ public class VisitService {
   private final VetService vetService;
 
   @Autowired
-  public VisitService(VisitRepository visitRepository, AnimalService animalService, ClientService clientService, VetService vetService) {
+  public VisitService(
+      VisitRepository visitRepository,
+      AnimalService animalService,
+      ClientService clientService,
+      VetService vetService) {
     this.visitRepository = visitRepository;
     this.animalService = animalService;
     this.clientService = clientService;
     this.vetService = vetService;
+  }
+
+  private static boolean dateTooSoon(LocalDateTime startTime) {
+    return !LocalDateTime.now().plusHours(1).isBefore(startTime);
+  }
+
+  private static boolean dateInPast(LocalDateTime startTime) {
+    return !LocalDateTime.now().isBefore(startTime);
   }
 
   public List<Visit> getAllVisits() {
@@ -49,22 +58,14 @@ public class VisitService {
       throw new VisitTooSoonException("Visit cannot be scheduled for less an hour from now on.");
     }
     if (!dateAvailable(req.getStartTime(), req.getDuration())) {
-      throw new VisitOverlapsException("Such visit would overlap with another visit.");
+      throw new VisitOverlapsException("Visit would overlap with another visit.");
     }
     var client = clientService.getRawClientById(req.getClientId());
     var animal = animalService.getRawAnimalById(req.getAnimalId());
     var vet = vetService.getRawVetById(req.getVetId());
 
-   var visit =  visitRepository.save(VisitMapper.toVisit(req, animal, client, vet));
-   return VisitMapper.toVisitResponseDto(visit);
-  }
-
-  private static boolean dateTooSoon(LocalDateTime startTime) {
-    return !LocalDateTime.now().plusHours(1).isBefore(startTime);
-  }
-
-  private static boolean dateInPast(LocalDateTime startTime) {
-    return !LocalDateTime.now().isBefore(startTime);
+    var visit = visitRepository.save(VisitMapper.toVisit(req, animal, client, vet));
+    return VisitMapper.toVisitResponseDto(visit);
   }
 
   private boolean dateAvailable(LocalDateTime startTime, Duration duration) {
@@ -83,12 +84,18 @@ public class VisitService {
     }
   }
 
-  public OperationResult<VisitLookupError, VisitResponseDto> getVisitById(int id) {
-    var visit =  visitRepository.findById(id);
+  public Visit getRawVisitById(int id) {
+    var visit = visitRepository.findById(id);
     if (visit.isPresent()) {
-      return OperationResult.success(VisitMapper.toVisitResponseDto(visit.get()));
-    }
-    return OperationResult.fail(VisitLookupError.NOT_FOUND);
+      return visit.get();
+    } else throw new VisitNotFoundException("Visit with id:" + id + " not found.");
+  }
+
+  public VisitResponseDto getVisitById(int id) {
+    var visit = visitRepository.findById(id);
+    if (visit.isPresent()) {
+      return VisitMapper.toVisitResponseDto(visit.get());
+    } else throw new VisitNotFoundException("Visit with id:" + id + " not found.");
   }
 
   @Scheduled(fixedRate = 3600000)
@@ -98,25 +105,15 @@ public class VisitService {
     System.out.println("finishOutOfDateVisits function run at " + time);
   }
 
-  public OperationResult<VisitUpdateError, Visit> updateVisit(int id, VisitUpdateRequestDto visitReq) {
-    var visit = visitRepository.findById(id);
-    if (visit.isPresent()) {
-      if (visitReq.getDescription() != null) {
-        visit.get().setDescription(visitReq.getDescription());
-      }
-      if (visitReq.getVisitStatus() != null) {
-        VisitStatus visitStatus = visitReq.getVisitStatus();
-        if (visitStatus != VisitStatus.CANCELLED
-            && visitStatus != VisitStatus.FINISHED
-            && visitStatus != VisitStatus.NOT_APPEARED) {
-          return OperationResult.fail(VisitUpdateError.ILLEGAL_VALUE);
-        }
-        visit.get().setVisitStatus(visitReq.getVisitStatus());
-      }
-      Visit v = visitRepository.save(visit.get());
-
-      return OperationResult.success(v);
+  public VisitResponseDto updateVisit(int id, VisitUpdateRequestDto visitReq) {
+    var visit = getRawVisitById(id);
+    if (visitReq.getVisitStatus() != null) {
+      visit.setVisitStatus(visitReq.getVisitStatus());
     }
-    return OperationResult.fail(VisitUpdateError.VISIT_NOT_FOUND);
+    if (visitReq.getDescription() != null) {
+      visit.setDescription(visitReq.getDescription());
+    }
+    visitRepository.save(visit);
+    return VisitMapper.toVisitResponseDto(visit);
   }
 }

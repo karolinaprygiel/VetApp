@@ -28,7 +28,7 @@ public class VetService {
 
   public Vet getRawVetById(int id) {
     var vet = vetRepository.findById(id);
-    return vet.orElseThrow(()-> {throw new VetNotFoundException("Vet with id " + id +" not found");
+    return vet.orElseThrow(()-> {throw new VetNotFoundException("Vet with id:" + id +" not found.");
     });
   }
 

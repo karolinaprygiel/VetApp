@@ -22,9 +22,10 @@ public class ClientService {
   }
 
   public Client getRawClientById(int id) {
+    System.out.println(id);
     var client = clientRepository.findById(id);
     return client.orElseThrow(() -> {
-      throw new ClientNotFoundException("Client with id " + id + " not found");
+      throw new ClientNotFoundException("Client with id:" + id + " not found.");
     });
   }
 

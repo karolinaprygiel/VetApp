@@ -17,8 +17,7 @@ public class VisitMapper {
         "");
   }
 
-  public static VisitResponseDto toVisitResponseDto(
-      Visit visit) {
+  public static VisitResponseDto toVisitResponseDto(Visit visit) {
     return new VisitResponseDto(
         visit.getId(),
         visit.getStartTime(),
@@ -28,7 +27,6 @@ public class VisitMapper {
         visit.getAnimal().getId(),
         visit.getClient().getId(),
         visit.getVet().getId(),
-        visit.getDescription()
-    );
+        visit.getDescription());
   }
 }

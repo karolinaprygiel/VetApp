@@ -37,7 +37,7 @@ public class VisitsRestController {
   @GetMapping(path = "{id}")
   public ResponseEntity<?> getVisit(@PathVariable int id) {
     var result = visitsService.getVisitById(id);
-    return result.map(this::visitLookupErrorToResponse, this::dtoToResponse);
+    return ResponseEntity.ok(result);
   }
 
   @GetMapping
@@ -62,7 +62,7 @@ public class VisitsRestController {
   ResponseEntity<?> update(
       @PathVariable int id, @RequestBody VisitUpdateRequestDto visitUpdateRequestDto) {
     var result = visitsService.updateVisit(id, visitUpdateRequestDto);
-    return result.map(this::visitUpdateErrorToResponse, this::visitToResponse);
+    return ResponseEntity.ok(result);
   }
 
   private ResponseEntity<?> visitToResponse(Visit visit) {

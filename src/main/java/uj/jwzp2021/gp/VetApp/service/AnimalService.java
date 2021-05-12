@@ -27,7 +27,7 @@ public class AnimalService {
   public Animal getRawAnimalById(int id) {
     var animal = animalRepository.findById(id);
     return animal.orElseThrow(() -> {
-      throw new AnimalNotFoundException("Animal with id " + id + " not found");
+      throw new AnimalNotFoundException("Animal with id:" + id + " not found");
     });
   }
 
