@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @AllArgsConstructor
 @Data
@@ -11,7 +12,7 @@ public class VetResponseDto {
   private int id;
   private String name;
   private String surname;
-  private LocalDateTime shiftStart;
-  private LocalDateTime shiftEnd;
+  private String shiftStart;
+  private String shiftEnd;
 
 }

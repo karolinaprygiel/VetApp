@@ -1,0 +1,3 @@
+ALTER TABLE vets
+ALTER COLUMN shift_start TYPE TIME,
+ALTER COLUMN shift_end TYPE TIME;

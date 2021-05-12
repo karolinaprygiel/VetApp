@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,9 +26,9 @@ public class Vet {
     private String surname;
 
 
-    private LocalDateTime shiftStart;
+    private LocalTime shiftStart;
 
-    private LocalDateTime shiftEnd;
+    private LocalTime shiftEnd;
 
     @OneToMany(mappedBy = "vet", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Visit> visits = new ArrayList<>();
