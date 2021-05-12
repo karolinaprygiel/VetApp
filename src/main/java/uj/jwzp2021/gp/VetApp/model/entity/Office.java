@@ -13,7 +13,7 @@ import javax.persistence.Id;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "clinic")
+@Entity(name = "offices")
 public class Office {
 
     @Id

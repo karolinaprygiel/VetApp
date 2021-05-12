@@ -3,15 +3,11 @@ package uj.jwzp2021.gp.VetApp.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uj.jwzp2021.gp.VetApp.exception.office.OfficeNotFoundException;
-import uj.jwzp2021.gp.VetApp.model.dto.Mappers.OfficeMapper;
+import uj.jwzp2021.gp.VetApp.mapper.OfficeMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.OfficeRequestDto;
-import uj.jwzp2021.gp.VetApp.model.dto.Requests.VetRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Responses.OfficeResponseDto;
-import uj.jwzp2021.gp.VetApp.model.dto.Responses.VetResponseDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Office;
-import uj.jwzp2021.gp.VetApp.model.entity.Vet;
 import uj.jwzp2021.gp.VetApp.repository.OfficeRepository;
-import uj.jwzp2021.gp.VetApp.repository.VetRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;

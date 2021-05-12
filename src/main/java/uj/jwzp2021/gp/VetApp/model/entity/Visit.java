@@ -45,11 +45,13 @@ public class Visit {
     @JoinColumn(name = "vet_id", referencedColumnName = "id")
     private Vet vet;
 
+    @ManyToOne
+    @JoinColumn(name = "office_id", referencedColumnName = "id")
+    private Office office;
+
     private String description;
 
-    public static Visit newVisit(LocalDateTime startTime, Duration duration, Animal animal, BigDecimal price, Client client, Vet vet) {
-        return new Visit(-1, startTime, duration, VisitStatus.PLANNED, price, animal, client, vet, null);
-    }
+
 
 
 }

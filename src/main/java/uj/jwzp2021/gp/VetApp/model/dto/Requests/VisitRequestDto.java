@@ -15,4 +15,5 @@ public class VisitRequestDto {
     private final int animalId;
     private final int clientId;
     private final int vetId;
+    private final int officeId;
 }

@@ -19,6 +19,7 @@ public class VisitResponseDto {
     private int animalId;
     private int clientId;
     private int vetId;
+    private int officeId;
     private String description;
 
 }

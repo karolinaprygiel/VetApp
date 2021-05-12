@@ -6,7 +6,7 @@ import uj.jwzp2021.gp.VetApp.model.entity.*;
 
 public class VisitMapper {
   public static Visit toVisit(
-      VisitRequestDto visitRequestDto, Animal animal, Client client, Vet vet) {
+      VisitRequestDto visitRequestDto, Animal animal, Client client, Vet vet, Office office) {
     return new Visit(
         -1,
         visitRequestDto.getStartTime(),
@@ -16,10 +16,13 @@ public class VisitMapper {
         animal,
         client,
         vet,
+        office,
         "");
   }
 
   public static VisitResponseDto toVisitResponseDto(Visit visit) {
+    var office = visit.getOffice();
+
     return new VisitResponseDto(
         visit.getId(),
         visit.getStartTime(),
@@ -29,6 +32,7 @@ public class VisitMapper {
         visit.getAnimal().getId(),
         visit.getClient().getId(),
         visit.getVet().getId(),
+        office != null ? office.getId() : -1,
         visit.getDescription());
   }
 }
