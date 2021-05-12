@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import uj.jwzp2021.gp.VetApp.model.entity.Visit;
+
 
 @Data
 @AllArgsConstructor
@@ -22,6 +24,8 @@ public class Client {
     private String surname;
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Animal> animals = new ArrayList<>();
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<Visit> visits = new ArrayList<>();
 
 
 

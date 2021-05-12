@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import uj.jwzp2021.gp.VetApp.service.AnimalService;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -29,6 +31,11 @@ public class Animal {
     @ManyToOne
     @JoinColumn(name = "client_id", referencedColumnName = "id", nullable = false)
     private Client owner;
+
+    @OneToMany(mappedBy = "animal", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<Visit> visits = new ArrayList<>();
+
+
 
 
 
