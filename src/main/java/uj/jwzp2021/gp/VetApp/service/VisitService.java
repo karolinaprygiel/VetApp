@@ -3,10 +3,7 @@ package uj.jwzp2021.gp.VetApp.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import uj.jwzp2021.gp.VetApp.exception.VisitNotFoundException;
-import uj.jwzp2021.gp.VetApp.exception.VisitOverlapsException;
-import uj.jwzp2021.gp.VetApp.exception.VisitStartsInPastException;
-import uj.jwzp2021.gp.VetApp.exception.VisitTooSoonException;
+import uj.jwzp2021.gp.VetApp.exception.*;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.VisitResponseDto;
@@ -63,6 +60,9 @@ public class VisitService {
     var client = clientService.getRawClientById(req.getClientId());
     var animal = animalService.getRawAnimalById(req.getAnimalId());
     var vet = vetService.getRawVetById(req.getVetId());
+    if (animal.getOwner() == client) {
+      throw new WrongOwnerException("This person does not own this animal.");
+    }
 
     var visit = visitRepository.save(VisitMapper.toVisit(req, animal, client, vet));
     return VisitMapper.toVisitResponseDto(visit);
