@@ -135,7 +135,7 @@ public class VisitsRestController {
     representation.add(
         linkTo(methodOn(ClientRestController.class).getClient(v.getClientId())).withRel("client"));
     representation.add(
-        linkTo(methodOn(VetRestController.class).getVet(v.getClientId())).withRel("vet"));
+        linkTo(methodOn(VetRestController.class).getVet(v.getVetId())).withRel("vet"));
     return representation;
   }
 

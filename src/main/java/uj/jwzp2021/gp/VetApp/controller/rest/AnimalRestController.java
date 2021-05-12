@@ -60,7 +60,7 @@ public class AnimalRestController {
     representation.add(
         linkTo(methodOn(AnimalRestController.class).getAnimal(a.getId())).withSelfRel());
     representation.add(
-        linkTo(methodOn(ClientRestController.class).getClient(a.getId())).withRel("owner"));
+        linkTo(methodOn(ClientRestController.class).getClient(a.getOwnerId())).withRel("owner"));
     return representation;
   }
 }
