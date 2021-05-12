@@ -92,10 +92,8 @@ public class VisitService {
   }
 
   public VisitResponseDto getVisitById(int id) {
-    var visit = visitRepository.findById(id);
-    if (visit.isPresent()) {
-      return VisitMapper.toVisitResponseDto(visit.get());
-    } else throw new VisitNotFoundException("Visit with id:" + id + " not found.");
+    return VisitMapper.toVisitResponseDto(getRawVisitById(id));
+
   }
 
   @Scheduled(fixedRate = 3600000)
