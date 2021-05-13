@@ -13,8 +13,8 @@ import java.util.List;
 @Repository
 public interface VisitRepository extends JpaRepository<Visit, Integer> {
 
-    @Query("select v from visits v where (:timeFrom >= v.startTime and :timeFrom < (v.startTime + v.duration)) or (:timeTo > v.startTime and :timeTo <= (v.startTime + v.duration))")
-    List<Visit> overlaps(LocalDateTime timeFrom, LocalDateTime timeTo);
+    @Query("select v from visits v where ((v.vet.id = :vetId or v.office.id = :officeId) and ((:timeFrom >= v.startTime and :timeFrom < (v.startTime + v.duration)) or (:timeTo > v.startTime and :timeTo <= (v.startTime + v.duration))))")
+    List<Visit> overlaps(LocalDateTime timeFrom, LocalDateTime timeTo, int vetId, int officeId);
 
     @Transactional
     @Modifying

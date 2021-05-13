@@ -3,11 +3,13 @@ package uj.jwzp2021.gp.VetApp.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import uj.jwzp2021.gp.VetApp.exception.vet.VetNotAvailableException;
 import uj.jwzp2021.gp.VetApp.exception.visit.*;
 import uj.jwzp2021.gp.VetApp.mapper.VisitMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitUpdateRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Responses.VisitResponseDto;
+import uj.jwzp2021.gp.VetApp.model.entity.Vet;
 import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.repository.VisitRepository;
 
@@ -58,19 +60,27 @@ public class VisitService {
   }
 
   public VisitResponseDto createVisit(VisitRequestDto req) {
+
+    var client = clientService.getRawClientById(req.getClientId());
+    var animal = animalService.getRawAnimalById(req.getAnimalId());
+    var vet = vetService.getRawVetById(req.getVetId());
+    var office = officeService.getRawOfficeById(req.getOfficeId());
+
     if (dateInPast(req.getStartTime())) {
       throw new VisitStartsInPastException("Visit can not start in the past.");
     }
     if (dateTooSoon(req.getStartTime())) {
       throw new VisitTooSoonException("Visit cannot be scheduled for less an hour from now on.");
     }
-    if (!dateAvailable(req.getStartTime(), req.getDuration())) {
+
+    if(!vetAvailable(req.getStartTime(), req.getDuration(), req.getVetId())){
+      throw new VetNotAvailableException("Visit not in the working hours of the chosen vet");
+    }
+
+    if (!dateAvailable(req.getStartTime(), req.getDuration(), req.getVetId(), req.getOfficeId())) {
       throw new VisitOverlapsException("Visit would overlap with another visit.");
     }
-    var client = clientService.getRawClientById(req.getClientId());
-    var animal = animalService.getRawAnimalById(req.getAnimalId());
-    var vet = vetService.getRawVetById(req.getVetId());
-    var office = officeService.getRawOfficeById(req.getOfficeId());
+
     if (animal.getOwner().getId() != client.getId()) {
       throw new WrongOwnerException("This person does not own this animal.");
     }
@@ -79,10 +89,14 @@ public class VisitService {
     return VisitMapper.toVisitResponseDto(visit);
   }
 
-  private boolean dateAvailable(LocalDateTime startTime, Duration duration) {
+  private boolean dateAvailable(LocalDateTime startTime, Duration duration, int vetId, int officeId) {
     List<Visit> overlaps =
-        visitRepository.overlaps(startTime, startTime.plusMinutes(duration.toMinutes()));
+        visitRepository.overlaps(startTime, startTime.plusMinutes(duration.toMinutes()), vetId, officeId);
     return overlaps.size() == 0;
+  }
+
+  private boolean vetAvailable(LocalDateTime startTime, Duration duration, int vetId) {
+    return vetService.vetAvailable(startTime, duration, vetId);
   }
 
   public boolean delete(int id) {

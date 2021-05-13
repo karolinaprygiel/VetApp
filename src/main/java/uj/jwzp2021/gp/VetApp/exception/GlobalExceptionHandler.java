@@ -11,6 +11,8 @@ import uj.jwzp2021.gp.VetApp.controller.rest.RestUtil;
 import uj.jwzp2021.gp.VetApp.exception.animal.AnimalNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.client.ClientNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.office.OfficeNotFoundException;
+import uj.jwzp2021.gp.VetApp.exception.vet.VetNotAvailableException;
+import uj.jwzp2021.gp.VetApp.exception.vet.VetNotExistsException;
 import uj.jwzp2021.gp.VetApp.exception.vet.VetNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.visit.VisitNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.visit.VisitOverlapsException;
@@ -62,6 +64,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(VisitTooSoonException.class)
   protected ResponseEntity<?> handleVisitTooSoonException(VisitTooSoonException ex, WebRequest request) {
+    return handleExceptionInternal(ex, RestUtil.response(ex.getMessage()), new HttpHeaders(), HttpStatus.NOT_ACCEPTABLE, request);
+  }
+
+  @ExceptionHandler(VetNotAvailableException.class)
+  protected ResponseEntity<?> VetNotAvailableException(VetNotAvailableException ex, WebRequest request) {
     return handleExceptionInternal(ex, RestUtil.response(ex.getMessage()), new HttpHeaders(), HttpStatus.NOT_ACCEPTABLE, request);
   }
 

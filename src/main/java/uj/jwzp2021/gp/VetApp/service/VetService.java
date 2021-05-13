@@ -9,6 +9,8 @@ import uj.jwzp2021.gp.VetApp.model.dto.Responses.VetResponseDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Vet;
 import uj.jwzp2021.gp.VetApp.repository.VetRepository;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,5 +48,11 @@ public class VetService {
     var vet = getRawVetById(id);
     vetRepository.delete(vet);
     return VetMapper.toVetResponseDto(vet);
+  }
+
+  public boolean vetAvailable(LocalDateTime startTime, Duration duration, int vetId) {
+    var vet = getRawVetById(vetId);
+    return startTime.plus(duration).toLocalTime().isBefore(vet.getShiftEnd().plusSeconds(1)) &&
+        startTime.toLocalTime().isAfter(vet.getShiftStart().minusSeconds(1));
   }
 }
