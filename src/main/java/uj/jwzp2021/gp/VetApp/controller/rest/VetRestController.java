@@ -1,7 +1,6 @@
 package uj.jwzp2021.gp.VetApp.controller.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +31,11 @@ public class VetRestController {
     return ResponseEntity.ok(vetService.getVetById(id));
   }
 
+  @GetMapping(path = "{id}/hateoas")
+  public ResponseEntity<?> getVetHateoas(@PathVariable int id) {
+    return ResponseEntity.ok(represent(vetService.getVetById(id)));
+  }
+
   @GetMapping
   public ResponseEntity<?> getAll() {
     return ResponseEntity.ok(vetService.getAll());
@@ -56,9 +60,15 @@ public class VetRestController {
   }
 
   private VetRepresentation represent(VetResponseDto v) {
-    Link selfLink = linkTo(methodOn(VetRestController.class).getVet(v.getId())).withSelfRel();
     var representation = VetRepresentation.fromVetResponseDto(v);
-    representation.add(selfLink);
+    representation.add(linkTo(methodOn(VetRestController.class).getVet(v.getId())).withSelfRel());
+    representation.add(
+        v.getVisitIds().stream()
+            .map(
+                (id) ->
+                    linkTo(methodOn(VisitsRestController.class).getVisit(id))
+                        .withRel("oneOfVisits"))
+            .collect(Collectors.toList()));
     return representation;
   }
 }

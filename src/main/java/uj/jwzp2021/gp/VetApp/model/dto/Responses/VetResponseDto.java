@@ -3,15 +3,15 @@ package uj.jwzp2021.gp.VetApp.model.dto.Responses;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.util.List;
 
 @AllArgsConstructor
 @Data
 public class VetResponseDto {
-  private int id;
-  private String name;
-  private String surname;
-  private String shiftStart;
-  private String shiftEnd;
+  private final int id;
+  private final String name;
+  private final String surname;
+  private final String shiftStart;
+  private final String shiftEnd;
+  private final List<Integer> visitIds;
 }
