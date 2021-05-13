@@ -12,6 +12,7 @@ import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitUpdateRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Responses.VisitResponseDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Visit;
+import uj.jwzp2021.gp.VetApp.service.AnimalService;
 import uj.jwzp2021.gp.VetApp.service.VisitService;
 import uj.jwzp2021.gp.VetApp.util.VisitCreationError;
 import uj.jwzp2021.gp.VetApp.util.VisitUpdateError;
@@ -26,46 +27,55 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping(path = "/api/visits", produces = MediaType.APPLICATION_JSON_VALUE)
 public class VisitsRestController {
 
-  private final VisitService visitsService;
+  private final VisitService visitService;
+  private final AnimalService animalService;
+
 
   @Autowired
-  public VisitsRestController(VisitService visitsService) {
-    this.visitsService = visitsService;
+  public VisitsRestController(VisitService visitService, AnimalService animalService) {
+    this.visitService = visitService;
+    this.animalService = animalService;
   }
 
   @GetMapping(path = "{id}")
   public ResponseEntity<?> getVisit(@PathVariable int id) {
-    var result = visitsService.getVisitById(id);
+    var result = visitService.getVisitById(id);
     return ResponseEntity.ok(result);
+  }
+
+  @GetMapping(path = "{id}/animal")
+  public ResponseEntity<?> getVisitAnimal(@PathVariable int id) {
+    var animal = animalService.getAnimalById(visitService.getVisitById(id).getAnimalId());
+    return ResponseEntity.ok(animal);
   }
 
   @GetMapping
   public ResponseEntity<?> getAllVisits() {
-    //    return visitsService.getAllVisits();
-    var visits = visitsService.getAllVisits();
+    //    return visitService.getAllVisits();
+    var visits = visitService.getAllVisits();
     return ResponseEntity.ok(visits);
   }
 
   @PostMapping()
   public ResponseEntity<?> createVisit(@RequestBody VisitRequestDto visitReq) {
-    return ResponseEntity.ok(visitsService.createVisit(visitReq));
+    return ResponseEntity.ok(visitService.createVisit(visitReq));
   }
 
   @DeleteMapping(path = "/{id}")
   ResponseEntity<?> delete(@PathVariable int id) {
-    return ResponseEntity.ok(visitsService.delete(id));
+    return ResponseEntity.ok(visitService.delete(id));
   }
 
   @PatchMapping(path = "/{id}")
   ResponseEntity<?> update(
       @PathVariable int id, @RequestBody VisitUpdateRequestDto visitUpdateRequestDto) {
-    var result = visitsService.updateVisit(id, visitUpdateRequestDto);
+    var result = visitService.updateVisit(id, visitUpdateRequestDto);
     return ResponseEntity.ok(result);
   }
 
   @GetMapping(value = "/hateoas", produces = "application/hal+json")
   public List<VisitRepresentation> getAllHateoas() {
-    var visits = visitsService.getAllVisits();
+    var visits = visitService.getAllVisits();
     return visits.stream().map(this::represent).collect(Collectors.toList());
   }
 
@@ -74,7 +84,9 @@ public class VisitsRestController {
     representation.add(
         linkTo(methodOn(VisitsRestController.class).getVisit(v.getId())).withSelfRel());
     representation.add(
-        linkTo(methodOn(AnimalRestController.class).getAnimal(v.getAnimalId())).withRel("animal"));
+        linkTo(methodOn(AnimalRestController.class).getAnimal(v.getAnimalId())).withRel("animalDetached"));
+    representation.add(
+        linkTo(methodOn(VisitsRestController.class).getVisitAnimal(v.getId())).withRel("animal"));
     representation.add(
         linkTo(methodOn(ClientRestController.class).getClient(v.getClientId())).withRel("client"));
     representation.add(
