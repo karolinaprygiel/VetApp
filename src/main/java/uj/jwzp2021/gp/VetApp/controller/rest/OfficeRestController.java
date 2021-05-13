@@ -54,9 +54,14 @@ public class OfficeRestController {
     return offices.stream().map(this::represent).collect(Collectors.toList());
   }
 
-  private OfficeRepresentation represent(OfficeResponseDto v) {
-    var representation = OfficeRepresentation.fromOfficeResponseDto(v);
-    representation.add(selfLink);
+  private OfficeRepresentation represent(OfficeResponseDto o) {
+    var representation = OfficeRepresentation.fromOfficeResponseDto(o);
+    representation.add(
+        linkTo(methodOn(OfficeRestController.class).getOffice(o.getId())).withSelfRel());
+    representation.add(
+        o.getVisitIds().stream()
+            .map((v) -> linkTo(methodOn(VisitsRestController.class).getVisit(v)).withRel("oneOfVisits"))
+            .collect(Collectors.toList()));
     return representation;
   }
 }
