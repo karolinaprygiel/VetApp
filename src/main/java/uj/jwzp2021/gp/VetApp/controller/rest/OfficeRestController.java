@@ -62,7 +62,7 @@ public class OfficeRestController {
   }
 
   private OfficeRepresentation represent(OfficeResponseDto v) {
-    Link selfLink = linkTo(methodOn(VetRestController.class).getVet(v.getId())).withSelfRel();
+    Link selfLink = linkTo(methodOn(OfficeRestController.class).getOffice(v.getId())).withSelfRel();
     var representation = OfficeRepresentation.fromOfficeResponseDto(v);
     representation.add(selfLink);
     return representation;
