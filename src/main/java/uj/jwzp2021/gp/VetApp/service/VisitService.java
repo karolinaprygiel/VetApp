@@ -23,17 +23,21 @@ public class VisitService {
   private final AnimalService animalService;
   private final ClientService clientService;
   private final VetService vetService;
+  private final OfficeService officeService;
 
   @Autowired
   public VisitService(
       VisitRepository visitRepository,
       AnimalService animalService,
       ClientService clientService,
-      VetService vetService) {
+      VetService vetService,
+      OfficeService officeService
+  ) {
     this.visitRepository = visitRepository;
     this.animalService = animalService;
     this.clientService = clientService;
     this.vetService = vetService;
+    this.officeService = officeService;
   }
 
   private static boolean dateTooSoon(LocalDateTime startTime) {
@@ -66,11 +70,12 @@ public class VisitService {
     var client = clientService.getRawClientById(req.getClientId());
     var animal = animalService.getRawAnimalById(req.getAnimalId());
     var vet = vetService.getRawVetById(req.getVetId());
-    if (animal.getOwner() == client) {
+    var office = officeService.getRawOfficeById(req.getOfficeId());
+    if (animal.getOwner().getId() != client.getId()) {
       throw new WrongOwnerException("This person does not own this animal.");
     }
 
-    var visit = visitRepository.save(VisitMapper.toVisit(req, animal, client, vet));
+    var visit = visitRepository.save(VisitMapper.toVisit(req, animal, client, vet, office));
     return VisitMapper.toVisitResponseDto(visit);
   }
 
