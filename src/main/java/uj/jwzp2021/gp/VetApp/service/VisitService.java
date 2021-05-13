@@ -53,7 +53,7 @@ public class VisitService {
     return visits.stream().map(VisitMapper::toVisitResponseDto).collect(Collectors.toList());
   }
 
-  public List<Visit> getAllRawVisits() {
+  List<Visit> getAllRawVisits() {
     return visitRepository.findAll();
   }
 
@@ -91,7 +91,7 @@ public class VisitService {
     return VisitMapper.toVisitResponseDto(visit);
   }
 
-  public Visit getRawVisitById(int id) {
+  Visit getRawVisitById(int id) {
     var visit = visitRepository.findById(id);
     if (visit.isPresent()) {
       return visit.get();

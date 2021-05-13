@@ -21,7 +21,7 @@ public class ClientService {
     this.clientRepository = clientRepository;
   }
 
-  public Client getRawClientById(int id) {
+  Client getRawClientById(int id) {
     var client = clientRepository.findById(id);
     return client.orElseThrow(() -> {
       throw new ClientNotFoundException("Client with id:" + id + " not found.");
