@@ -60,7 +60,9 @@ public class OfficeRestController {
         linkTo(methodOn(OfficeRestController.class).getOffice(o.getId())).withSelfRel());
     representation.add(
         o.getVisitIds().stream()
-            .map((v) -> linkTo(methodOn(VisitsRestController.class).getVisit(v)).withRel("oneOfVisits"))
+            .map(
+                (v) ->
+                    linkTo(methodOn(VisitsRestController.class).getVisit(v)).withRel("oneOfVisits"))
             .collect(Collectors.toList()));
     return representation;
   }

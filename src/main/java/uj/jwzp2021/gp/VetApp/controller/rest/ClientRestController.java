@@ -1,15 +1,12 @@
 package uj.jwzp2021.gp.VetApp.controller.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uj.jwzp2021.gp.VetApp.controller.rest.hateoas.ClientRepresentation;
-import uj.jwzp2021.gp.VetApp.controller.rest.hateoas.VisitRepresentation;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.ClientRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Responses.ClientResponseDto;
-import uj.jwzp2021.gp.VetApp.model.dto.Responses.VisitResponseDto;
 import uj.jwzp2021.gp.VetApp.service.ClientService;
 
 import java.util.List;
@@ -36,8 +33,7 @@ public class ClientRestController {
 
   @GetMapping
   public ResponseEntity<?> getAllClients() {
-    return ResponseEntity.ok(
-        clientService.getAll());
+    return ResponseEntity.ok(clientService.getAll());
   }
 
   @PostMapping
@@ -59,9 +55,15 @@ public class ClientRestController {
   }
 
   private ClientRepresentation represent(ClientResponseDto c) {
-    Link selfLink = linkTo(methodOn(VisitsRestController.class).getVisit(c.getId())).withSelfRel();
     var representation = ClientRepresentation.fromClientResponseDto(c);
-    representation.add(selfLink);
+    representation.add(
+        linkTo(methodOn(VisitsRestController.class).getVisit(c.getId())).withSelfRel());
+    representation.add(
+        c.getAnimalIds().stream()
+            .map(
+                (id) ->
+                    linkTo(methodOn(AnimalRestController.class).getAnimal(id)).withRel("oneOfPets"))
+            .collect(Collectors.toList()));
     return representation;
   }
 }
