@@ -85,14 +85,10 @@ public class VisitService {
     return overlaps.size() == 0;
   }
 
-  public boolean delete(int id) {
-    var visit = visitRepository.findById(id);
-    if (visit.isPresent()) {
-      visitRepository.deleteById(visit.get().getId());
-      return true;
-    } else {
-      return false;
-    }
+  public VisitResponseDto delete(int id) {
+    var visit = getRawVisitById(id);
+    visitRepository.delete(visit);
+    return VisitMapper.toVisitResponseDto(visit);
   }
 
   public Visit getRawVisitById(int id) {
