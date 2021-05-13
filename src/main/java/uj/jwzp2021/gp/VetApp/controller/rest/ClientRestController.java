@@ -49,7 +49,7 @@ public class ClientRestController {
   @DeleteMapping(path = "/{id}")
   public ResponseEntity<?> deleteClient(@PathVariable int id) {
     var client = clientService.deleteClient(id);
-    return ResponseEntity.accepted().body(client);
+    return ResponseEntity.ok(client);
   }
 
   @GetMapping(value = "/hateoas", produces = "application/hal+json")

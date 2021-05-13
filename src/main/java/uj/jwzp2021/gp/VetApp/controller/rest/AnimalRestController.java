@@ -46,7 +46,7 @@ public class AnimalRestController {
   @DeleteMapping(path = "/{id}")
   public ResponseEntity<?> deleteAnimal(@PathVariable int id) {
     var animal = animalService.deleteAnimal(id);
-    return ResponseEntity.accepted().body(animal);
+    return ResponseEntity.ok(animal);
   }
 
   @GetMapping(value = "/hateoas", produces = "application/hal+json")

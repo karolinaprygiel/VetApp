@@ -46,7 +46,7 @@ public class VetRestController {
   @DeleteMapping(path = "/{id}")
   public ResponseEntity<?> deleteVet(@PathVariable int id) {
     var result = vetService.deleteVet(id);
-    return ResponseEntity.accepted().body(result);
+    return ResponseEntity.ok(result);
   }
 
   @GetMapping(value = "/hateoas", produces = "application/hal+json")
