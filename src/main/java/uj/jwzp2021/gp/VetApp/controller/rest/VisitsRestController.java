@@ -63,63 +63,6 @@ public class VisitsRestController {
     return ResponseEntity.ok(result);
   }
 
-  private ResponseEntity<?> visitToResponse(Visit visit) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(VisitMapper.toVisitResponseDto(visit));
-  }
-
-  private ResponseEntity<?> dtoToResponse(VisitResponseDto visitResponseDto) {
-    return ResponseEntity.status(HttpStatus.OK).body(visitResponseDto);
-  }
-
-  private ResponseEntity<?> visitCreationErrorToResponse(VisitCreationError result) {
-    switch (result) {
-      case STARTS_IN_PAST:
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-            .body(RestUtil.response("Can not book a visit in the past."));
-      case TOO_SOON:
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-            .body(RestUtil.response("Booking for less than an hour in the future is prohibited."));
-      case OVERLAP:
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-            .body(RestUtil.response("Overlapping with other visit."));
-      case REPOSITORY_PROBLEM:
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(RestUtil.response("Problem with server, please try again later."));
-      case CLIENT_NOT_EXISTS:
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(RestUtil.response("Client with provided id not exists."));
-      case ANIMAL_NOT_EXISTS:
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(RestUtil.response("Animal with provided id not exists."));
-      case VET_NOT_EXISTS:
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(RestUtil.response("Vet with provided id not exists."));
-      default:
-        return ResponseEntity.badRequest().body(RestUtil.response("Unknown error."));
-    }
-  }
-
-  private ResponseEntity<?> visitUpdateErrorToResponse(VisitUpdateError result) {
-    switch (result) {
-      case VISIT_NOT_FOUND:
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body(RestUtil.response("Visit with such id was not found."));
-      case ILLEGAL_FIELD:
-        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
-            .body(RestUtil.response("You can modify only status and description."));
-      case ILLEGAL_VALUE:
-        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
-            .body(
-                RestUtil.response(
-                    "You can set status only to FINISHED, CANCELLED and NOT_APPEARED values."));
-      case REPOSITORY_PROBLEM:
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(RestUtil.response("Problem with server, please try again later."));
-      default:
-        return ResponseEntity.badRequest().body(RestUtil.response("Unknown error."));
-    }
-  }
-
   @GetMapping(value = "/hateoas", produces = "application/hal+json")
   public List<VisitRepresentation> getAllHateoas() {
     var visits = visitsService.getAllVisits();
