@@ -55,7 +55,7 @@ public class VisitService {
     return visits.stream().map(VisitMapper::toVisitResponseDto).collect(Collectors.toList());
   }
 
-  public List<Visit> getAllRawVisits() {
+  List<Visit> getAllRawVisits() {
     return visitRepository.findAll();
   }
 
@@ -95,21 +95,18 @@ public class VisitService {
     return overlaps.size() == 0;
   }
 
+  public VisitResponseDto delete(int id) {
+    var visit = getRawVisitById(id);
+    visitRepository.delete(visit);
+    return VisitMapper.toVisitResponseDto(visit);
+    }
+
   private boolean vetAvailable(LocalDateTime startTime, Duration duration, int vetId) {
     return vetService.vetAvailable(startTime, duration, vetId);
   }
 
-  public boolean delete(int id) {
-    var visit = visitRepository.findById(id);
-    if (visit.isPresent()) {
-      visitRepository.deleteById(visit.get().getId());
-      return true;
-    } else {
-      return false;
-    }
-  }
 
-  public Visit getRawVisitById(int id) {
+  Visit getRawVisitById(int id) {
     var visit = visitRepository.findById(id);
     if (visit.isPresent()) {
       return visit.get();

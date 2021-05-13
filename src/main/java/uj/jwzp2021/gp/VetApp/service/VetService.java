@@ -23,7 +23,7 @@ public class VetService {
     this.vetRepository = vetRepository;
   }
 
-  public Vet getRawVetById(int id) {
+  Vet getRawVetById(int id) {
     var vet = vetRepository.findById(id);
     return vet.orElseThrow(()-> {throw new VetNotFoundException("Vet with id:" + id +" not found.");
     });

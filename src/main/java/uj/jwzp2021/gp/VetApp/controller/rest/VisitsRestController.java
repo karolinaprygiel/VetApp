@@ -52,8 +52,8 @@ public class VisitsRestController {
   }
 
   @DeleteMapping(path = "/{id}")
-  void delete(@PathVariable int id) {
-    visitsService.delete(id);
+  ResponseEntity<?> delete(@PathVariable int id) {
+    return ResponseEntity.ok(visitsService.delete(id));
   }
 
   @PatchMapping(path = "/{id}")

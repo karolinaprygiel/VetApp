@@ -21,7 +21,7 @@ public class OfficeService {
     this.officeRepository = officeRepository;
   }
 
-  public Office getRawOfficeById(int id) {
+  Office getRawOfficeById(int id) {
     var office = officeRepository.findById(id);
     return office.orElseThrow(()-> {throw new OfficeNotFoundException("Office with id:" + id +" not found.");
     });
