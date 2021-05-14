@@ -18,6 +18,8 @@ import uj.jwzp2021.gp.VetApp.repository.VisitRepository;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -182,7 +184,7 @@ public class VisitService {
     if (dateInPast(dateTo)){
       throw new VisitStartsInPastException("Cannot book visits in past");
     }else if (dateInPast(dateFrom)){
-      return LocalDateTime.now(clock).plusMinutes(60);
+      return LocalDateTime.now(clock).plusMinutes(60).truncatedTo(ChronoUnit.MINUTES);
     }else{
       return dateFrom;
     }
