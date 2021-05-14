@@ -1,22 +1,17 @@
 package uj.jwzp2021.gp.VetApp.controller.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Link;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uj.jwzp2021.gp.VetApp.controller.rest.hateoas.VisitRepresentation;
-import uj.jwzp2021.gp.VetApp.mapper.VisitMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitUpdateRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Responses.VisitResponseDto;
-import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.service.AnimalService;
 import uj.jwzp2021.gp.VetApp.service.VisitService;
-import uj.jwzp2021.gp.VetApp.util.VisitCreationError;
-import uj.jwzp2021.gp.VetApp.util.VisitUpdateError;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,7 +24,6 @@ public class VisitsRestController {
 
   private final VisitService visitService;
   private final AnimalService animalService;
-
 
   @Autowired
   public VisitsRestController(VisitService visitService, AnimalService animalService) {
@@ -84,7 +78,8 @@ public class VisitsRestController {
     representation.add(
         linkTo(methodOn(VisitsRestController.class).getVisit(v.getId())).withSelfRel());
     representation.add(
-        linkTo(methodOn(AnimalRestController.class).getAnimal(v.getAnimalId())).withRel("animalDetached"));
+        linkTo(methodOn(AnimalRestController.class).getAnimal(v.getAnimalId()))
+            .withRel("animalDetached"));
     representation.add(
         linkTo(methodOn(VisitsRestController.class).getVisitAnimal(v.getId())).withRel("animal"));
     representation.add(
@@ -94,4 +89,11 @@ public class VisitsRestController {
     return representation;
   }
 
+  @GetMapping("/find")
+  public ResponseEntity<?> find(
+      @RequestParam(value = "hourFrom") Timestamp from,
+      @RequestParam(value = "hourTo") Timestamp to,
+      @RequestParam(value = "preferredVet", required = false, defaultValue = "") String vetName) {
+
+  }
 }
