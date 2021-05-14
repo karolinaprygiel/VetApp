@@ -11,17 +11,16 @@ import uj.jwzp2021.gp.VetApp.service.VisitService;
 @RequestMapping("/ui")
 public class VisitsThymeController {
 
-    private final VisitService visitsService;
+  private final VisitService visitsService;
 
-    @Autowired
-    public VisitsThymeController(VisitService visitsService) {
-        this.visitsService = visitsService;
-    }
+  @Autowired
+  public VisitsThymeController(VisitService visitsService) {
+    this.visitsService = visitsService;
+  }
 
-    @GetMapping("/visits")
-    public String showAllVisits(Model model) {
-        model.addAttribute("visits", visitsService.getAllVisits());
-        return "visits";
-    }
-
+  @GetMapping("/visits")
+  public String showAllVisits(Model model) {
+    model.addAttribute("visits", visitsService.getAllVisits());
+    return "visits";
+  }
 }

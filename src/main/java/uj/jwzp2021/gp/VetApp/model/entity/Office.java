@@ -1,6 +1,5 @@
 package uj.jwzp2021.gp.VetApp.model.entity;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,12 +14,10 @@ import java.util.List;
 @Entity(name = "offices")
 public class Office {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
-    private String name;
-
-    @OneToMany(mappedBy = "office", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<Visit> visits = new ArrayList<>();
-
+  @OneToMany(mappedBy = "office", cascade = CascadeType.ALL, orphanRemoval = true)
+  private final List<Visit> visits = new ArrayList<>();
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private int id;
+  private String name;
 }

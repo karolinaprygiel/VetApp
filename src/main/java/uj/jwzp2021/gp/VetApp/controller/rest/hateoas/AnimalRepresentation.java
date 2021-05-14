@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.hateoas.RepresentationModel;
 import uj.jwzp2021.gp.VetApp.model.dto.Responses.AnimalResponseDto;
-import uj.jwzp2021.gp.VetApp.model.dto.Responses.ClientResponseDto;
 import uj.jwzp2021.gp.VetApp.model.entity.AnimalType;
 
 @Data

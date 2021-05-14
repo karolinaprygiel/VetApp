@@ -17,17 +17,19 @@ public class OfficeService {
   private final OfficeRepository officeRepository;
 
   @Autowired
-  public OfficeService (OfficeRepository officeRepository){
+  public OfficeService(OfficeRepository officeRepository) {
     this.officeRepository = officeRepository;
   }
 
   Office getRawOfficeById(int id) {
     var office = officeRepository.findById(id);
-    return office.orElseThrow(()-> {throw new OfficeNotFoundException("Office with id:" + id +" not found.");
-    });
+    return office.orElseThrow(
+        () -> {
+          throw new OfficeNotFoundException("Office with id:" + id + " not found.");
+        });
   }
 
-  public OfficeResponseDto getOfficeById(int id){
+  public OfficeResponseDto getOfficeById(int id) {
     return OfficeMapper.toOfficeResponseDto(getRawOfficeById(id));
   }
 
@@ -42,12 +44,12 @@ public class OfficeService {
   }
 
   public OfficeResponseDto createOffice(OfficeRequestDto officeRequestDto) {
-    var office= officeRepository.save(OfficeMapper.toOffice(officeRequestDto));
+    var office = officeRepository.save(OfficeMapper.toOffice(officeRequestDto));
     return OfficeMapper.toOfficeResponseDto(office);
   }
 
   public OfficeResponseDto deleteOffice(int id) {
-    var office= getRawOfficeById(id);
+    var office = getRawOfficeById(id);
     officeRepository.delete(office);
     return OfficeMapper.toOfficeResponseDto(office);
   }

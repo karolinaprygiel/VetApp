@@ -11,15 +11,14 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 public class VisitResponseDto {
-    private int id;
-    private LocalDateTime startTime;
-    private Duration duration;
-    private VisitStatus status;
-    private BigDecimal price;
-    private int animalId;
-    private int clientId;
-    private int vetId;
-    private int officeId;
-    private String description;
-
+  private int id;
+  private LocalDateTime startTime;
+  private Duration duration;
+  private VisitStatus status;
+  private BigDecimal price;
+  private int animalId;
+  private int clientId;
+  private int vetId;
+  private int officeId;
+  private String description;
 }
