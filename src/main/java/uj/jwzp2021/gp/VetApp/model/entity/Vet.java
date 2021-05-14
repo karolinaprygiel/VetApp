@@ -20,14 +20,9 @@ public class Vet {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-
     private String name;
-
     private String surname;
-
-
     private LocalTime shiftStart;
-
     private LocalTime shiftEnd;
 
     @OneToMany(mappedBy = "vet", cascade = CascadeType.ALL, orphanRemoval = true)

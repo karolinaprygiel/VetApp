@@ -19,11 +19,8 @@ public class Animal {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-
     private AnimalType type;
-
     private String name;
-
     private int yearOfBirth;
     //private int monthOfBirth;
     //private int dayOfBirth;

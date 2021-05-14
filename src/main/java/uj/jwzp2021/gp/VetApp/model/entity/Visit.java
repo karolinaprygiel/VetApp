@@ -30,7 +30,6 @@ public class Visit {
 
     @Column(name = "visit_status")
     private VisitStatus visitStatus;
-
     private BigDecimal price;
 
     @ManyToOne
