@@ -12,6 +12,8 @@ import uj.jwzp2021.gp.VetApp.service.AnimalService;
 import uj.jwzp2021.gp.VetApp.service.VisitService;
 
 import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -91,9 +93,18 @@ public class VisitsRestController {
 
   @GetMapping("/find")
   public ResponseEntity<?> find(
-      @RequestParam(value = "hourFrom") Timestamp from,
-      @RequestParam(value = "hourTo") Timestamp to,
-      @RequestParam(value = "preferredVet", required = false, defaultValue = "") String vetName) {
+      @RequestParam(value = "dateFrom") String from,
+      @RequestParam(value = "dateTo") String to,
+      @RequestParam(value = "duration") String duration_,
+      @RequestParam(value = "preferredVet", required = false, defaultValue = "-1") String vetId_) {
+
+    LocalDateTime dateFrom  = LocalDateTime.parse(from);
+    LocalDateTime dateTo = LocalDateTime.parse(to);
+    Duration duration = Duration.parse(duration_);
+    int vetId = Integer.parseInt(vetId_);
+
+    var visits = visitService.findVisits(dateFrom, dateTo, duration, vetId);
+    return ResponseEntity.ok(visits);
 
   }
 }

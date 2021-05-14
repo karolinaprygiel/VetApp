@@ -34,9 +34,13 @@ public class VetService {
   }
 
   public List<VetResponseDto> getAll() {
-      return vetRepository.findAll().stream()
+      return getRawAll().stream()
           .map(VetMapper::toVetResponseDto)
           .collect(Collectors.toList());
+  }
+
+  public List<Vet> getRawAll() {
+    return vetRepository.findAll();
   }
 
   public VetResponseDto createVet(VetRequestDto vetRequestDto) {

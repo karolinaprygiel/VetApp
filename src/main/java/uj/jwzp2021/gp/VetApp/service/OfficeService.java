@@ -32,9 +32,13 @@ public class OfficeService {
   }
 
   public List<OfficeResponseDto> getAll() {
-    return officeRepository.findAll().stream()
+    return getRawAll().stream()
         .map(OfficeMapper::toOfficeResponseDto)
         .collect(Collectors.toList());
+  }
+
+  public List<Office> getRawAll() {
+    return officeRepository.findAll();
   }
 
   public OfficeResponseDto createOffice(OfficeRequestDto officeRequestDto) {
