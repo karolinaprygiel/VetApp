@@ -34,9 +34,7 @@ public class OfficeService {
   }
 
   public List<OfficeResponseDto> getAll() {
-    return getRawAll().stream()
-        .map(OfficeMapper::toOfficeResponseDto)
-        .collect(Collectors.toList());
+    return getRawAll().stream().map(OfficeMapper::toOfficeResponseDto).collect(Collectors.toList());
   }
 
   public List<Office> getRawAll() {

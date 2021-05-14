@@ -14,43 +14,40 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name="visits")
+@Entity(name = "visits")
 @TypeDef(typeClass = PostgreSQLIntervalType.class, defaultForType = Duration.class)
 public class Visit {
 
-    @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
-    private int id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private int id;
 
-    @Column(name = "start_time")
-    private LocalDateTime startTime;
+  @Column(name = "start_time")
+  private LocalDateTime startTime;
 
-    @Column(columnDefinition = "interval")
-    private Duration duration;
+  @Column(columnDefinition = "interval")
+  private Duration duration;
 
-    @Column(name = "visit_status")
-    private VisitStatus visitStatus;
-    private BigDecimal price;
+  @Column(name = "visit_status")
+  private VisitStatus visitStatus;
 
-    @ManyToOne
-    @JoinColumn(name = "animal_id", referencedColumnName = "id")
-    private Animal animal;
+  private BigDecimal price;
 
-    @ManyToOne
-    @JoinColumn(name = "client_id", referencedColumnName = "id")
-    private Client client;
+  @ManyToOne
+  @JoinColumn(name = "animal_id", referencedColumnName = "id")
+  private Animal animal;
 
-    @ManyToOne
-    @JoinColumn(name = "vet_id", referencedColumnName = "id")
-    private Vet vet;
+  @ManyToOne
+  @JoinColumn(name = "client_id", referencedColumnName = "id")
+  private Client client;
 
-    @ManyToOne
-    @JoinColumn(name = "office_id", referencedColumnName = "id")
-    private Office office;
+  @ManyToOne
+  @JoinColumn(name = "vet_id", referencedColumnName = "id")
+  private Vet vet;
 
-    private String description;
+  @ManyToOne
+  @JoinColumn(name = "office_id", referencedColumnName = "id")
+  private Office office;
 
-
-
-
+  private String description;
 }

@@ -7,8 +7,4 @@ import lombok.Data;
 @AllArgsConstructor
 public class OfficeRequestDto {
   private final String name;
-
-  public OfficeRequestDto() {
-    this.name = null;
-  }
 }

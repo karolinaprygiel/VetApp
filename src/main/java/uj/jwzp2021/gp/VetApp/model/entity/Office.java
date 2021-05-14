@@ -16,8 +16,10 @@ public class Office {
 
   @OneToMany(mappedBy = "office", cascade = CascadeType.ALL, orphanRemoval = true)
   private final List<Visit> visits = new ArrayList<>();
+
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private int id;
+
   private String name;
 }
