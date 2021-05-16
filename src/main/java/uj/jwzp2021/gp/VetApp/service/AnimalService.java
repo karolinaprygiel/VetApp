@@ -30,8 +30,8 @@ public class AnimalService {
     var animal = animalRepository.findById(id);
     return animal.orElseThrow(
         () -> {
-          log.debug("Not found animal with id=" + id);
-          throw new AnimalNotFoundException("Animal with id:" + id + " not found.");
+          log.debug("Animal with id:" + id + " not found");
+          throw new AnimalNotFoundException("Animal with id:" + id + " not found");
         });
   }
 

@@ -1,5 +1,6 @@
 package uj.jwzp2021.gp.VetApp.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uj.jwzp2021.gp.VetApp.exception.client.ClientNotFoundException;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 public class ClientService {
   private final ClientRepository clientRepository;
 
@@ -24,6 +26,7 @@ public class ClientService {
     var client = clientRepository.findById(id);
     return client.orElseThrow(
         () -> {
+          log.debug("Client with id:" + id + " not found.");
           throw new ClientNotFoundException("Client with id:" + id + " not found.");
         });
   }
