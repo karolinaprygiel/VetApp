@@ -60,7 +60,7 @@ public class ClientRestController {
   private ClientRepresentation representFull(Client c) {
     var representation = ClientRepresentation.fromClient(c);
     representation.add(
-        linkTo(methodOn(VisitsRestController.class).getVisit(c.getId())).withSelfRel());
+        linkTo(methodOn(ClientRestController.class).getClient(c.getId())).withSelfRel());
     representation.add(
         c.getAnimals().stream()
             .map(Animal::getId)
