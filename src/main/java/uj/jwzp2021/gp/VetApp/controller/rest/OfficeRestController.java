@@ -10,7 +10,6 @@ import uj.jwzp2021.gp.VetApp.model.entity.Office;
 import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.service.OfficeService;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -29,33 +28,34 @@ public class OfficeRestController {
 
   @GetMapping(path = "/{id}")
   public ResponseEntity<?> getOffice(@PathVariable int id) {
-    return ResponseEntity.ok(officeService.getOfficeById(id));
+    return ResponseEntity.ok(representFull(officeService.getOfficeById(id)));
   }
 
   @GetMapping
   public ResponseEntity<?> getAllOffices() {
-    return ResponseEntity.ok(officeService.getAll());
+    return ResponseEntity.ok(
+        officeService.getAll().stream().map(this::representFull).collect(Collectors.toList()));
   }
 
   @PostMapping
   public ResponseEntity<?> createOffice(@RequestBody OfficeRequestDto officeRequestDto) {
-    var office = officeService.createOffice(officeRequestDto);
-    return ResponseEntity.status(HttpStatus.CREATED).body(office);
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(representFull(officeService.createOffice(officeRequestDto)));
   }
 
   @DeleteMapping(path = "/{id}")
   public ResponseEntity<?> deleteOffice(@PathVariable int id) {
-    var office = officeService.deleteOffice(id);
-    return ResponseEntity.ok(office);
+    return ResponseEntity.ok(representFull(officeService.deleteOffice(id)));
   }
 
-  @GetMapping(value = "/hateoas", produces = "application/hal+json")
-  public List<OfficeRepresentation> getAllHateoas() {
-    var offices = officeService.getAll();
-    return offices.stream().map(this::represent).collect(Collectors.toList());
+  private OfficeRepresentation representBrief(Office o) {
+    var representation = OfficeRepresentation.fromOffice(o);
+    representation.add(
+        linkTo(methodOn(OfficeRestController.class).getOffice(o.getId())).withSelfRel());
+    return representation;
   }
 
-  private OfficeRepresentation represent(Office o) {
+  private OfficeRepresentation representFull(Office o) {
     var representation = OfficeRepresentation.fromOffice(o);
     representation.add(
         linkTo(methodOn(OfficeRestController.class).getOffice(o.getId())).withSelfRel());

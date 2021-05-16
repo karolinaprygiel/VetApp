@@ -10,7 +10,6 @@ import uj.jwzp2021.gp.VetApp.model.entity.Vet;
 import uj.jwzp2021.gp.VetApp.service.VetService;
 import uj.jwzp2021.gp.VetApp.service.VisitService;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -31,41 +30,42 @@ public class VetRestController {
 
   @GetMapping(path = "{id}")
   public ResponseEntity<?> getVet(@PathVariable int id) {
-    return ResponseEntity.ok(vetService.getVetById(id));
-  }
-
-  @GetMapping(path = "{id}/hateoas")
-  public ResponseEntity<?> getVetHateoas(@PathVariable int id) {
-    return ResponseEntity.ok(represent(vetService.getVetById(id)));
+    var a = vetService.getVetById(id);
+    var x = representFull(a);
+    return ResponseEntity.ok(x);
   }
 
   @GetMapping
   public ResponseEntity<?> getAll() {
-    return ResponseEntity.ok(vetService.getAll());
+    return ResponseEntity.ok(
+        vetService.getAll().stream().map(this::representBrief).collect(Collectors.toList()));
   }
 
   @PostMapping
   public ResponseEntity<?> createVet(@RequestBody VetRequestDto vetRequestDto) {
-    var result = vetService.createVet(vetRequestDto);
-    return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(representFull(vetService.createVet(vetRequestDto)));
   }
 
   @DeleteMapping(path = "/{id}")
   public ResponseEntity<?> deleteVet(@PathVariable int id) {
-    var result = vetService.deleteVet(id);
-    return ResponseEntity.ok(result);
+    return ResponseEntity.ok(representFull(vetService.deleteVet(id)));
   }
 
-  @GetMapping(value = "/hateoas", produces = "application/hal+json")
-  public List<VetRepresentation> getAllHateoas() {
-    var vets = vetService.getAll();
-    return vets.stream().map(this::represent).collect(Collectors.toList());
-  }
-
-  private VetRepresentation represent(Vet v) {
+  private VetRepresentation representBrief(Vet v) {
     var representation = VetRepresentation.fromVet(v);
     representation.add(linkTo(methodOn(VetRestController.class).getVet(v.getId())).withSelfRel());
-    // todo: add list of visits
+    return representation;
+  }
+
+  private VetRepresentation representFull(Vet v) {
+    var representation = VetRepresentation.fromVet(v);
+    representation.add(linkTo(methodOn(VetRestController.class).getVet(v.getId())).withSelfRel());
+    representation.add(
+        linkTo(
+                methodOn(VisitService.class).getAllVisits().stream()
+                    .filter(visit -> visit.getVet() == v))
+            .withRel("visits"));
     return representation;
   }
 }
