@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import uj.jwzp2021.gp.VetApp.controller.rest.hateoas.AnimalRepresentation;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.AnimalRequestDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Animal;
+import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.service.AnimalService;
 
 import java.util.stream.Collectors;
@@ -65,6 +66,13 @@ public class AnimalRestController {
     representation.add(
         linkTo(methodOn(ClientRestController.class).getClient(a.getOwner().getId()))
             .withRel("owner"));
+    representation.add(
+        a.getVisits().stream()
+            .map(Visit::getId)
+            .map(
+                (visit) ->
+                    linkTo(methodOn(VisitsRestController.class).getVisit(visit)).withRel("visits"))
+            .collect(Collectors.toList()));
     return representation;
   }
 }

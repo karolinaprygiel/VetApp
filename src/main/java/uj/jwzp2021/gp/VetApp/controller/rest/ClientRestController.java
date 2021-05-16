@@ -8,6 +8,7 @@ import uj.jwzp2021.gp.VetApp.controller.rest.hateoas.ClientRepresentation;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.ClientRequestDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Animal;
 import uj.jwzp2021.gp.VetApp.model.entity.Client;
+import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.service.ClientService;
 
 import java.util.stream.Collectors;
@@ -65,7 +66,14 @@ public class ClientRestController {
             .map(Animal::getId)
             .map(
                 (id) ->
-                    linkTo(methodOn(AnimalRestController.class).getAnimal(id)).withRel("oneOfPets"))
+                    linkTo(methodOn(AnimalRestController.class).getAnimal(id)).withRel("pets"))
+            .collect(Collectors.toList()));
+    representation.add(
+        c.getVisits().stream()
+            .map(Visit::getId)
+            .map(
+                (visit) ->
+                    linkTo(methodOn(VisitsRestController.class).getVisit(visit)).withRel("visits"))
             .collect(Collectors.toList()));
     return representation;
   }
