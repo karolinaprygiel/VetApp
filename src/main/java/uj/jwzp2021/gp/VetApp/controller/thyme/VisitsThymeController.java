@@ -20,7 +20,7 @@ public class VisitsThymeController {
 
     @GetMapping("/visits")
     public String showAllVisits(Model model) {
-        model.addAttribute("visits", visitsService.getAllRawVisits());
+        model.addAttribute("visits", visitsService.getAll());
         return "visits";
     }
 

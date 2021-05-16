@@ -63,7 +63,7 @@ public class VetRestController {
     representation.add(linkTo(methodOn(VetRestController.class).getVet(v.getId())).withSelfRel());
     representation.add(
         linkTo(
-                methodOn(VisitService.class).getAllVisits().stream()
+                methodOn(VisitService.class).getAll().stream()
                     .filter(visit -> visit.getVet() == v))
             .withRel("visits"));
     return representation;

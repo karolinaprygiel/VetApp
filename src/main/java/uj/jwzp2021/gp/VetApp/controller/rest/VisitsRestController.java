@@ -41,7 +41,7 @@ public class VisitsRestController {
   @GetMapping
   public ResponseEntity<?> getAllVisits() {
     //    return visitService.getAllVisits();
-    var visits = visitService.getAllVisits();
+    var visits = visitService.getAll();
     return ResponseEntity.ok(visits);
   }
 
@@ -64,7 +64,7 @@ public class VisitsRestController {
 
   @GetMapping(value = "/hateoas", produces = "application/hal+json")
   public List<VisitRepresentation> getAllHateoas() {
-    var visits = visitService.getAllVisits();
+    var visits = visitService.getAll();
     return visits.stream().map(this::represent).collect(Collectors.toList());
   }
 

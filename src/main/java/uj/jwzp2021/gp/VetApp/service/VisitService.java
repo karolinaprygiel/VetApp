@@ -49,7 +49,7 @@ public class VisitService {
     this.clock = clock;
   }
 
-  public List<Visit> getAllVisits() {
+  public List<Visit> getAll() {
     var visits = getAllRawVisits();
     return new ArrayList<>(visits);
   }
