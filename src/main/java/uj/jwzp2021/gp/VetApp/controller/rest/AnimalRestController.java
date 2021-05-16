@@ -30,14 +30,14 @@ public class AnimalRestController {
 
   @GetMapping(path = "{id}")
   public ResponseEntity<?> getAnimal(@PathVariable int id) {
-    log.info("/animals/"+ id +" received GET request" + id);
+    log.info("Received GET request for /animals/" + id);
     var animal = animalService.getAnimalById(id);
     return ResponseEntity.ok(representFull(animal));
   }
 
   @GetMapping
   public ResponseEntity<?> getAllAnimals() {
-    log.info("/animals received GET request");
+    log.info("Received GET request for /animals");
     return ResponseEntity.ok(
         animalService.getAllAnimals().stream()
             .map(this::representBrief)
@@ -46,20 +46,20 @@ public class AnimalRestController {
 
   @PostMapping
   public ResponseEntity<?> createAnimal(@RequestBody AnimalRequestDto animalRequestDto) {
-    log.info("/animals received POST request with: " + animalRequestDto);
+    log.info("Received POST request for /animals with: " + animalRequestDto);
     var result = animalService.createAnimal(animalRequestDto);
     return ResponseEntity.status(HttpStatus.CREATED).body((representFull(result)));
   }
 
   @DeleteMapping(path = "/{id}")
   public ResponseEntity<?> deleteAnimal(@PathVariable int id) {
-    log.info("/animals/" + id + " received DELETE request");
+    log.info("Received DELETE request for /animals/" + id);
     var animal = animalService.deleteAnimal(id);
     return ResponseEntity.ok(representFull(animal));
   }
 
   private AnimalRepresentation representBrief(Animal a) {
-    log.debug("Creating Brief animal representation");
+    log.debug("Creating Brief Animal representation");
     var representation = AnimalRepresentation.fromAnimal(a);
     representation.add(
         linkTo(methodOn(AnimalRestController.class).getAnimal(a.getId())).withSelfRel());
@@ -67,7 +67,7 @@ public class AnimalRestController {
   }
 
   private AnimalRepresentation representFull(Animal a) {
-    log.debug("Creating Full animal representation");
+    log.debug("Creating Full Animal representation");
     var representation = AnimalRepresentation.fromAnimal(a);
     representation.add(
         linkTo(methodOn(AnimalRestController.class).getAnimal(a.getId())).withSelfRel());
