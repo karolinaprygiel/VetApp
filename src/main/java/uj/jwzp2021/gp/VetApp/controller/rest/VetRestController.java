@@ -59,12 +59,14 @@ public class VetRestController {
   }
 
   private VetRepresentation representBrief(Vet v) {
+    log.debug("Creating Brief Vet representation");
     var representation = VetRepresentation.fromVet(v);
     representation.add(linkTo(methodOn(VetRestController.class).getVet(v.getId())).withSelfRel());
     return representation;
   }
 
   private VetRepresentation representFull(Vet v) {
+    log.debug("Creating Full Vet representation");
     var representation = VetRepresentation.fromVet(v);
     representation.add(linkTo(methodOn(VetRestController.class).getVet(v.getId())).withSelfRel());
     representation.add(

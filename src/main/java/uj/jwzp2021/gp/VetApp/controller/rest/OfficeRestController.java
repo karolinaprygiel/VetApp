@@ -55,6 +55,7 @@ public class OfficeRestController {
   }
 
   private OfficeRepresentation representBrief(Office o) {
+    log.debug("Creating Brief Office representation");
     var representation = OfficeRepresentation.fromOffice(o);
     representation.add(
         linkTo(methodOn(OfficeRestController.class).getOffice(o.getId())).withSelfRel());
@@ -62,6 +63,7 @@ public class OfficeRestController {
   }
 
   private OfficeRepresentation representFull(Office o) {
+    log.debug("Creating Full Office representation");
     var representation = OfficeRepresentation.fromOffice(o);
     representation.add(
         linkTo(methodOn(OfficeRestController.class).getOffice(o.getId())).withSelfRel());
