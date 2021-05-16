@@ -53,7 +53,7 @@ public class ClientRestController {
   private ClientRepresentation representBrief(Client c) {
     var representation = ClientRepresentation.fromClient(c);
     representation.add(
-        linkTo(methodOn(VisitsRestController.class).getVisit(c.getId())).withSelfRel());
+        linkTo(methodOn(ClientRestController.class).getClient(c.getId())).withSelfRel());
     return representation;
   }
 
