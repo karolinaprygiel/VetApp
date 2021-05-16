@@ -97,6 +97,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(VisitOverlapsException.class)
   protected ResponseEntity<?> handleVisitOverlapsException(
       VisitOverlapsException ex, WebRequest request) {
+    log.error("Returning httpStatus=409. Reason: " + ex.getMessage());
     return handleExceptionInternal(
         ex,
         JsonFormatter.toResponseJson(ex.getMessage()),
@@ -108,6 +109,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(VisitStartsInPastException.class)
   protected ResponseEntity<?> handleVisitStartsInPastException(
       VisitStartsInPastException ex, WebRequest request) {
+    log.error("Returning httpStatus=406. Reason: " + ex.getMessage());
     return handleExceptionInternal(
         ex,
         JsonFormatter.toResponseJson(ex.getMessage()),
@@ -119,6 +121,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(VisitTooSoonException.class)
   protected ResponseEntity<?> handleVisitTooSoonException(
       VisitTooSoonException ex, WebRequest request) {
+    log.error("Returning httpStatus=406. Reason: " + ex.getMessage());
     return handleExceptionInternal(
         ex,
         JsonFormatter.toResponseJson(ex.getMessage()),
@@ -130,6 +133,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(VetNotAvailableException.class)
   protected ResponseEntity<?> VetNotAvailableException(
       VetNotAvailableException ex, WebRequest request) {
+    log.error("Returning httpStatus=406. Reason: " + ex.getMessage());
     return handleExceptionInternal(
         ex,
         JsonFormatter.toResponseJson(ex.getMessage()),

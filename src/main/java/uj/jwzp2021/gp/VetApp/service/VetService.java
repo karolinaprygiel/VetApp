@@ -2,6 +2,7 @@ package uj.jwzp2021.gp.VetApp.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import uj.jwzp2021.gp.VetApp.exception.vet.VetNotFoundException;
 import uj.jwzp2021.gp.VetApp.mapper.VetMapper;
@@ -26,7 +27,7 @@ public class VetService {
   }
 
   public Vet getVetById(int id) {
-    log.debug("Looking up vet with id=" +id);
+    log.info("Looking up vet with id=" +id);
     var vet = vetRepository.findById(id);
     return vet.orElseThrow(
         () -> {
@@ -35,31 +36,34 @@ public class VetService {
   }
 
   public List<Vet> getAll() {
-    log.debug("Looking up all vets");
+    log.info("Looking up all vets");
     return vetRepository.findAll();
   }
 
   public Vet createVet(VetRequestDto vetRequestDto) {
-    log.debug("Creating vet for: " + vetRequestDto);
-    return vetRepository.save(VetMapper.toVet(vetRequestDto));
+    log.info("Creating vet for: " + vetRequestDto);
+    Vet vet;
+    try{
+      vet = vetRepository.save(VetMapper.toVet(vetRequestDto));
+    }catch (DataAccessException ex){
+      log.error("Repository problem while saving vet for request: " + vetRequestDto);
+      throw ex;
+    }
+    log.info("Vet for request: " + vetRequestDto + " created successfully");
+    return vet;
 
-//    log.debug("Creating vet for: " + vetRequestDto);
-//    Vet v;
-//    var vet = VetMapper.toVet(vetRequestDto);
-//    try{
-//      v = vetRepository.save(vet);
-//    }catch (Exception e){
-//      log.error("Error while saving vet to database");
-//      throw e;
-//    }
-//    log.info("Vet created successfully");
-//    return v;
   }
 
   public Vet deleteVet(int id) {
-    log.debug("Deleting vet with id=" + id);
+    log.info("Deleting vet with id=" + id);
     var vet = getVetById(id);
-    vetRepository.delete(vet);
+    try{
+      vetRepository.delete(vet);
+    }catch (DataAccessException ex){
+      log.error("Repository error while deleting vet with id=" + id);
+      throw ex;
+    }
+    log.info("Vet with id=" + id + " deleted successfully");
     return vet;
   }
 

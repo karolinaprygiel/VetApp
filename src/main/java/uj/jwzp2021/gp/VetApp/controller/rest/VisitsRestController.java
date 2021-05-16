@@ -33,33 +33,44 @@ public class VisitsRestController {
   @GetMapping(path = "{id}")
   public ResponseEntity<?> getVisit(@PathVariable int id) {
     log.info("Received GET request for api/visits/" + id);
-    return ResponseEntity.ok(representFull(visitService.getVisitById(id)));
+    var visitRepresentation = representFull(visitService.getVisitById(id));
+    log.info("Returning httpStatus=200. Visit with id=" + id + " was found.");
+    return ResponseEntity.ok(visitRepresentation);
   }
 
   @GetMapping
   public ResponseEntity<?> getAllVisits() {
     log.info("Received GET request for api/visits");
-    return ResponseEntity.ok(
-        visitService.getAll().stream().map(this::representBrief).collect(Collectors.toList()));
+    var visitRepresentations = visitService.getAll().stream()
+        .map(this::representBrief)
+        .collect(Collectors.toList());
+    log.info("Returning httpStatus=200, returning all visits");
+    return ResponseEntity.ok(visitRepresentations);
   }
 
   @PostMapping()
   public ResponseEntity<?> createVisit(@RequestBody VisitRequestDto visitReq) {
     log.info("Received POST request for api/visits with: " + visitReq);
-    return ResponseEntity.ok(representFull(visitService.createVisit(visitReq)));
+    var visitRepresentation = representFull(visitService.createVisit(visitReq));
+    log.info("Returning httpStatus=201. Visit for request" + visitReq + " created successfully");
+    return ResponseEntity.ok(visitRepresentation);
   }
 
   @DeleteMapping(path = "/{id}")
   ResponseEntity<?> delete(@PathVariable int id) {
     log.info("Received DELETE request for api/visits/" + id);
-    return ResponseEntity.ok(representFull(visitService.delete(id)));
+    var visitRepresentation = representFull(visitService.delete(id));
+    log.info("Returning httpStatus=200. Visit with id=" + id +" deleted successfully");
+    return ResponseEntity.ok(visitRepresentation);
   }
 
   @PatchMapping(path = "/{id}")
   ResponseEntity<?> update(
       @PathVariable int id, @RequestBody VisitUpdateRequestDto visitUpdateRequestDto) {
     log.info("Received PATCH request for api/visits/" + id + " with: " + visitUpdateRequestDto);
-    return ResponseEntity.ok(representFull(visitService.updateVisit(id, visitUpdateRequestDto)));
+    var visitRepresentation= representFull(visitService.updateVisit(id, visitUpdateRequestDto));
+    log.info("Returning httpStatus=200. Visit with id=" + id +" updated successfully with: " + visitUpdateRequestDto);
+    return ResponseEntity.ok(visitRepresentation);
   }
 
   private VisitRepresentation representBrief(Visit v) {
@@ -107,6 +118,7 @@ public class VisitsRestController {
     int vetId = Integer.parseInt(vetId_);
 
     var visits = visitService.findVisits(dateFrom, dateTo, duration, vetId);
+    log.info("Returning httpStatus=200. Returning possible visit's dates");
     return ResponseEntity.ok(visits);
   }
 }

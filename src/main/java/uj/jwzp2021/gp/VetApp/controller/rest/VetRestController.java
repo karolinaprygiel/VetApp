@@ -33,29 +33,33 @@ public class VetRestController {
   @GetMapping(path = "{id}")
   public ResponseEntity<?> getVet(@PathVariable int id) {
     log.info("Received GET request for api/vets/"+ id);
-    var a = vetService.getVetById(id);
-    var x = representFull(a);
-    return ResponseEntity.ok(x);
+    var vetRepresentation = representFull(vetService.getVetById(id));
+    log.info("Returning httpStatus=200. Vet with id=" + id + " was found.");
+    return ResponseEntity.ok(vetRepresentation);
   }
 
   @GetMapping
   public ResponseEntity<?> getAll() {
     log.info("Received GET request for api/vets");
-    return ResponseEntity.ok(
-        vetService.getAll().stream().map(this::representBrief).collect(Collectors.toList()));
+    var vetRepresentation = vetService.getAll().stream().map(this::representBrief).collect(Collectors.toList());
+    log.info("Returning httpStatus=200, returning all vets.");
+    return ResponseEntity.ok(vetRepresentation);
   }
 
   @PostMapping
   public ResponseEntity<?> createVet(@RequestBody VetRequestDto vetRequestDto) {
     log.info("Received POST request for api/vets with: " + vetRequestDto);
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(representFull(vetService.createVet(vetRequestDto)));
+    var vetRepresentation = representFull(vetService.createVet(vetRequestDto));
+    log.info("Returning httpStatus=201. Vet for request" + vetRequestDto + " created successfully");
+    return ResponseEntity.status(HttpStatus.CREATED).body(vetRepresentation);
   }
 
   @DeleteMapping(path = "/{id}")
   public ResponseEntity<?> deleteVet(@PathVariable int id) {
     log.info("Received DELETE request for api/vets/" + id);
-    return ResponseEntity.ok(representFull(vetService.deleteVet(id)));
+    var vetRepresentation =  representFull(vetService.deleteVet(id));
+    log.info("Returning httpStatus=200. Vet with id=" + id +" deleted successfully");
+    return ResponseEntity.ok(vetRepresentation);
   }
 
   private VetRepresentation representBrief(Vet v) {

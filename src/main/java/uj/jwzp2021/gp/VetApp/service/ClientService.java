@@ -33,12 +33,11 @@ public class ClientService {
   }
 
   public List<Client> getAll() {
-    log.debug("Looking up all clients");
+    log.info("Looking up all clients");
     return new ArrayList<>(clientRepository.findAll());
   }
 
   public Client deleteClient(int id) {
-    log.debug("Deleting client with id=" + id);
     var client = getClientById(id);
     try{
     clientRepository.delete(client);
@@ -51,7 +50,6 @@ public class ClientService {
   }
 
   public Client createClient(ClientRequestDto clientRequestDto) {
-    log.debug("Creating client for: " + clientRequestDto);
     Client client;
     try{
       client = clientRepository.save(ClientMapper.toClient(clientRequestDto));

@@ -36,12 +36,12 @@ public class AnimalService {
   }
 
   public List<Animal> getAllAnimals() {
-    log.debug("Looking up all animals");
+    log.info("Looking up all animals");
     return new ArrayList<>(animalRepository.findAll());
   }
 
   public Animal deleteAnimal(int id) {
-    log.debug("Deleting animal with id=" + id);
+    log.info("Deleting animal with id=" + id);
     var animal = getAnimalById(id);
     try{
     animalRepository.delete(animal);

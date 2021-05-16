@@ -23,7 +23,7 @@ public class OfficeService {
   }
 
   public Office getOfficeById(int id) {
-    log.debug("Looking up office with id=" + id);
+    log.info("Looking up office with id=" + id);
     var office = officeRepository.findById(id);
     return office.orElseThrow(
         () -> {
@@ -32,12 +32,12 @@ public class OfficeService {
   }
 
   public List<Office> getAll() {
-    log.debug("Looking up all offices");
+    log.info("Looking up all offices");
     return officeRepository.findAll();
   }
 
   public Office createOffice(OfficeRequestDto officeRequestDto) {
-    log.debug("Creating office for: " + officeRequestDto);
+    log.info("Creating office for: " + officeRequestDto);
     Office office;
     try{
       office = officeRepository.save(OfficeMapper.toOffice(officeRequestDto));
@@ -50,7 +50,7 @@ public class OfficeService {
   }
 
   public Office deleteOffice(int id) {
-    log.debug("Deleting office with id=" + id);
+    log.info("Deleting office with id=" + id);
     var office = getOfficeById(id);
     try{
     officeRepository.delete(office);

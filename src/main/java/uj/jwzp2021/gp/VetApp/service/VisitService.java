@@ -1,8 +1,11 @@
 package uj.jwzp2021.gp.VetApp.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import uj.jwzp2021.gp.VetApp.exception.animal.AnimalNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.vet.VetNotAvailableException;
 import uj.jwzp2021.gp.VetApp.exception.visit.*;
 import uj.jwzp2021.gp.VetApp.mapper.VisitMapper;
@@ -17,12 +20,12 @@ import uj.jwzp2021.gp.VetApp.repository.VisitRepository;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class VisitService {
 
@@ -49,15 +52,35 @@ public class VisitService {
     this.clock = clock;
   }
 
-  public List<Visit> getAll() {
-    var visits = getAllRawVisits();
-    return new ArrayList<>(visits);
+
+  public Visit getVisitById(int id) {
+    log.info("Looking up visit with id=" + id);
+    var visit = visitRepository.findById(id);
+    return visit.orElseThrow(
+        () -> {
+          throw new VisitNotFoundException("Visit with id:" + id + " not found.");
+        });
   }
 
-  List<Visit> getAllRawVisits() {
+
+  public List<Visit> getAll() {
+    log.info("Looking up all visits");
     return visitRepository.findAll().stream()
         .sorted(Comparator.comparing(Visit::getStartTime))
         .collect(Collectors.toList());
+  }
+
+  public Visit delete(int id) {
+    log.info("Deleting visit with id=" + id);
+    var visit = getVisitById(id);
+    try{
+      visitRepository.delete(visit);
+    }catch (DataAccessException ex){
+      log.error("Repository error while deleting visit with id=" + id);
+      throw ex;
+    }
+    log.info("Vet with id=" + id + " deleted successfully");
+    return visit;
   }
 
   public Visit createVisit(VisitRequestDto req) {
@@ -87,7 +110,15 @@ public class VisitService {
       throw new WrongOwnerException("This person does not own this animal.");
     }
 
-    return visitRepository.save(VisitMapper.toVisit(req, animal, client, vet, office));
+    Visit visit;
+    try{
+     visit = visitRepository.save(VisitMapper.toVisit(req, animal, client, vet, office));
+    } catch(DataAccessException ex){
+      log.error("Repository problem while saving visit for request: " + req);
+      throw ex;
+    }
+    log.info("Visit for request: " + req + " created successfully");
+    return visit;
   }
 
   private boolean dateAvailable(
@@ -98,21 +129,8 @@ public class VisitService {
     return overlaps.size() == 0;
   }
 
-  public Visit delete(int id) {
-    var visit = getVisitById(id);
-    visitRepository.delete(visit);
-    return visit;
-  }
-
   private boolean vetAvailable(LocalDateTime startTime, Duration duration, int vetId) {
     return vetService.vetAvailable(startTime, duration, vetId);
-  }
-
-  public Visit getVisitById(int id) {
-    var visit = visitRepository.findById(id);
-    if (visit.isPresent()) {
-      return visit.get();
-    } else throw new VisitNotFoundException("Visit with id:" + id + " not found.");
   }
 
     private boolean dateTooSoon(LocalDateTime startTime) {
@@ -128,10 +146,11 @@ public class VisitService {
   public void finishOutOfDateVisits() {
     LocalDateTime time = LocalDateTime.now(clock);
     visitRepository.finishOutOfDateVisits(time);
-    System.out.println("finishOutOfDateVisits function run at " + time);
+    log.info("finishOutOfDateVisits function run at " + time);
   }
 
   public Visit updateVisit(int id, VisitUpdateRequestDto visitReq) {
+    log.info("Updating visit with id=" + id +" for: " + visitReq);
     var visit = getVisitById(id);
     if (visitReq.getVisitStatus() != null) {
       visit.setVisitStatus(visitReq.getVisitStatus());
@@ -139,13 +158,50 @@ public class VisitService {
     if (visitReq.getDescription() != null) {
       visit.setDescription(visitReq.getDescription());
     }
+    try{
     visitRepository.save(visit);
+    } catch (DataAccessException ex) {
+      log.error("Repository problem while updating visit with id=" + id +"  for request: " + visitReq);
+      throw ex;
+    }
     return visit;
   }
 
-  public List<VisitDatesResponseDto> findVisits(
-      LocalDateTime dateFrom, LocalDateTime dateTo, Duration duration, int vetId) {
+  public List<VisitDatesResponseDto> findVisits(LocalDateTime dateFrom, LocalDateTime dateTo, Duration duration, int vetId) {
+    log.info("Finding available visits between {} and {} of duration {} preferred vet: {}", dateFrom, dateTo, duration, vetId != -1 ? vetId : "Not specified");
     List<VisitDatesResponseDto> possibleVisits = new ArrayList<>();
+    List<Vet> vets = getPossibleVets(vetId);
+    Collections.shuffle(vets);
+    List<Office> offices = officeService.getAll();
+    Collections.shuffle(offices);
+    LocalDateTime startTime = getStartTime(dateFrom, dateTo);
+
+    while (startTime.plusMinutes(duration.toMinutes()).isBefore(dateTo.plusSeconds(1))) {
+      boolean isDateAvailable = false;
+      outerloop:
+      for (var vet : vets) {
+        if (!vetAvailable(startTime, duration, vet.getId())){
+          continue;
+        }
+        for (var office : offices) {
+          isDateAvailable = dateAvailable(startTime, duration, vet.getId(), office.getId());
+          if (isDateAvailable) {
+            possibleVisits.add(new VisitDatesResponseDto(startTime, duration, vet.getId(), office.getId()));
+            break outerloop;
+          }
+        }
+      }
+      if (isDateAvailable) {
+        startTime = startTime.plusMinutes(15);
+      } else {
+        startTime = startTime.plusMinutes(5);
+      }
+    }
+    return possibleVisits;
+  }
+
+
+  private List<Vet> getPossibleVets(int vetId) {
     List<Vet> vets = new ArrayList<>();
     if (vetId != -1) {
       var vet = vetService.getVetById(vetId);
@@ -153,33 +209,7 @@ public class VisitService {
     } else {
       vets.addAll(vetService.getAll());
     }
-    List<Office> offices = officeService.getAll();
-    LocalDateTime startTime = getStartTime(dateFrom, dateTo);
-
-    while (startTime.plusMinutes(duration.toMinutes()).isBefore(dateTo.plusSeconds(1))) {
-      boolean foundDate = false;
-      for (var vet : vets) {
-        for (var office : offices) {
-          foundDate =
-              dateAvailable(startTime, duration, vet.getId(), office.getId())
-                  && vetAvailable(startTime, duration, vet.getId());
-          if (foundDate) {
-            possibleVisits.add(
-                new VisitDatesResponseDto(startTime, duration, vet.getId(), office.getId()));
-            break;
-          }
-        }
-        if (foundDate) {
-          break;
-        }
-      }
-      if (foundDate) {
-        startTime = startTime.plusMinutes(15);
-      } else {
-        startTime = startTime.plusMinutes(5);
-      }
-    }
-    return possibleVisits;
+    return vets;
   }
 
   private LocalDateTime getStartTime(LocalDateTime dateFrom, LocalDateTime dateTo) {
