@@ -30,28 +30,34 @@ public class OfficeRestController {
 
   @GetMapping(path = "/{id}")
   public ResponseEntity<?> getOffice(@PathVariable int id) {
-    log.info("Received GET request for /offices/" + id);
-    return ResponseEntity.ok(representFull(officeService.getOfficeById(id)));
+    log.info("Received GET request for api/offices/" + id);
+    var officeRepresentation = representFull(officeService.getOfficeById(id));
+    log.info("Returning httpStatus=200. Office with id=" + id + " was found.") ;
+    return ResponseEntity.ok(officeRepresentation);
   }
 
   @GetMapping
   public ResponseEntity<?> getAllOffices() {
-    log.info("Received GET request for /offices/");
-    return ResponseEntity.ok(
-        officeService.getAll().stream().map(this::representBrief).collect(Collectors.toList()));
+    log.info("Received GET request for api/offices/");
+    var officeRepresentations = officeService.getAll().stream().map(this::representBrief).collect(Collectors.toList());
+    log.info("Returning httpStatus=200, returning all offices.");
+    return ResponseEntity.ok(officeRepresentations);
   }
 
   @PostMapping
   public ResponseEntity<?> createOffice(@RequestBody OfficeRequestDto officeRequestDto) {
-    log.info("Received POST request for /offices with: " + officeRequestDto);
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(representFull(officeService.createOffice(officeRequestDto)));
+    log.info("Received POST request for api/offices with: " + officeRequestDto);
+    var officeRepresentation = representFull(officeService.createOffice(officeRequestDto));
+    log.info("Returning httpStatus=201. Office for request" + officeRequestDto+ " created successfully");
+    return ResponseEntity.status(HttpStatus.CREATED).body(officeRepresentation);
   }
 
   @DeleteMapping(path = "/{id}")
   public ResponseEntity<?> deleteOffice(@PathVariable int id) {
-    log.info("Received DELETE request for /offices/" + id);
-    return ResponseEntity.ok(representFull(officeService.deleteOffice(id)));
+    log.info("Received DELETE request for api/offices/" + id);
+    var officeRepresentation = representFull(officeService.deleteOffice(id));
+    log.info("Returning httpStatus=200. Office with id=" + id +" deleted successfully");
+    return ResponseEntity.ok(officeRepresentation);
   }
 
   private OfficeRepresentation representBrief(Office o) {

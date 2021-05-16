@@ -32,33 +32,33 @@ public class VisitsRestController {
 
   @GetMapping(path = "{id}")
   public ResponseEntity<?> getVisit(@PathVariable int id) {
-    log.info("Received GET request for /visits/" + id);
+    log.info("Received GET request for api/visits/" + id);
     return ResponseEntity.ok(representFull(visitService.getVisitById(id)));
   }
 
   @GetMapping
   public ResponseEntity<?> getAllVisits() {
-    log.info("Received GET request for /visits");
+    log.info("Received GET request for api/visits");
     return ResponseEntity.ok(
         visitService.getAll().stream().map(this::representBrief).collect(Collectors.toList()));
   }
 
   @PostMapping()
   public ResponseEntity<?> createVisit(@RequestBody VisitRequestDto visitReq) {
-    log.info("Received POST request for /visits with: " + visitReq);
+    log.info("Received POST request for api/visits with: " + visitReq);
     return ResponseEntity.ok(representFull(visitService.createVisit(visitReq)));
   }
 
   @DeleteMapping(path = "/{id}")
   ResponseEntity<?> delete(@PathVariable int id) {
-    log.info("Received DELETE request for /visits/" + id);
+    log.info("Received DELETE request for api/visits/" + id);
     return ResponseEntity.ok(representFull(visitService.delete(id)));
   }
 
   @PatchMapping(path = "/{id}")
   ResponseEntity<?> update(
       @PathVariable int id, @RequestBody VisitUpdateRequestDto visitUpdateRequestDto) {
-    log.info("Received PATCH request for /visits/" + id + " with: " + visitUpdateRequestDto);
+    log.info("Received PATCH request for api/visits/" + id + " with: " + visitUpdateRequestDto);
     return ResponseEntity.ok(representFull(visitService.updateVisit(id, visitUpdateRequestDto)));
   }
 
@@ -93,7 +93,7 @@ public class VisitsRestController {
       @RequestParam(value = "duration") String duration_,
       @RequestParam(value = "preferredVet", required = false, defaultValue = "-1") String vetId_) {
     log.info(
-        "Received GET request for /find with parameters: (dateFrom:"
+        "Received GET request for api/find with parameters: (dateFrom:"
             + from
             + ", dateTo:"
             + to

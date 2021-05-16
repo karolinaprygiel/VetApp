@@ -30,32 +30,37 @@ public class AnimalRestController {
 
   @GetMapping(path = "{id}")
   public ResponseEntity<?> getAnimal(@PathVariable int id) {
-    log.info("Received GET request for /animals/" + id);
-    var animal = animalService.getAnimalById(id);
-    return ResponseEntity.ok(representFull(animal));
+    log.info("Received GET request for api/animals/" + id);
+    var animalRepresentation = representFull(animalService.getAnimalById(id));
+    log.info("Returning httpStatus=200. Animal with id=" + id + " was found.");
+    return ResponseEntity.ok(animalRepresentation);
   }
 
   @GetMapping
   public ResponseEntity<?> getAllAnimals() {
-    log.info("Received GET request for /animals");
-    return ResponseEntity.ok(
-        animalService.getAllAnimals().stream()
-            .map(this::representBrief)
-            .collect(Collectors.toList()));
+    log.info("Received GET request for api/animals");
+    var animalRepresentations = animalService.getAllAnimals().stream()
+        .map(this::representBrief)
+        .collect(Collectors.toList());
+    log.info("Returning httpStatus=200, returning all animals.");
+    return ResponseEntity.ok(animalRepresentations);
+
   }
 
   @PostMapping
   public ResponseEntity<?> createAnimal(@RequestBody AnimalRequestDto animalRequestDto) {
-    log.info("Received POST request for /animals with: " + animalRequestDto);
-    var result = animalService.createAnimal(animalRequestDto);
-    return ResponseEntity.status(HttpStatus.CREATED).body((representFull(result)));
+    log.info("Received POST request for api/animals with: " + animalRequestDto);
+    var animalRepresentation = representFull(animalService.createAnimal(animalRequestDto));
+    log.info("Returning httpStatus=201. Animal for request" + animalRequestDto + " created successfully");
+    return ResponseEntity.status(HttpStatus.CREATED).body(animalRepresentation);
   }
 
   @DeleteMapping(path = "/{id}")
   public ResponseEntity<?> deleteAnimal(@PathVariable int id) {
-    log.info("Received DELETE request for /animals/" + id);
-    var animal = animalService.deleteAnimal(id);
-    return ResponseEntity.ok(representFull(animal));
+    log.info("Received DELETE request for api/animals/" + id);
+    var animalRepresentation = representFull(animalService.deleteAnimal(id));
+    log.info("Returning httpStatus=200. Animal with id=" + id +" deleted successfully");
+    return ResponseEntity.ok(animalRepresentation);
   }
 
   private AnimalRepresentation representBrief(Animal a) {
