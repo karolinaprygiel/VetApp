@@ -1,5 +1,6 @@
 package uj.jwzp2021.gp.VetApp.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uj.jwzp2021.gp.VetApp.exception.animal.AnimalNotFoundException;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 public class AnimalService {
 
   private final AnimalRepository animalRepository;
@@ -27,6 +29,7 @@ public class AnimalService {
     var animal = animalRepository.findById(id);
     return animal.orElseThrow(
         () -> {
+          log.debug();
           throw new AnimalNotFoundException("Animal with id:" + id + " not found.");
         });
   }

@@ -1,5 +1,6 @@
 package uj.jwzp2021.gp.VetApp.controller.rest;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("api/animals")
+@Slf4j
 public class AnimalRestController {
 
   private final AnimalService animalService;
@@ -28,12 +30,14 @@ public class AnimalRestController {
 
   @GetMapping(path = "{id}")
   public ResponseEntity<?> getAnimal(@PathVariable int id) {
+    log.info("/animals/"+ id +" received GET request" + id);
     var animal = animalService.getAnimalById(id);
     return ResponseEntity.ok(representFull(animal));
   }
 
   @GetMapping
   public ResponseEntity<?> getAllAnimals() {
+    log.info("/animals received GET request");
     return ResponseEntity.ok(
         animalService.getAllAnimals().stream()
             .map(this::representBrief)
@@ -42,6 +46,7 @@ public class AnimalRestController {
 
   @PostMapping
   public ResponseEntity<?> createAnimal(@RequestBody AnimalRequestDto animalRequestDto) {
+    log.info("/animals received POST request with: " + animalRequestDto);
     var result = animalService.createAnimal(animalRequestDto);
     return ResponseEntity.status(HttpStatus.CREATED).body((representFull(result)));
   }
