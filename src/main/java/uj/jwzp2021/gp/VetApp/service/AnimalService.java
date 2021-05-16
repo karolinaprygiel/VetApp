@@ -5,12 +5,11 @@ import org.springframework.stereotype.Service;
 import uj.jwzp2021.gp.VetApp.exception.animal.AnimalNotFoundException;
 import uj.jwzp2021.gp.VetApp.mapper.AnimalMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.AnimalRequestDto;
-import uj.jwzp2021.gp.VetApp.model.dto.Responses.AnimalResponseDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Animal;
 import uj.jwzp2021.gp.VetApp.repository.AnimalRepository;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class AnimalService {
@@ -24,33 +23,26 @@ public class AnimalService {
     this.clientService = clientService;
   }
 
-  Animal getRawAnimalById(int id) {
+  public Animal getAnimalById(int id) {
     var animal = animalRepository.findById(id);
     return animal.orElseThrow(
         () -> {
-          throw new AnimalNotFoundException("Animal with id:" + id + " not found");
+          throw new AnimalNotFoundException("Animal with id:" + id + " not found.");
         });
   }
 
-  public AnimalResponseDto getAnimalById(int id) {
-    return AnimalMapper.toAnimalResponseDto(getRawAnimalById(id));
+  public List<Animal> getAllAnimals() {
+    return new ArrayList<>(animalRepository.findAll());
   }
 
-  public List<AnimalResponseDto> getAllAnimals() {
-    return animalRepository.findAll().stream()
-        .map(AnimalMapper::toAnimalResponseDto)
-        .collect(Collectors.toList());
-  }
-
-  public AnimalResponseDto deleteAnimal(int id) {
-    var animal = getRawAnimalById(id);
+  public Animal deleteAnimal(int id) {
+    var animal = getAnimalById(id);
     animalRepository.delete(animal);
-    return AnimalMapper.toAnimalResponseDto(animal);
+    return animal;
   }
 
-  public AnimalResponseDto createAnimal(AnimalRequestDto animalRequestDto) {
-    var owner = clientService.getRawClientById(animalRequestDto.getOwnerId());
-    var animal = animalRepository.save(AnimalMapper.toAnimal(animalRequestDto, owner));
-    return AnimalMapper.toAnimalResponseDto(animal);
+  public Animal createAnimal(AnimalRequestDto animalRequestDto) {
+    var owner = clientService.getClientById(animalRequestDto.getOwnerId());
+    return animalRepository.save(AnimalMapper.toAnimal(animalRequestDto, owner));
   }
 }

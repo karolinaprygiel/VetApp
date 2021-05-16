@@ -6,7 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uj.jwzp2021.gp.VetApp.controller.rest.hateoas.OfficeRepresentation;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.OfficeRequestDto;
-import uj.jwzp2021.gp.VetApp.model.dto.Responses.OfficeResponseDto;
+import uj.jwzp2021.gp.VetApp.model.entity.Office;
+import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.service.OfficeService;
 
 import java.util.List;
@@ -54,12 +55,13 @@ public class OfficeRestController {
     return offices.stream().map(this::represent).collect(Collectors.toList());
   }
 
-  private OfficeRepresentation represent(OfficeResponseDto o) {
-    var representation = OfficeRepresentation.fromOfficeResponseDto(o);
+  private OfficeRepresentation represent(Office o) {
+    var representation = OfficeRepresentation.fromOffice(o);
     representation.add(
         linkTo(methodOn(OfficeRestController.class).getOffice(o.getId())).withSelfRel());
     representation.add(
-        o.getVisitIds().stream()
+        o.getVisits().stream()
+            .map(Visit::getId)
             .map(
                 (v) ->
                     linkTo(methodOn(VisitsRestController.class).getVisit(v)).withRel("oneOfVisits"))

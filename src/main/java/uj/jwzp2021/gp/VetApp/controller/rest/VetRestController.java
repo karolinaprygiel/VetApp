@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uj.jwzp2021.gp.VetApp.controller.rest.hateoas.VetRepresentation;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VetRequestDto;
-import uj.jwzp2021.gp.VetApp.model.dto.Responses.VetResponseDto;
+import uj.jwzp2021.gp.VetApp.model.entity.Vet;
 import uj.jwzp2021.gp.VetApp.service.VetService;
 import uj.jwzp2021.gp.VetApp.service.VisitService;
 
@@ -32,14 +32,6 @@ public class VetRestController {
   @GetMapping(path = "{id}")
   public ResponseEntity<?> getVet(@PathVariable int id) {
     return ResponseEntity.ok(vetService.getVetById(id));
-  }
-
-  @GetMapping(path = "{id}/visits")
-  public ResponseEntity<?> getVetVisits(@PathVariable int id) {
-    return ResponseEntity.ok(
-        vetService.getVetById(id).getVisitIds().stream()
-            .map(visitService::getVisitById)
-            .collect(Collectors.toList()));
   }
 
   @GetMapping(path = "{id}/hateoas")
@@ -70,11 +62,10 @@ public class VetRestController {
     return vets.stream().map(this::represent).collect(Collectors.toList());
   }
 
-  private VetRepresentation represent(VetResponseDto v) {
-    var representation = VetRepresentation.fromVetResponseDto(v);
+  private VetRepresentation represent(Vet v) {
+    var representation = VetRepresentation.fromVet(v);
     representation.add(linkTo(methodOn(VetRestController.class).getVet(v.getId())).withSelfRel());
-    representation.add(
-        linkTo(methodOn(VetRestController.class).getVetVisits(v.getId())).withRel("visits"));
+    // todo: add list of visits
     return representation;
   }
 }

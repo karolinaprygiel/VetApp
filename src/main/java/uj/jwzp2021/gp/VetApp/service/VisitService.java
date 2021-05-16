@@ -9,7 +9,6 @@ import uj.jwzp2021.gp.VetApp.mapper.VisitMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitUpdateRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Responses.VisitDatesResponseDto;
-import uj.jwzp2021.gp.VetApp.model.dto.Responses.VisitResponseDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Office;
 import uj.jwzp2021.gp.VetApp.model.entity.Vet;
 import uj.jwzp2021.gp.VetApp.model.entity.Visit;
@@ -58,9 +57,9 @@ public class VisitService {
     return !LocalDateTime.now(clock).isBefore(startTime);
   }
 
-  public List<VisitResponseDto> getAllVisits() {
+  public List<Visit> getAllVisits() {
     var visits = getAllRawVisits();
-    return visits.stream().map(VisitMapper::toVisitResponseDto).collect(Collectors.toList());
+    return new ArrayList<>(visits);
   }
 
   List<Visit> getAllRawVisits() {
@@ -69,12 +68,12 @@ public class VisitService {
         .collect(Collectors.toList());
   }
 
-  public VisitResponseDto createVisit(VisitRequestDto req) {
+  public Visit createVisit(VisitRequestDto req) {
 
-    var client = clientService.getRawClientById(req.getClientId());
-    var animal = animalService.getRawAnimalById(req.getAnimalId());
-    var vet = vetService.getRawVetById(req.getVetId());
-    var office = officeService.getRawOfficeById(req.getOfficeId());
+    var client = clientService.getClientById(req.getClientId());
+    var animal = animalService.getAnimalById(req.getAnimalId());
+    var vet = vetService.getVetById(req.getVetId());
+    var office = officeService.getOfficeById(req.getOfficeId());
 
     if (dateInPast(req.getStartTime())) {
       throw new VisitStartsInPastException("Visit can not start in the past.");
@@ -84,20 +83,19 @@ public class VisitService {
     }
 
     if (!vetAvailable(req.getStartTime(), req.getDuration(), req.getVetId())) {
-      throw new VetNotAvailableException("Visit not in the working hours of the chosen vet");
+      throw new VetNotAvailableException("Visit not in the working hours of the chosen vet.");
     }
 
     if (!dateAvailable(req.getStartTime(), req.getDuration(), req.getVetId(), req.getOfficeId())) {
       throw new VisitOverlapsException(
-          "Visit would overlap with another visit. Try to change, date, vet or office");
+          "Visit would overlap with another visit. Try to change, date, vet or office.");
     }
 
     if (animal.getOwner().getId() != client.getId()) {
       throw new WrongOwnerException("This person does not own this animal.");
     }
 
-    var visit = visitRepository.save(VisitMapper.toVisit(req, animal, client, vet, office));
-    return VisitMapper.toVisitResponseDto(visit);
+    return visitRepository.save(VisitMapper.toVisit(req, animal, client, vet, office));
   }
 
   private boolean dateAvailable(
@@ -108,25 +106,21 @@ public class VisitService {
     return overlaps.size() == 0;
   }
 
-  public VisitResponseDto delete(int id) {
-    var visit = getRawVisitById(id);
+  public Visit delete(int id) {
+    var visit = getVisitById(id);
     visitRepository.delete(visit);
-    return VisitMapper.toVisitResponseDto(visit);
+    return visit;
   }
 
   private boolean vetAvailable(LocalDateTime startTime, Duration duration, int vetId) {
     return vetService.vetAvailable(startTime, duration, vetId);
   }
 
-  Visit getRawVisitById(int id) {
+  public Visit getVisitById(int id) {
     var visit = visitRepository.findById(id);
     if (visit.isPresent()) {
       return visit.get();
     } else throw new VisitNotFoundException("Visit with id:" + id + " not found.");
-  }
-
-  public VisitResponseDto getVisitById(int id) {
-    return VisitMapper.toVisitResponseDto(getRawVisitById(id));
   }
 
   @Scheduled(fixedRate = 3600000)
@@ -136,8 +130,8 @@ public class VisitService {
     System.out.println("finishOutOfDateVisits function run at " + time);
   }
 
-  public VisitResponseDto updateVisit(int id, VisitUpdateRequestDto visitReq) {
-    var visit = getRawVisitById(id);
+  public Visit updateVisit(int id, VisitUpdateRequestDto visitReq) {
+    var visit = getVisitById(id);
     if (visitReq.getVisitStatus() != null) {
       visit.setVisitStatus(visitReq.getVisitStatus());
     }
@@ -145,7 +139,7 @@ public class VisitService {
       visit.setDescription(visitReq.getDescription());
     }
     visitRepository.save(visit);
-    return VisitMapper.toVisitResponseDto(visit);
+    return visit;
   }
 
   public List<VisitDatesResponseDto> findVisits(
@@ -153,12 +147,12 @@ public class VisitService {
     List<VisitDatesResponseDto> possibleVisits = new ArrayList<>();
     List<Vet> vets = new ArrayList<>();
     if (vetId != -1) {
-      var vet = vetService.getRawVetById(vetId);
+      var vet = vetService.getVetById(vetId);
       vets.add(vet);
     } else {
-      vets.addAll(vetService.getRawAll());
+      vets.addAll(vetService.getAll());
     }
-    List<Office> offices = officeService.getRawAll();
+    List<Office> offices = officeService.getAll();
     LocalDateTime startTime = getStartTime(dateFrom, dateTo);
 
     while (startTime.plusMinutes(duration.toMinutes()).isBefore(dateTo.plusSeconds(1))) {

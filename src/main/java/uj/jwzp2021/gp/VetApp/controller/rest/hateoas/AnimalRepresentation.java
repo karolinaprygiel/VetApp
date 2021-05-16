@@ -2,10 +2,12 @@ package uj.jwzp2021.gp.VetApp.controller.rest.hateoas;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.hateoas.RepresentationModel;
-import uj.jwzp2021.gp.VetApp.model.dto.Responses.AnimalResponseDto;
+import uj.jwzp2021.gp.VetApp.model.entity.Animal;
 import uj.jwzp2021.gp.VetApp.model.entity.AnimalType;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 public class AnimalRepresentation extends RepresentationModel<AnimalRepresentation> {
@@ -15,12 +17,12 @@ public class AnimalRepresentation extends RepresentationModel<AnimalRepresentati
   private final int yearOfBirth;
   private final int ownerId;
 
-  public static AnimalRepresentation fromAnimal(AnimalResponseDto animalResponseDto) {
+  public static AnimalRepresentation fromAnimal(Animal animal) {
     return new AnimalRepresentation(
-        animalResponseDto.getId(),
-        animalResponseDto.getName(),
-        animalResponseDto.getType(),
-        animalResponseDto.getYearOfBirth(),
-        animalResponseDto.getOwnerId());
+        animal.getId(),
+        animal.getName(),
+        animal.getType(),
+        animal.getYearOfBirth(),
+        animal.getOwner().getId());
   }
 }

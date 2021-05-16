@@ -6,7 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uj.jwzp2021.gp.VetApp.controller.rest.hateoas.ClientRepresentation;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.ClientRequestDto;
-import uj.jwzp2021.gp.VetApp.model.dto.Responses.ClientResponseDto;
+import uj.jwzp2021.gp.VetApp.model.entity.Animal;
+import uj.jwzp2021.gp.VetApp.model.entity.Client;
 import uj.jwzp2021.gp.VetApp.service.ClientService;
 
 import java.util.List;
@@ -54,12 +55,13 @@ public class ClientRestController {
     return clients.stream().map(this::represent).collect(Collectors.toList());
   }
 
-  private ClientRepresentation represent(ClientResponseDto c) {
-    var representation = ClientRepresentation.fromClientResponseDto(c);
+  private ClientRepresentation represent(Client c) {
+    var representation = ClientRepresentation.fromClient(c);
     representation.add(
         linkTo(methodOn(VisitsRestController.class).getVisit(c.getId())).withSelfRel());
     representation.add(
-        c.getAnimalIds().stream()
+        c.getAnimals().stream()
+            .map(Animal::getId)
             .map(
                 (id) ->
                     linkTo(methodOn(AnimalRestController.class).getAnimal(id)).withRel("oneOfPets"))

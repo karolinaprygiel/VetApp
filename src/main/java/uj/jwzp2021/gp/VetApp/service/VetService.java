@@ -5,12 +5,12 @@ import org.springframework.stereotype.Service;
 import uj.jwzp2021.gp.VetApp.exception.vet.VetNotFoundException;
 import uj.jwzp2021.gp.VetApp.mapper.VetMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VetRequestDto;
-import uj.jwzp2021.gp.VetApp.model.dto.Responses.VetResponseDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Vet;
 import uj.jwzp2021.gp.VetApp.repository.VetRepository;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +23,7 @@ public class VetService {
     this.vetRepository = vetRepository;
   }
 
-  Vet getRawVetById(int id) {
+  public Vet getVetById(int id) {
     var vet = vetRepository.findById(id);
     return vet.orElseThrow(
         () -> {
@@ -31,31 +31,22 @@ public class VetService {
         });
   }
 
-  public VetResponseDto getVetById(int id) {
-    return VetMapper.toVetResponseDto(getRawVetById(id));
-  }
-
-  public List<VetResponseDto> getAll() {
-    return getRawAll().stream().map(VetMapper::toVetResponseDto).collect(Collectors.toList());
-  }
-
-  public List<Vet> getRawAll() {
+  public List<Vet> getAll() {
     return vetRepository.findAll();
   }
 
-  public VetResponseDto createVet(VetRequestDto vetRequestDto) {
-    var vet = vetRepository.save(VetMapper.toVet(vetRequestDto));
-    return VetMapper.toVetResponseDto(vet);
+  public Vet createVet(VetRequestDto vetRequestDto) {
+    return vetRepository.save(VetMapper.toVet(vetRequestDto));
   }
 
-  public VetResponseDto deleteVet(int id) {
-    var vet = getRawVetById(id);
+  public Vet deleteVet(int id) {
+    var vet = getVetById(id);
     vetRepository.delete(vet);
-    return VetMapper.toVetResponseDto(vet);
+    return vet;
   }
 
   public boolean vetAvailable(LocalDateTime startTime, Duration duration, int vetId) {
-    var vet = getRawVetById(vetId);
+    var vet = getVetById(vetId);
     return startTime.plus(duration).toLocalTime().isBefore(vet.getShiftEnd().plusSeconds(1))
         && startTime.toLocalTime().isAfter(vet.getShiftStart().minusSeconds(1));
   }

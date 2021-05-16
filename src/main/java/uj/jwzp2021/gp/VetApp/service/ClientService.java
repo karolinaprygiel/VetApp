@@ -5,12 +5,11 @@ import org.springframework.stereotype.Service;
 import uj.jwzp2021.gp.VetApp.exception.client.ClientNotFoundException;
 import uj.jwzp2021.gp.VetApp.mapper.ClientMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.ClientRequestDto;
-import uj.jwzp2021.gp.VetApp.model.dto.Responses.ClientResponseDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Client;
 import uj.jwzp2021.gp.VetApp.repository.ClientRepository;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ClientService {
@@ -21,7 +20,7 @@ public class ClientService {
     this.clientRepository = clientRepository;
   }
 
-  Client getRawClientById(int id) {
+  public Client getClientById(int id) {
     var client = clientRepository.findById(id);
     return client.orElseThrow(
         () -> {
@@ -29,24 +28,18 @@ public class ClientService {
         });
   }
 
-  public ClientResponseDto getClientById(int id) {
-    return ClientMapper.toClientResponseDto(getRawClientById(id));
+  public List<Client> getAll() {
+    return new ArrayList<>(clientRepository.findAll());
   }
 
-  public List<ClientResponseDto> getAll() {
-    return clientRepository.findAll().stream()
-        .map(ClientMapper::toClientResponseDto)
-        .collect(Collectors.toList());
-  }
-
-  public ClientResponseDto deleteClient(int id) {
-    var client = getRawClientById(id);
+  public Client deleteClient(int id) {
+    var client = getClientById(id);
     clientRepository.delete(client);
-    return ClientMapper.toClientResponseDto(client);
+    return client;
   }
 
-  public ClientResponseDto createClient(ClientRequestDto clientRequestDto) {
+  public Client createClient(ClientRequestDto clientRequestDto) {
     var client = clientRepository.save(ClientMapper.toClient(clientRequestDto));
-    return ClientMapper.toClientResponseDto(client);
+    return client;
   }
 }
