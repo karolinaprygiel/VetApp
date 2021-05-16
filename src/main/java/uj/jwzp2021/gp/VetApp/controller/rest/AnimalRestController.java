@@ -53,11 +53,13 @@ public class AnimalRestController {
 
   @DeleteMapping(path = "/{id}")
   public ResponseEntity<?> deleteAnimal(@PathVariable int id) {
+    log.info("/animals/" + id + " received DELETE request");
     var animal = animalService.deleteAnimal(id);
     return ResponseEntity.ok(representFull(animal));
   }
 
   private AnimalRepresentation representBrief(Animal a) {
+    log.debug("Creating Brief animal representation");
     var representation = AnimalRepresentation.fromAnimal(a);
     representation.add(
         linkTo(methodOn(AnimalRestController.class).getAnimal(a.getId())).withSelfRel());
@@ -65,6 +67,7 @@ public class AnimalRestController {
   }
 
   private AnimalRepresentation representFull(Animal a) {
+    log.debug("Creating Full animal representation");
     var representation = AnimalRepresentation.fromAnimal(a);
     representation.add(
         linkTo(methodOn(AnimalRestController.class).getAnimal(a.getId())).withSelfRel());
