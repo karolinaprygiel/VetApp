@@ -34,7 +34,7 @@ public class OfficeRestController {
   @GetMapping
   public ResponseEntity<?> getAllOffices() {
     return ResponseEntity.ok(
-        officeService.getAll().stream().map(this::representFull).collect(Collectors.toList()));
+        officeService.getAll().stream().map(this::representBrief).collect(Collectors.toList()));
   }
 
   @PostMapping
@@ -64,7 +64,7 @@ public class OfficeRestController {
             .map(Visit::getId)
             .map(
                 (v) ->
-                    linkTo(methodOn(VisitsRestController.class).getVisit(v)).withRel("oneOfVisits"))
+                    linkTo(methodOn(VisitsRestController.class).getVisit(v)).withRel("visits"))
             .collect(Collectors.toList()));
     return representation;
   }

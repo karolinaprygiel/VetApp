@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import uj.jwzp2021.gp.VetApp.controller.rest.hateoas.VetRepresentation;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VetRequestDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Vet;
+import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.service.VetService;
 import uj.jwzp2021.gp.VetApp.service.VisitService;
 
@@ -62,10 +63,12 @@ public class VetRestController {
     var representation = VetRepresentation.fromVet(v);
     representation.add(linkTo(methodOn(VetRestController.class).getVet(v.getId())).withSelfRel());
     representation.add(
-        linkTo(
-                methodOn(VisitService.class).getAll().stream()
-                    .filter(visit -> visit.getVet() == v))
-            .withRel("visits"));
+        v.getVisits().stream()
+            .map(Visit::getId)
+            .map(
+                (visit) ->
+                    linkTo(methodOn(VisitsRestController.class).getVisit(visit)).withRel("visits"))
+            .collect(Collectors.toList()));
     return representation;
   }
 }
