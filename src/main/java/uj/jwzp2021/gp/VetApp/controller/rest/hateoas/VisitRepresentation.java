@@ -16,6 +16,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class VisitRepresentation extends RepresentationModel<VisitRepresentation> {
   private final int id;
+  private final int animalId;
+  private final int clientId;
+  private final int vetId;
   private final LocalDateTime startTime;
   private final Duration duration;
   private final VisitStatus status;
@@ -23,6 +26,13 @@ public class VisitRepresentation extends RepresentationModel<VisitRepresentation
 
   public static VisitRepresentation fromVisit(Visit v) {
     return new VisitRepresentation(
-        v.getId(), v.getStartTime(), v.getDuration(), v.getVisitStatus(), v.getPrice());
+        v.getId(),
+        v.getAnimal().getId(),
+        v.getClient().getId(),
+        v.getVet().getId(),
+        v.getStartTime(),
+        v.getDuration(),
+        v.getVisitStatus(),
+        v.getPrice());
   }
 }
