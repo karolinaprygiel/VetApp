@@ -26,22 +26,26 @@ public class ClientService {
     var client = clientRepository.findById(id);
     return client.orElseThrow(
         () -> {
-          log.debug("Client with id:" + id + " not found.");
-          throw new ClientNotFoundException("Client with id:" + id + " not found.");
+          log.debug("Client with id:" + id + " not found");
+          throw new ClientNotFoundException("Client with id:" + id + " not found");
         });
   }
 
   public List<Client> getAll() {
+    log.trace("getAll() was called");
     return new ArrayList<>(clientRepository.findAll());
   }
 
   public Client deleteClient(int id) {
+    log.trace("deleteClient() was called with id=" + id);
+    log.debug("Deleting client with id=" + id);
     var client = getClientById(id);
     clientRepository.delete(client);
     return client;
   }
 
   public Client createClient(ClientRequestDto clientRequestDto) {
+    log.debug("Creating client for: " + clientRequestDto);
     var client = clientRepository.save(ClientMapper.toClient(clientRequestDto));
     return client;
   }
