@@ -7,11 +7,10 @@ import org.springframework.web.bind.annotation.*;
 import uj.jwzp2021.gp.VetApp.controller.rest.hateoas.VisitRepresentation;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitUpdateRequestDto;
-import uj.jwzp2021.gp.VetApp.model.dto.Responses.VisitResponseDto;
+import uj.jwzp2021.gp.VetApp.model.entity.Visit;
 import uj.jwzp2021.gp.VetApp.service.AnimalService;
 import uj.jwzp2021.gp.VetApp.service.VisitService;
 
-import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,12 +36,6 @@ public class VisitsRestController {
   public ResponseEntity<?> getVisit(@PathVariable int id) {
     var result = visitService.getVisitById(id);
     return ResponseEntity.ok(result);
-  }
-
-  @GetMapping(path = "{id}/animal")
-  public ResponseEntity<?> getVisitAnimal(@PathVariable int id) {
-    var animal = animalService.getAnimalById(visitService.getVisitById(id).getAnimalId());
-    return ResponseEntity.ok(animal);
   }
 
   @GetMapping
@@ -75,19 +68,18 @@ public class VisitsRestController {
     return visits.stream().map(this::represent).collect(Collectors.toList());
   }
 
-  private VisitRepresentation represent(VisitResponseDto v) {
+  private VisitRepresentation represent(Visit v) {
     var representation = VisitRepresentation.fromVisit(v);
     representation.add(
         linkTo(methodOn(VisitsRestController.class).getVisit(v.getId())).withSelfRel());
     representation.add(
-        linkTo(methodOn(AnimalRestController.class).getAnimal(v.getAnimalId()))
-            .withRel("animalDetached"));
+        linkTo(methodOn(AnimalRestController.class).getAnimal(v.getAnimal().getId()))
+            .withRel("animal"));
     representation.add(
-        linkTo(methodOn(VisitsRestController.class).getVisitAnimal(v.getId())).withRel("animal"));
+        linkTo(methodOn(ClientRestController.class).getClient(v.getClient().getId()))
+            .withRel("client"));
     representation.add(
-        linkTo(methodOn(ClientRestController.class).getClient(v.getClientId())).withRel("client"));
-    representation.add(
-        linkTo(methodOn(VetRestController.class).getVet(v.getVetId())).withRel("vet"));
+        linkTo(methodOn(VetRestController.class).getVet(v.getVet().getId())).withRel("vet"));
     return representation;
   }
 
@@ -98,13 +90,12 @@ public class VisitsRestController {
       @RequestParam(value = "duration") String duration_,
       @RequestParam(value = "preferredVet", required = false, defaultValue = "-1") String vetId_) {
 
-    LocalDateTime dateFrom  = LocalDateTime.parse(from);
+    LocalDateTime dateFrom = LocalDateTime.parse(from);
     LocalDateTime dateTo = LocalDateTime.parse(to);
     Duration duration = Duration.parse(duration_);
     int vetId = Integer.parseInt(vetId_);
 
     var visits = visitService.findVisits(dateFrom, dateTo, duration, vetId);
     return ResponseEntity.ok(visits);
-
   }
 }

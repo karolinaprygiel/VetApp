@@ -6,10 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uj.jwzp2021.gp.VetApp.controller.rest.hateoas.ClientRepresentation;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.ClientRequestDto;
-import uj.jwzp2021.gp.VetApp.model.dto.Responses.ClientResponseDto;
+import uj.jwzp2021.gp.VetApp.model.entity.Animal;
+import uj.jwzp2021.gp.VetApp.model.entity.Client;
 import uj.jwzp2021.gp.VetApp.service.ClientService;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -28,38 +28,41 @@ public class ClientRestController {
 
   @GetMapping(path = "/{id}")
   public ResponseEntity<?> getClient(@PathVariable int id) {
-    return ResponseEntity.ok(clientService.getClientById(id));
+    return ResponseEntity.ok(representFull(clientService.getClientById(id)));
   }
 
   @GetMapping
   public ResponseEntity<?> getAllClients() {
-    return ResponseEntity.ok(clientService.getAll());
+    return ResponseEntity.ok(
+        clientService.getAll().stream().map(this::representBrief).collect(Collectors.toList()));
   }
 
   @PostMapping
   public ResponseEntity<?> createClient(@RequestBody ClientRequestDto clientRequestDto) {
     var client = clientService.createClient(clientRequestDto);
-    return ResponseEntity.status(HttpStatus.CREATED).body(client);
+    return ResponseEntity.status(HttpStatus.CREATED).body(representFull(client));
   }
 
   @DeleteMapping(path = "/{id}")
   public ResponseEntity<?> deleteClient(@PathVariable int id) {
     var client = clientService.deleteClient(id);
-    return ResponseEntity.ok(client);
+    return ResponseEntity.ok(representFull(client));
   }
 
-  @GetMapping(value = "/hateoas", produces = "application/hal+json")
-  public List<ClientRepresentation> getAllHateoas() {
-    var clients = clientService.getAll();
-    return clients.stream().map(this::represent).collect(Collectors.toList());
+  private ClientRepresentation representBrief(Client c) {
+    var representation = ClientRepresentation.fromClient(c);
+    representation.add(
+        linkTo(methodOn(VisitsRestController.class).getVisit(c.getId())).withSelfRel());
+    return representation;
   }
 
-  private ClientRepresentation represent(ClientResponseDto c) {
-    var representation = ClientRepresentation.fromClientResponseDto(c);
+  private ClientRepresentation representFull(Client c) {
+    var representation = ClientRepresentation.fromClient(c);
     representation.add(
         linkTo(methodOn(VisitsRestController.class).getVisit(c.getId())).withSelfRel());
     representation.add(
-        c.getAnimalIds().stream()
+        c.getAnimals().stream()
+            .map(Animal::getId)
             .map(
                 (id) ->
                     linkTo(methodOn(AnimalRestController.class).getAnimal(id)).withRel("oneOfPets"))

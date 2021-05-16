@@ -6,10 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uj.jwzp2021.gp.VetApp.controller.rest.hateoas.AnimalRepresentation;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.AnimalRequestDto;
-import uj.jwzp2021.gp.VetApp.model.dto.Responses.AnimalResponseDto;
+import uj.jwzp2021.gp.VetApp.model.entity.Animal;
 import uj.jwzp2021.gp.VetApp.service.AnimalService;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -29,38 +28,43 @@ public class AnimalRestController {
   @GetMapping(path = "{id}")
   public ResponseEntity<?> getAnimal(@PathVariable int id) {
     var animal = animalService.getAnimalById(id);
-    return ResponseEntity.ok(animal);
+    return ResponseEntity.ok(representFull(animal));
   }
 
   @GetMapping
   public ResponseEntity<?> getAllAnimals() {
-    return ResponseEntity.ok(animalService.getAllAnimals());
+    return ResponseEntity.ok(
+        animalService.getAllAnimals().stream()
+            .map(this::representBrief)
+            .collect(Collectors.toList()));
   }
 
   @PostMapping
   public ResponseEntity<?> createAnimal(@RequestBody AnimalRequestDto animalRequestDto) {
     var result = animalService.createAnimal(animalRequestDto);
-    return ResponseEntity.status(HttpStatus.CREATED).body((result));
+    return ResponseEntity.status(HttpStatus.CREATED).body((representFull(result)));
   }
 
   @DeleteMapping(path = "/{id}")
   public ResponseEntity<?> deleteAnimal(@PathVariable int id) {
     var animal = animalService.deleteAnimal(id);
-    return ResponseEntity.ok(animal);
+    return ResponseEntity.ok(representFull(animal));
   }
 
-  @GetMapping(value = "/hateoas", produces = "application/hal+json")
-  public List<AnimalRepresentation> getAllHateoas() {
-    var animals = animalService.getAllAnimals();
-    return animals.stream().map(this::represent).collect(Collectors.toList());
+  private AnimalRepresentation representBrief(Animal a) {
+    var representation = AnimalRepresentation.fromAnimal(a);
+    representation.add(
+        linkTo(methodOn(AnimalRestController.class).getAnimal(a.getId())).withSelfRel());
+    return representation;
   }
 
-  private AnimalRepresentation represent(AnimalResponseDto a) {
+  private AnimalRepresentation representFull(Animal a) {
     var representation = AnimalRepresentation.fromAnimal(a);
     representation.add(
         linkTo(methodOn(AnimalRestController.class).getAnimal(a.getId())).withSelfRel());
     representation.add(
-        linkTo(methodOn(ClientRestController.class).getClient(a.getOwnerId())).withRel("owner"));
+        linkTo(methodOn(ClientRestController.class).getClient(a.getOwner().getId()))
+            .withRel("owner"));
     return representation;
   }
 }
