@@ -73,7 +73,8 @@ public class VetRestController {
   private VetRepresentation represent(VetResponseDto v) {
     var representation = VetRepresentation.fromVetResponseDto(v);
     representation.add(linkTo(methodOn(VetRestController.class).getVet(v.getId())).withSelfRel());
-    representation.add(linkTo(methodOn(VetRestController.class).getVetVisits(v.getId())).withRel("visits"));
+    representation.add(
+        linkTo(methodOn(VetRestController.class).getVetVisits(v.getId())).withRel("visits"));
     return representation;
   }
 }

@@ -21,10 +21,6 @@ public class VisitRepresentation extends RepresentationModel<VisitRepresentation
 
   public static VisitRepresentation fromVisit(VisitResponseDto v) {
     return new VisitRepresentation(
-        v.getId(),
-        v.getStartTime(),
-        v.getDuration(),
-        v.getStatus(),
-        v.getPrice());
+        v.getId(), v.getStartTime(), v.getDuration(), v.getStatus(), v.getPrice());
   }
 }

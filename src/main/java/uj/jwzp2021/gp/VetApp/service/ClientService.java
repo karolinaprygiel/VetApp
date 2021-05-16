@@ -23,14 +23,14 @@ public class ClientService {
 
   Client getRawClientById(int id) {
     var client = clientRepository.findById(id);
-    return client.orElseThrow(() -> {
-      throw new ClientNotFoundException("Client with id:" + id + " not found.");
-    });
+    return client.orElseThrow(
+        () -> {
+          throw new ClientNotFoundException("Client with id:" + id + " not found.");
+        });
   }
 
   public ClientResponseDto getClientById(int id) {
     return ClientMapper.toClientResponseDto(getRawClientById(id));
-
   }
 
   public List<ClientResponseDto> getAll() {
@@ -43,7 +43,8 @@ public class ClientService {
     var client = getRawClientById(id);
     clientRepository.delete(client);
     return ClientMapper.toClientResponseDto(client);
-}
+  }
+
   public ClientResponseDto createClient(ClientRequestDto clientRequestDto) {
     var client = clientRepository.save(ClientMapper.toClient(clientRequestDto));
     return ClientMapper.toClientResponseDto(client);

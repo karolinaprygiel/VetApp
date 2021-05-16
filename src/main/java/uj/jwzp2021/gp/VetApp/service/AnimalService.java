@@ -26,9 +26,10 @@ public class AnimalService {
 
   Animal getRawAnimalById(int id) {
     var animal = animalRepository.findById(id);
-    return animal.orElseThrow(() -> {
-      throw new AnimalNotFoundException("Animal with id:" + id + " not found");
-    });
+    return animal.orElseThrow(
+        () -> {
+          throw new AnimalNotFoundException("Animal with id:" + id + " not found");
+        });
   }
 
   public AnimalResponseDto getAnimalById(int id) {
@@ -36,7 +37,9 @@ public class AnimalService {
   }
 
   public List<AnimalResponseDto> getAllAnimals() {
-    return animalRepository.findAll().stream().map(AnimalMapper::toAnimalResponseDto).collect(Collectors.toList());
+    return animalRepository.findAll().stream()
+        .map(AnimalMapper::toAnimalResponseDto)
+        .collect(Collectors.toList());
   }
 
   public AnimalResponseDto deleteAnimal(int id) {
@@ -49,6 +52,5 @@ public class AnimalService {
     var owner = clientService.getRawClientById(animalRequestDto.getOwnerId());
     var animal = animalRepository.save(AnimalMapper.toAnimal(animalRequestDto, owner));
     return AnimalMapper.toAnimalResponseDto(animal);
-
   }
 }

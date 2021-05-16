@@ -19,7 +19,6 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -42,8 +41,7 @@ public class VisitService {
       ClientService clientService,
       VetService vetService,
       OfficeService officeService,
-      Clock clock
-  ) {
+      Clock clock) {
     this.visitRepository = visitRepository;
     this.animalService = animalService;
     this.clientService = clientService;
@@ -60,6 +58,10 @@ public class VisitService {
 
   public VisitResponseDto getVisitById(int id) {
     return VisitMapper.toVisitResponseDto(getRawVisitById(id));
+    }
+
+  private boolean dateTooSoon(LocalDateTime startTime) {
+    return !LocalDateTime.now(clock).plusHours(1).isBefore(startTime);
   }
 
 
@@ -70,7 +72,7 @@ public class VisitService {
 
   public List<Visit> getAllRawVisits() {
     return visitRepository.findAll().stream().sorted(Comparator.comparing(Visit::getStartTime)).collect(Collectors.toList());
-  }
+ }
 
   public VisitResponseDto createVisit(VisitRequestDto req) {
 
@@ -86,12 +88,13 @@ public class VisitService {
       throw new VisitTooSoonException("Visit cannot be scheduled for less an hour from now on.");
     }
 
-    if(!vetAvailable(req.getStartTime(), req.getDuration(), req.getVetId())){
+    if (!vetAvailable(req.getStartTime(), req.getDuration(), req.getVetId())) {
       throw new VetNotAvailableException("Visit not in the working hours of the chosen vet");
     }
 
     if (!dateAvailable(req.getStartTime(), req.getDuration(), req.getVetId(), req.getOfficeId())) {
-      throw new VisitOverlapsException("Visit would overlap with another visit. Try to change, date, vet or office");
+      throw new VisitOverlapsException(
+          "Visit would overlap with another visit. Try to change, date, vet or office");
     }
 
     if (animal.getOwner().getId() != client.getId()) {
@@ -102,9 +105,11 @@ public class VisitService {
     return VisitMapper.toVisitResponseDto(visit);
   }
 
-  private boolean dateAvailable(LocalDateTime startTime, Duration duration, int vetId, int officeId) {
+  private boolean dateAvailable(
+      LocalDateTime startTime, Duration duration, int vetId, int officeId) {
     List<Visit> overlaps =
-        visitRepository.overlaps(startTime, startTime.plusMinutes(duration.toMinutes()), vetId, officeId);
+        visitRepository.overlaps(
+            startTime, startTime.plusMinutes(duration.toMinutes()), vetId, officeId);
     return overlaps.size() == 0;
   }
 
@@ -112,13 +117,20 @@ public class VisitService {
     var visit = getRawVisitById(id);
     visitRepository.delete(visit);
     return VisitMapper.toVisitResponseDto(visit);
-    }
+  }
 
   private boolean vetAvailable(LocalDateTime startTime, Duration duration, int vetId) {
     return vetService.vetAvailable(startTime, duration, vetId);
   }
 
-  private boolean dateTooSoon(LocalDateTime startTime) {
+  public Visit getRawVisitById(int id) {
+    var visit = visitRepository.findById(id);
+    if (visit.isPresent()) {
+      return visit.get();
+    } else throw new VisitNotFoundException("Visit with id:" + id + " not found.");
+    }
+
+    private boolean dateTooSoon(LocalDateTime startTime) {
     return !LocalDateTime.now(clock).plusHours(1).isBefore(startTime);
   }
 
@@ -146,37 +158,43 @@ public class VisitService {
     return VisitMapper.toVisitResponseDto(visit);
   }
 
-  public List<VisitDatesResponseDto> findVisits(LocalDateTime dateFrom, LocalDateTime dateTo, Duration duration, int vetId) {
+  public List<VisitDatesResponseDto> findVisits(
+      LocalDateTime dateFrom, LocalDateTime dateTo, Duration duration, int vetId) {
     List<VisitDatesResponseDto> possibleVisits = new ArrayList<>();
     List<Vet> vets = new ArrayList<>();
-    if (vetId != -1){
+    if (vetId != -1) {
       var vet = vetService.getRawVetById(vetId);
       vets.add(vet);
-    }else{
+    } else {
       vets.addAll(vetService.getRawAll());
     }
     List<Office> offices = officeService.getRawAll();
     LocalDateTime startTime = getStartTime(dateFrom, dateTo);
 
-    while(startTime.plusMinutes(duration.toMinutes()).isBefore(dateTo.plusSeconds(1))){
+    while (startTime.plusMinutes(duration.toMinutes()).isBefore(dateTo.plusSeconds(1))) {
       boolean foundDate = false;
-      for (var vet : vets){
-        for (var office : offices){
-          foundDate = dateAvailable(startTime, duration, vet.getId(), office.getId()) && vetAvailable(startTime,duration, vet.getId());
-          if(foundDate){
-            possibleVisits.add(new VisitDatesResponseDto(startTime, duration, vet.getId(), office.getId()));
+      for (var vet : vets) {
+        for (var office : offices) {
+          foundDate =
+              dateAvailable(startTime, duration, vet.getId(), office.getId())
+                  && vetAvailable(startTime, duration, vet.getId());
+          if (foundDate) {
+            possibleVisits.add(
+                new VisitDatesResponseDto(startTime, duration, vet.getId(), office.getId()));
             break;
           }
         }
-        if (foundDate){ break; }
+        if (foundDate) {
+          break;
+        }
       }
-      if (foundDate){
+      if (foundDate) {
         startTime = startTime.plusMinutes(15);
-      }else{
+      } else {
         startTime = startTime.plusMinutes(5);
       }
     }
-      return possibleVisits;
+    return possibleVisits;
   }
 
   private LocalDateTime getStartTime(LocalDateTime dateFrom, LocalDateTime dateTo) {

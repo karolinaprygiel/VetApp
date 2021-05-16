@@ -13,11 +13,13 @@ import java.util.List;
 @Repository
 public interface VisitRepository extends JpaRepository<Visit, Integer> {
 
-    @Query("select v from visits v where ((v.vet.id = :vetId or v.office.id = :officeId) and ((:timeFrom >= v.startTime and :timeFrom < (v.startTime + v.duration)) or (:timeTo > v.startTime and :timeTo <= (v.startTime + v.duration))))")
-    List<Visit> overlaps(LocalDateTime timeFrom, LocalDateTime timeTo, int vetId, int officeId);
+  @Query(
+      "select v from visits v where ((v.vet.id = :vetId or v.office.id = :officeId) and ((:timeFrom >= v.startTime and :timeFrom < (v.startTime + v.duration)) or (:timeTo > v.startTime and :timeTo <= (v.startTime + v.duration))))")
+  List<Visit> overlaps(LocalDateTime timeFrom, LocalDateTime timeTo, int vetId, int officeId);
 
-    @Transactional
-    @Modifying
-    @Query("update visits v set v.visitStatus = uj.jwzp2021.gp.VetApp.model.entity.VisitStatus.FINISHED_AUTOMATICALLY WHERE (v.startTime + v.duration) < :time and v.visitStatus = uj.jwzp2021.gp.VetApp.model.entity.VisitStatus.PLANNED")
-    void finishOutOfDateVisits(LocalDateTime time);
+  @Transactional
+  @Modifying
+  @Query(
+      "update visits v set v.visitStatus = uj.jwzp2021.gp.VetApp.model.entity.VisitStatus.FINISHED_AUTOMATICALLY WHERE (v.startTime + v.duration) < :time and v.visitStatus = uj.jwzp2021.gp.VetApp.model.entity.VisitStatus.PLANNED")
+  void finishOutOfDateVisits(LocalDateTime time);
 }

@@ -5,8 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,20 +12,16 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name="vets")
+@Entity(name = "vets")
 public class Vet {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
-    private String name;
-    private String surname;
-    private LocalTime shiftStart;
-    private LocalTime shiftEnd;
-
-    @OneToMany(mappedBy = "vet", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<Visit> visits = new ArrayList<>();
-
-
-
+  @OneToMany(mappedBy = "vet", cascade = CascadeType.ALL, orphanRemoval = true)
+  private final List<Visit> visits = new ArrayList<>();
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private int id;
+  private String name;
+  private String surname;
+  private LocalTime shiftStart;
+  private LocalTime shiftEnd;
 }

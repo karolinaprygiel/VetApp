@@ -19,24 +19,24 @@ public class VetService {
   private final VetRepository vetRepository;
 
   @Autowired
-  public VetService (VetRepository vetRepository){
+  public VetService(VetRepository vetRepository) {
     this.vetRepository = vetRepository;
   }
 
   Vet getRawVetById(int id) {
     var vet = vetRepository.findById(id);
-    return vet.orElseThrow(()-> {throw new VetNotFoundException("Vet with id:" + id +" not found.");
-    });
+    return vet.orElseThrow(
+        () -> {
+          throw new VetNotFoundException("Vet with id:" + id + " not found.");
+        });
   }
 
-  public VetResponseDto getVetById(int id){
+  public VetResponseDto getVetById(int id) {
     return VetMapper.toVetResponseDto(getRawVetById(id));
   }
 
   public List<VetResponseDto> getAll() {
-      return getRawAll().stream()
-          .map(VetMapper::toVetResponseDto)
-          .collect(Collectors.toList());
+    return getRawAll().stream().map(VetMapper::toVetResponseDto).collect(Collectors.toList());
   }
 
   public List<Vet> getRawAll() {
@@ -56,7 +56,7 @@ public class VetService {
 
   public boolean vetAvailable(LocalDateTime startTime, Duration duration, int vetId) {
     var vet = getRawVetById(vetId);
-    return startTime.plus(duration).toLocalTime().isBefore(vet.getShiftEnd().plusSeconds(1)) &&
-        startTime.toLocalTime().isAfter(vet.getShiftStart().minusSeconds(1));
+    return startTime.plus(duration).toLocalTime().isBefore(vet.getShiftEnd().plusSeconds(1))
+        && startTime.toLocalTime().isAfter(vet.getShiftStart().minusSeconds(1));
   }
 }

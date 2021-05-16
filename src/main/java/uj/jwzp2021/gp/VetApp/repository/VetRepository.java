@@ -5,5 +5,4 @@ import org.springframework.stereotype.Repository;
 import uj.jwzp2021.gp.VetApp.model.entity.Vet;
 
 @Repository
-public interface VetRepository extends JpaRepository<Vet, Integer> {
-}
+public interface VetRepository extends JpaRepository<Vet, Integer> {}
