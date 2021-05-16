@@ -49,21 +49,11 @@ public class VisitService {
     this.officeService = officeService;
     this.clock = clock;
   }
-  Visit getRawVisitById(int id) {
-    var visit = visitRepository.findById(id);
-    if (visit.isPresent()) {
-      return visit.get();
-    } else throw new VisitNotFoundException("Visit with id:" + id + " not found.");
-  }
+
 
   public VisitResponseDto getVisitById(int id) {
     return VisitMapper.toVisitResponseDto(getRawVisitById(id));
     }
-
-  private boolean dateTooSoon(LocalDateTime startTime) {
-    return !LocalDateTime.now(clock).plusHours(1).isBefore(startTime);
-  }
-
 
   public List<VisitResponseDto> getAllVisits() {
     var visits = getAllRawVisits();
