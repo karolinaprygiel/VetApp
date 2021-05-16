@@ -1,5 +1,6 @@
 package uj.jwzp2021.gp.VetApp.controller.rest;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+@Slf4j
 @RequestMapping("api/offices")
 @RestController
 public class OfficeRestController {
@@ -28,23 +30,27 @@ public class OfficeRestController {
 
   @GetMapping(path = "/{id}")
   public ResponseEntity<?> getOffice(@PathVariable int id) {
+    log.info("Received GET request for /offices/" + id);
     return ResponseEntity.ok(representFull(officeService.getOfficeById(id)));
   }
 
   @GetMapping
   public ResponseEntity<?> getAllOffices() {
+    log.info("Received GET request for /offices/");
     return ResponseEntity.ok(
         officeService.getAll().stream().map(this::representBrief).collect(Collectors.toList()));
   }
 
   @PostMapping
   public ResponseEntity<?> createOffice(@RequestBody OfficeRequestDto officeRequestDto) {
+    log.info("Received POST request for /offices with: " + officeRequestDto);
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(representFull(officeService.createOffice(officeRequestDto)));
   }
 
   @DeleteMapping(path = "/{id}")
   public ResponseEntity<?> deleteOffice(@PathVariable int id) {
+    log.info("Received DELETE request for /offices/" + id);
     return ResponseEntity.ok(representFull(officeService.deleteOffice(id)));
   }
 
