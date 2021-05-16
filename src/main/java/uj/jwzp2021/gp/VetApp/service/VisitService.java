@@ -51,22 +51,24 @@ public class VisitService {
     this.officeService = officeService;
     this.clock = clock;
   }
-
-
-  private boolean dateTooSoon(LocalDateTime startTime) {
-    return !LocalDateTime.now(clock).plusHours(1).isBefore(startTime);
+  Visit getRawVisitById(int id) {
+    var visit = visitRepository.findById(id);
+    if (visit.isPresent()) {
+      return visit.get();
+    } else throw new VisitNotFoundException("Visit with id:" + id + " not found.");
   }
 
-  private boolean dateInPast(LocalDateTime startTime) {
-    return !LocalDateTime.now(clock).isBefore(startTime);
+  public VisitResponseDto getVisitById(int id) {
+    return VisitMapper.toVisitResponseDto(getRawVisitById(id));
   }
+
 
   public List<VisitResponseDto> getAllVisits() {
     var visits = getAllRawVisits();
     return visits.stream().map(VisitMapper::toVisitResponseDto).collect(Collectors.toList());
   }
 
-  List<Visit> getAllRawVisits() {
+  public List<Visit> getAllRawVisits() {
     return visitRepository.findAll().stream().sorted(Comparator.comparing(Visit::getStartTime)).collect(Collectors.toList());
   }
 
@@ -116,17 +118,14 @@ public class VisitService {
     return vetService.vetAvailable(startTime, duration, vetId);
   }
 
-
-  Visit getRawVisitById(int id) {
-    var visit = visitRepository.findById(id);
-    if (visit.isPresent()) {
-      return visit.get();
-    } else throw new VisitNotFoundException("Visit with id:" + id + " not found.");
+  private boolean dateTooSoon(LocalDateTime startTime) {
+    return !LocalDateTime.now(clock).plusHours(1).isBefore(startTime);
   }
 
-  public VisitResponseDto getVisitById(int id) {
-    return VisitMapper.toVisitResponseDto(getRawVisitById(id));
+  private boolean dateInPast(LocalDateTime startTime) {
+    return !LocalDateTime.now(clock).isBefore(startTime);
   }
+
 
   @Scheduled(fixedRate = 3600000)
   public void finishOutOfDateVisits() {
