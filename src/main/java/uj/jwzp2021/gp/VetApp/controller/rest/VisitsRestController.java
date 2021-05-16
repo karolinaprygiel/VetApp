@@ -40,9 +40,7 @@ public class VisitsRestController {
   public ResponseEntity<?> getAllVisits() {
     log.info("Received GET request for /visits");
     return ResponseEntity.ok(
-        visitService.getAll().stream()
-            .map(this::representBrief)
-            .collect(Collectors.toList()));
+        visitService.getAll().stream().map(this::representBrief).collect(Collectors.toList()));
   }
 
   @PostMapping()
@@ -65,6 +63,7 @@ public class VisitsRestController {
   }
 
   private VisitRepresentation representBrief(Visit v) {
+    log.debug("Creating Brief Visit representation");
     var representation = VisitRepresentation.fromVisit(v);
     representation.add(
         linkTo(methodOn(VisitsRestController.class).getVisit(v.getId())).withSelfRel());
@@ -72,6 +71,7 @@ public class VisitsRestController {
   }
 
   private VisitRepresentation representFull(Visit v) {
+    log.debug("Creating Full Visit representation");
     var representation = VisitRepresentation.fromVisit(v);
     representation.add(
         linkTo(methodOn(VisitsRestController.class).getVisit(v.getId())).withSelfRel());
@@ -92,7 +92,15 @@ public class VisitsRestController {
       @RequestParam(value = "dateTo") String to,
       @RequestParam(value = "duration") String duration_,
       @RequestParam(value = "preferredVet", required = false, defaultValue = "-1") String vetId_) {
-
+    log.info(
+        "Received GET request for /find with parameters: (dateFrom:"
+            + from
+            + ", dateTo:"
+            + to
+            + ", duration:"
+            + duration_
+            + ", preferredVet:"
+            + vetId_);
     LocalDateTime dateFrom = LocalDateTime.parse(from);
     LocalDateTime dateTo = LocalDateTime.parse(to);
     Duration duration = Duration.parse(duration_);

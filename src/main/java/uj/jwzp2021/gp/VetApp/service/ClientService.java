@@ -32,12 +32,11 @@ public class ClientService {
   }
 
   public List<Client> getAll() {
-    log.trace("getAll() was called");
+    log.debug("getAll() was called");
     return new ArrayList<>(clientRepository.findAll());
   }
 
   public Client deleteClient(int id) {
-    log.trace("deleteClient() was called with id=" + id);
     log.debug("Deleting client with id=" + id);
     var client = getClientById(id);
     clientRepository.delete(client);
