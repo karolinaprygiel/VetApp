@@ -1,5 +1,6 @@
 package uj.jwzp2021.gp.VetApp.controller.rest;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
+@Slf4j
 @RequestMapping("api/vets")
 @RestController
 public class VetRestController {
@@ -31,35 +32,45 @@ public class VetRestController {
 
   @GetMapping(path = "{id}")
   public ResponseEntity<?> getVet(@PathVariable int id) {
-    var a = vetService.getVetById(id);
-    var x = representFull(a);
-    return ResponseEntity.ok(x);
+    log.info("Received GET request for api/vets/"+ id);
+    var vetRepresentation = representFull(vetService.getVetById(id));
+    log.info("Returning httpStatus=200. Vet with id=" + id + " was found.");
+    return ResponseEntity.ok(vetRepresentation);
   }
 
   @GetMapping
   public ResponseEntity<?> getAll() {
-    return ResponseEntity.ok(
-        vetService.getAll().stream().map(this::representBrief).collect(Collectors.toList()));
+    log.info("Received GET request for api/vets");
+    var vetRepresentation = vetService.getAll().stream().map(this::representBrief).collect(Collectors.toList());
+    log.info("Returning httpStatus=200, returning all vets.");
+    return ResponseEntity.ok(vetRepresentation);
   }
 
   @PostMapping
   public ResponseEntity<?> createVet(@RequestBody VetRequestDto vetRequestDto) {
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(representFull(vetService.createVet(vetRequestDto)));
+    log.info("Received POST request for api/vets with: " + vetRequestDto);
+    var vetRepresentation = representFull(vetService.createVet(vetRequestDto));
+    log.info("Returning httpStatus=201. Vet for request" + vetRequestDto + " created successfully");
+    return ResponseEntity.status(HttpStatus.CREATED).body(vetRepresentation);
   }
 
   @DeleteMapping(path = "/{id}")
   public ResponseEntity<?> deleteVet(@PathVariable int id) {
-    return ResponseEntity.ok(representFull(vetService.deleteVet(id)));
+    log.info("Received DELETE request for api/vets/" + id);
+    var vetRepresentation =  representFull(vetService.deleteVet(id));
+    log.info("Returning httpStatus=200. Vet with id=" + id +" deleted successfully");
+    return ResponseEntity.ok(vetRepresentation);
   }
 
   private VetRepresentation representBrief(Vet v) {
+    log.debug("Creating Brief Vet representation");
     var representation = VetRepresentation.fromVet(v);
     representation.add(linkTo(methodOn(VetRestController.class).getVet(v.getId())).withSelfRel());
     return representation;
   }
 
   private VetRepresentation representFull(Vet v) {
+    log.debug("Creating Full Vet representation");
     var representation = VetRepresentation.fromVet(v);
     representation.add(linkTo(methodOn(VetRestController.class).getVet(v.getId())).withSelfRel());
     representation.add(

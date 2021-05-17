@@ -1,5 +1,6 @@
 package uj.jwzp2021.gp.VetApp.controller.rest;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("api/animals")
+@Slf4j
 public class AnimalRestController {
 
   private final AnimalService animalService;
@@ -28,31 +30,41 @@ public class AnimalRestController {
 
   @GetMapping(path = "{id}")
   public ResponseEntity<?> getAnimal(@PathVariable int id) {
-    var animal = animalService.getAnimalById(id);
-    return ResponseEntity.ok(representFull(animal));
+    log.info("Received GET request for api/animals/" + id);
+    var animalRepresentation = representFull(animalService.getAnimalById(id));
+    log.info("Returning httpStatus=200. Animal with id=" + id + " was found.");
+    return ResponseEntity.ok(animalRepresentation);
   }
 
   @GetMapping
   public ResponseEntity<?> getAllAnimals() {
-    return ResponseEntity.ok(
-        animalService.getAllAnimals().stream()
-            .map(this::representBrief)
-            .collect(Collectors.toList()));
+    log.info("Received GET request for api/animals");
+    var animalRepresentations = animalService.getAllAnimals().stream()
+        .map(this::representBrief)
+        .collect(Collectors.toList());
+    log.info("Returning httpStatus=200, returning all animals.");
+    return ResponseEntity.ok(animalRepresentations);
+
   }
 
   @PostMapping
   public ResponseEntity<?> createAnimal(@RequestBody AnimalRequestDto animalRequestDto) {
-    var result = animalService.createAnimal(animalRequestDto);
-    return ResponseEntity.status(HttpStatus.CREATED).body((representFull(result)));
+    log.info("Received POST request for api/animals with: " + animalRequestDto);
+    var animalRepresentation = representFull(animalService.createAnimal(animalRequestDto));
+    log.info("Returning httpStatus=201. Animal for request" + animalRequestDto + " created successfully");
+    return ResponseEntity.status(HttpStatus.CREATED).body(animalRepresentation);
   }
 
   @DeleteMapping(path = "/{id}")
   public ResponseEntity<?> deleteAnimal(@PathVariable int id) {
-    var animal = animalService.deleteAnimal(id);
-    return ResponseEntity.ok(representFull(animal));
+    log.info("Received DELETE request for api/animals/" + id);
+    var animalRepresentation = representFull(animalService.deleteAnimal(id));
+    log.info("Returning httpStatus=200. Animal with id=" + id +" deleted successfully");
+    return ResponseEntity.ok(animalRepresentation);
   }
 
   private AnimalRepresentation representBrief(Animal a) {
+    log.debug("Creating Brief Animal representation");
     var representation = AnimalRepresentation.fromAnimal(a);
     representation.add(
         linkTo(methodOn(AnimalRestController.class).getAnimal(a.getId())).withSelfRel());
@@ -60,6 +72,7 @@ public class AnimalRestController {
   }
 
   private AnimalRepresentation representFull(Animal a) {
+    log.debug("Creating Full Animal representation");
     var representation = AnimalRepresentation.fromAnimal(a);
     representation.add(
         linkTo(methodOn(AnimalRestController.class).getAnimal(a.getId())).withSelfRel());

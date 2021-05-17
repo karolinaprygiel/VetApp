@@ -1,5 +1,6 @@
 package uj.jwzp2021.gp.VetApp.controller.rest;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping(path = "/api/visits", produces = MediaType.APPLICATION_JSON_VALUE)
+@Slf4j
 public class VisitsRestController {
 
   private final VisitService visitService;
@@ -30,34 +32,49 @@ public class VisitsRestController {
 
   @GetMapping(path = "{id}")
   public ResponseEntity<?> getVisit(@PathVariable int id) {
-    return ResponseEntity.ok(representFull(visitService.getVisitById(id)));
+    log.info("Received GET request for api/visits/" + id);
+    var visitRepresentation = representFull(visitService.getVisitById(id));
+    log.info("Returning httpStatus=200. Visit with id=" + id + " was found.");
+    return ResponseEntity.ok(visitRepresentation);
   }
 
   @GetMapping
   public ResponseEntity<?> getAllVisits() {
-    return ResponseEntity.ok(
-        visitService.getAll().stream()
-            .map(this::representBrief)
-            .collect(Collectors.toList()));
+    log.info("Received GET request for api/visits");
+    var visitRepresentations = visitService.getAll().stream()
+        .map(this::representBrief)
+        .collect(Collectors.toList());
+    log.info("Returning httpStatus=200, returning all visits");
+    return ResponseEntity.ok(visitRepresentations);
   }
 
   @PostMapping()
   public ResponseEntity<?> createVisit(@RequestBody VisitRequestDto visitReq) {
-    return ResponseEntity.ok(representFull(visitService.createVisit(visitReq)));
+    log.info("Received POST request for api/visits with: " + visitReq);
+    var visitRepresentation = representFull(visitService.createVisit(visitReq));
+    log.info("Returning httpStatus=201. Visit for request" + visitReq + " created successfully");
+    return ResponseEntity.ok(visitRepresentation);
   }
 
   @DeleteMapping(path = "/{id}")
   ResponseEntity<?> delete(@PathVariable int id) {
-    return ResponseEntity.ok(representFull(visitService.delete(id)));
+    log.info("Received DELETE request for api/visits/" + id);
+    var visitRepresentation = representFull(visitService.delete(id));
+    log.info("Returning httpStatus=200. Visit with id=" + id +" deleted successfully");
+    return ResponseEntity.ok(visitRepresentation);
   }
 
   @PatchMapping(path = "/{id}")
   ResponseEntity<?> update(
       @PathVariable int id, @RequestBody VisitUpdateRequestDto visitUpdateRequestDto) {
-    return ResponseEntity.ok(representFull(visitService.updateVisit(id, visitUpdateRequestDto)));
+    log.info("Received PATCH request for api/visits/" + id + " with: " + visitUpdateRequestDto);
+    var visitRepresentation= representFull(visitService.updateVisit(id, visitUpdateRequestDto));
+    log.info("Returning httpStatus=200. Visit with id=" + id +" updated successfully with: " + visitUpdateRequestDto);
+    return ResponseEntity.ok(visitRepresentation);
   }
 
   private VisitRepresentation representBrief(Visit v) {
+    log.debug("Creating Brief Visit representation");
     var representation = VisitRepresentation.fromVisit(v);
     representation.add(
         linkTo(methodOn(VisitsRestController.class).getVisit(v.getId())).withSelfRel());
@@ -65,6 +82,7 @@ public class VisitsRestController {
   }
 
   private VisitRepresentation representFull(Visit v) {
+    log.debug("Creating Full Visit representation");
     var representation = VisitRepresentation.fromVisit(v);
     representation.add(
         linkTo(methodOn(VisitsRestController.class).getVisit(v.getId())).withSelfRel());
@@ -85,13 +103,22 @@ public class VisitsRestController {
       @RequestParam(value = "dateTo") String to,
       @RequestParam(value = "duration") String duration_,
       @RequestParam(value = "preferredVet", required = false, defaultValue = "-1") String vetId_) {
-
+    log.info(
+        "Received GET request for api/find with parameters: (dateFrom:"
+            + from
+            + ", dateTo:"
+            + to
+            + ", duration:"
+            + duration_
+            + ", preferredVet:"
+            + vetId_);
     LocalDateTime dateFrom = LocalDateTime.parse(from);
     LocalDateTime dateTo = LocalDateTime.parse(to);
     Duration duration = Duration.parse(duration_);
     int vetId = Integer.parseInt(vetId_);
 
     var visits = visitService.findVisits(dateFrom, dateTo, duration, vetId);
+    log.info("Returning httpStatus=200. Returning possible visit's dates");
     return ResponseEntity.ok(visits);
   }
 }

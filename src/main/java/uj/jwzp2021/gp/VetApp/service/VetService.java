@@ -1,6 +1,8 @@
 package uj.jwzp2021.gp.VetApp.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import uj.jwzp2021.gp.VetApp.exception.vet.VetNotFoundException;
 import uj.jwzp2021.gp.VetApp.mapper.VetMapper;
@@ -14,6 +16,7 @@ import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Service
 public class VetService {
   private final VetRepository vetRepository;
@@ -24,6 +27,7 @@ public class VetService {
   }
 
   public Vet getVetById(int id) {
+    log.info("Looking up vet with id=" + id);
     var vet = vetRepository.findById(id);
     return vet.orElseThrow(
         () -> {
@@ -32,16 +36,33 @@ public class VetService {
   }
 
   public List<Vet> getAll() {
+    log.info("Looking up all vets");
     return vetRepository.findAll();
   }
 
   public Vet createVet(VetRequestDto vetRequestDto) {
-    return vetRepository.save(VetMapper.toVet(vetRequestDto));
+    log.info("Creating vet for: " + vetRequestDto);
+    Vet vet;
+    try {
+      vet = vetRepository.save(VetMapper.toVet(vetRequestDto));
+    } catch (DataAccessException ex) {
+      log.error("Repository problem while saving vet for request: " + vetRequestDto);
+      throw ex;
+    }
+    log.info("Vet for request: " + vetRequestDto + " created successfully");
+    return vet;
   }
 
   public Vet deleteVet(int id) {
+    log.info("Deleting vet with id=" + id);
     var vet = getVetById(id);
-    vetRepository.delete(vet);
+    try {
+      vetRepository.delete(vet);
+    } catch (DataAccessException ex) {
+      log.error("Repository error while deleting vet with id=" + id);
+      throw ex;
+    }
+    log.info("Vet with id=" + id + " deleted successfully");
     return vet;
   }
 
@@ -85,11 +106,14 @@ public class VetService {
             && startTime.plus(duration).isBefore(vetWorkEnd.plusSeconds(1));
       } else {
         /* vet works at midnight, but visit does not cross it - let's split the vet's shift into two shifts */
-        var vetWorkStart1= LocalDateTime.of(startTime.toLocalDate(), LocalTime.MIDNIGHT);;
-        var vetWorkEnd1 = LocalDateTime.of(startTime.toLocalDate().minusDays(1), vet.getShiftStart()).plus(vet.getWorkingTime());
+        var vetWorkStart1 = LocalDateTime.of(startTime.toLocalDate(), LocalTime.MIDNIGHT);
+        ;
+        var vetWorkEnd1 =
+            LocalDateTime.of(startTime.toLocalDate().minusDays(1), vet.getShiftStart())
+                .plus(vet.getWorkingTime());
 
         var vetWorkStart2 = LocalDateTime.of(startTime.toLocalDate(), vet.getShiftStart());
-        var vetWorkEnd2 = LocalDateTime.of(startTime.toLocalDate(), LocalTime.of(23,59,59, 59));
+        var vetWorkEnd2 = LocalDateTime.of(startTime.toLocalDate(), LocalTime.of(23, 59, 59, 59));
         return (startTime.isAfter(vetWorkStart1.minusSeconds(1))
                 && startTime.plus(duration).isBefore(vetWorkEnd1.plusSeconds(1)))
             || (startTime.isAfter(vetWorkStart2.minusSeconds(1))
@@ -97,4 +121,5 @@ public class VetService {
       }
     }
   }
-}
+    }
+

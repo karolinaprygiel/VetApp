@@ -1,5 +1,6 @@
 package uj.jwzp2021.gp.VetApp.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import uj.jwzp2021.gp.VetApp.exception.visit.VisitOverlapsException;
 import uj.jwzp2021.gp.VetApp.exception.visit.VisitStartsInPastException;
 import uj.jwzp2021.gp.VetApp.exception.visit.VisitTooSoonException;
 
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -34,6 +36,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(AnimalNotFoundException.class)
   protected ResponseEntity<?> handleAnimalNotFoundException(
       AnimalNotFoundException ex, WebRequest request) {
+    log.error("Returning httpStatus=404. Reason: " + ex.getMessage());
+
     return handleExceptionInternal(
         ex,
         JsonFormatter.toResponseJson(ex.getMessage()),
@@ -45,6 +49,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(OfficeNotFoundException.class)
   protected ResponseEntity<?> handleOfficeNotFoundException(
       OfficeNotFoundException ex, WebRequest request) {
+    log.error("Returning httpStatus=404. Reason: " + ex.getMessage());
     return handleExceptionInternal(
         ex,
         JsonFormatter.toResponseJson(ex.getMessage()),
@@ -56,6 +61,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(ClientNotFoundException.class)
   protected ResponseEntity<?> handleClientNotFoundException(
       ClientNotFoundException ex, WebRequest request) {
+    log.error("Returning httpStatus=404. Reason: " + ex.getMessage());
     return handleExceptionInternal(
         ex,
         JsonFormatter.toResponseJson(ex.getMessage()),
@@ -67,6 +73,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(VetNotFoundException.class)
   protected ResponseEntity<?> handleVetNotFoundException(
       VetNotFoundException ex, WebRequest request) {
+    log.error("Returning httpStatus=404. Reason: " + ex.getMessage());
     return handleExceptionInternal(
         ex,
         JsonFormatter.toResponseJson(ex.getMessage()),
@@ -78,6 +85,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(VisitNotFoundException.class)
   protected ResponseEntity<?> handleVisitNotFoundException(
       VisitNotFoundException ex, WebRequest request) {
+    log.error("Returning httpStatus=404. Reason: " + ex.getMessage());
     return handleExceptionInternal(
         ex,
         JsonFormatter.toResponseJson(ex.getMessage()),
@@ -89,6 +97,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(VisitOverlapsException.class)
   protected ResponseEntity<?> handleVisitOverlapsException(
       VisitOverlapsException ex, WebRequest request) {
+    log.error("Returning httpStatus=409. Reason: " + ex.getMessage());
     return handleExceptionInternal(
         ex,
         JsonFormatter.toResponseJson(ex.getMessage()),
@@ -100,6 +109,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(VisitStartsInPastException.class)
   protected ResponseEntity<?> handleVisitStartsInPastException(
       VisitStartsInPastException ex, WebRequest request) {
+    log.error("Returning httpStatus=406. Reason: " + ex.getMessage());
     return handleExceptionInternal(
         ex,
         JsonFormatter.toResponseJson(ex.getMessage()),
@@ -111,6 +121,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(VisitTooSoonException.class)
   protected ResponseEntity<?> handleVisitTooSoonException(
       VisitTooSoonException ex, WebRequest request) {
+    log.error("Returning httpStatus=406. Reason: " + ex.getMessage());
     return handleExceptionInternal(
         ex,
         JsonFormatter.toResponseJson(ex.getMessage()),
@@ -122,6 +133,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(VetNotAvailableException.class)
   protected ResponseEntity<?> VetNotAvailableException(
       VetNotAvailableException ex, WebRequest request) {
+    log.error("Returning httpStatus=406. Reason: " + ex.getMessage());
     return handleExceptionInternal(
         ex,
         JsonFormatter.toResponseJson(ex.getMessage()),
