@@ -13,6 +13,6 @@ public class VetMapper {
         vetRequestDto.getName(),
         vetRequestDto.getSurname(),
         LocalTime.parse(vetRequestDto.getShiftStart()),
-        LocalTime.parse(vetRequestDto.getShiftEnd()));
+        vetRequestDto.getWorkingTime());
   }
 }

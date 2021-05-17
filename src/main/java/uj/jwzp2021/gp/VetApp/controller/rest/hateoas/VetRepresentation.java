@@ -14,7 +14,7 @@ public class VetRepresentation extends RepresentationModel<VetRepresentation> {
   private final String name;
   private final String surname;
   private final String shiftStart;
-  private final String shiftEnd;
+  private final String workingTime;
 
   public static VetRepresentation fromVet(Vet vet) {
     return new VetRepresentation(
@@ -22,6 +22,6 @@ public class VetRepresentation extends RepresentationModel<VetRepresentation> {
         vet.getName(),
         vet.getSurname(),
         vet.getShiftStart().toString(),
-        vet.getShiftEnd().toString());
+        vet.getWorkingTime().toString());
   }
 }

@@ -105,7 +105,8 @@ public class VisitService {
   }
 
   private boolean vetAvailable(LocalDateTime startTime, Duration duration, int vetId) {
-    return vetService.vetAvailable(startTime, duration, vetId);
+   return vetService.isVetAtWork(startTime, duration, vetId);
+  // return true;
   }
 
   public Visit getVisitById(int id) {
