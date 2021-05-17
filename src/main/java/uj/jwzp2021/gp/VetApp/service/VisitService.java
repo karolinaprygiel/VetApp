@@ -74,7 +74,7 @@ public class VisitService {
       throw new VisitTooSoonException("Visit cannot be scheduled for less an hour from now on.");
     }
 
-    if (!vetAvailable(req.getStartTime(), req.getDuration(), req.getVetId())) {
+    if (!vetAvailable(req.getStartTime(), req.getDuration(), vet)) {
       throw new VetNotAvailableException("Visit not in the working hours of the chosen vet.");
     }
 
@@ -104,8 +104,8 @@ public class VisitService {
     return visit;
   }
 
-  private boolean vetAvailable(LocalDateTime startTime, Duration duration, int vetId) {
-   return vetService.isVetAtWork(startTime, duration, vetId);
+  private boolean vetAvailable(LocalDateTime startTime, Duration duration, Vet vet) {
+   return vetService.isVetAtWork(startTime, duration, vet);
   // return true;
   }
 
@@ -163,7 +163,7 @@ public class VisitService {
         for (var office : offices) {
           foundDate =
               dateAvailable(startTime, duration, vet.getId(), office.getId())
-                  && vetAvailable(startTime, duration, vet.getId());
+                  && vetAvailable(startTime, duration, vet);
           if (foundDate) {
             possibleVisits.add(
                 new VisitDatesResponseDto(startTime, duration, vet.getId(), office.getId()));

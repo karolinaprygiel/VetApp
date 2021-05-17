@@ -51,8 +51,7 @@ public class VetService {
     return startTime.isAfter(endTime);
   }
 
-  public boolean isVetAtWork(LocalDateTime startTime, Duration duration, int vetId) {
-    var vet = getVetById(vetId);
+  public boolean isVetAtWork(LocalDateTime startTime, Duration duration, Vet vet) {
 
     // vet 15.04 20:00 - 16.04 4:00
     // wizyty:
