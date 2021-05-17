@@ -168,11 +168,11 @@ public class VisitService {
   }
 
   public List<VisitDatesResponseDto> findVisits(LocalDateTime dateFrom, LocalDateTime dateTo, Duration duration, int vetId) {
-    log.info("Finding available visits between {} and {} of duration {} preferred vet: {}", dateFrom, dateTo, duration, vetId != -1 ? vetId : "Not specified");
-    List<VisitDatesResponseDto> possibleVisits = new ArrayList<>();
+    log.info("Finding available visits between {} and {} of duration {} preferred vet id: {}", dateFrom, dateTo, duration, vetId != -1 ? vetId : "Not specified");
+    List<VisitDatesResponseDto> availableVisitTerms = new ArrayList<>();
     List<Vet> vets = getPossibleVets(vetId);
-    Collections.shuffle(vets);
     List<Office> offices = officeService.getAll();
+    Collections.shuffle(vets);
     Collections.shuffle(offices);
     LocalDateTime startTime = getStartTime(dateFrom, dateTo);
 
@@ -186,7 +186,7 @@ public class VisitService {
         for (var office : offices) {
           isDateAvailable = dateAvailable(startTime, duration, vet.getId(), office.getId());
           if (isDateAvailable) {
-            possibleVisits.add(new VisitDatesResponseDto(startTime, duration, vet.getId(), office.getId()));
+            availableVisitTerms.add(new VisitDatesResponseDto(startTime, duration, vet.getId(), office.getId()));
             break outerloop;
           }
         }
@@ -197,7 +197,7 @@ public class VisitService {
         startTime = startTime.plusMinutes(5);
       }
     }
-    return possibleVisits;
+    return availableVisitTerms;
   }
 
 
