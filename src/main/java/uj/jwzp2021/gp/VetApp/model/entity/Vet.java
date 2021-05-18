@@ -21,13 +21,15 @@ public class Vet {
 
   @OneToMany(mappedBy = "vet", cascade = CascadeType.ALL, orphanRemoval = true)
   private final List<Visit> visits = new ArrayList<>();
+
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private int id;
+
   private String name;
   private String surname;
   private LocalTime shiftStart;
-  //private LocalTime shiftEnd;
+  // private LocalTime shiftEnd;
   @Column(columnDefinition = "interval", name = "working_time")
   private Duration workingTime;
 }
