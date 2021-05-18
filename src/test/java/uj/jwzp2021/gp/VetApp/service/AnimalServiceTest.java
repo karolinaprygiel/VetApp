@@ -28,6 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class AnimalServiceTest {
@@ -96,7 +97,7 @@ class AnimalServiceTest {
     given(animalRepository.findById(1)).willReturn(Optional.empty());
     VeterinaryAppException exception = assertThrows(AnimalNotFoundException.class, () -> animalService.getAnimalById(1));
     assertEquals("Animal with id=1 not found", exception.getMessage());
-    verify(animalRepository, Mockito.times(0)).delete(any());
+    verifyNoMoreInteractions(animalRepository);
   }
 
   @Test
