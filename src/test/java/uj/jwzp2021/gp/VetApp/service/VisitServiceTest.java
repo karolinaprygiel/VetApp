@@ -1,6 +1,7 @@
 package uj.jwzp2021.gp.VetApp.service;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,6 +15,7 @@ import uj.jwzp2021.gp.VetApp.exception.vet.VetNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.visit.VisitNotFoundException;
 import uj.jwzp2021.gp.VetApp.mapper.VisitMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitRequestDto;
+import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitUpdateRequestDto;
 import uj.jwzp2021.gp.VetApp.model.entity.*;
 import uj.jwzp2021.gp.VetApp.repository.VisitRepository;
 
@@ -48,18 +50,18 @@ class VisitServiceTest {
   private VisitMapper visitMapper;
   @Mock
   private Clock clock;
-  private static Clock fixedClock;
-  private static Visit visit;
-  private static Visit visit2;
-  private static VisitRequestDto visitReq;
-  private static Animal animal;
-  private static Client client;
-  private static Vet vet;
-  private static Office office;
+  private Clock fixedClock;
+  private Visit visit;
+  private Visit visit2;
+  private VisitRequestDto visitReq;
+  private Animal animal;
+  private Client client;
+  private Vet vet;
+  private Office office;
 
 
-  @BeforeAll
-  static void setUp(){
+  @BeforeEach
+   void setUp(){
     visit = new Visit(1, LocalDateTime.of(2021, 7,21, 15, 20), Duration.ofMinutes(15),
         VisitStatus.PLANNED, BigDecimal.valueOf(50), null, null, null, null, "SomeDescriptiom");
     visit2 = new Visit(2, LocalDateTime.of(2018, 11,20, 12, 0), Duration.ofMinutes(10),
@@ -147,17 +149,17 @@ class VisitServiceTest {
 
   @Test
   void createVisit_OfficeNotExists_Throws_OfficeNotFoundException() {
-    //M
+
   }
 
   @Test
   void createVisit_DateInPast_Throws_VisitStartsInPastException() {
-    //M
+
   }
 
   @Test
   void createVisit_DateToSoon_Throws_VisitTooSoonException() {
-    // M
+
   }
 
   @Test
@@ -170,7 +172,6 @@ class VisitServiceTest {
 
   @Test
   void createVisit_WrongOwner_Throws_WrongOwnerException() {
-    //M
 
   }
 
@@ -181,22 +182,49 @@ class VisitServiceTest {
 
   @Test
   void updateVisit_VisitNotExists_Throws_VisitNotFoundException() {
+    VisitUpdateRequestDto updateReq = new VisitUpdateRequestDto();
+    given(visitRepository.findById(1)).willReturn(Optional.empty());
+    VeterinaryAppException exception = assertThrows(VisitNotFoundException.class, () -> visitService.updateVisit(1,updateReq));
+    assertEquals("Visit with id=1 not found", exception.getMessage());
+    verifyNoMoreInteractions(visitRepository);
   }
 
   @Test
   void updateVisit_UpdateStatus_Returns_UpdatedVisit() {
+    VisitUpdateRequestDto updateReq = new VisitUpdateRequestDto(VisitStatus.CANCELLED, null);
+    given(visitRepository.findById(1)).willReturn(Optional.of(visit));
+    Visit updatedVisit = new Visit(1, LocalDateTime.of(2021, 7,21, 15, 20), Duration.ofMinutes(15),
+        VisitStatus.CANCELLED, BigDecimal.valueOf(50), null, null, null, null, "SomeDescriptiom");
+    assertThat(visitService.updateVisit(1, updateReq)).isEqualTo(updatedVisit);
+    verify(visitRepository, Mockito.times(1)).save(updatedVisit);
   }
 
   @Test
   void updateVisit_UpdateDescription_Returns_UpdatedVisit() {
+    VisitUpdateRequestDto updateReq = new VisitUpdateRequestDto(null, "SomeNewDescription");
+    given(visitRepository.findById(1)).willReturn(Optional.of(visit));
+    Visit updatedVisit = new Visit(1, LocalDateTime.of(2021, 7,21, 15, 20), Duration.ofMinutes(15),
+        VisitStatus.PLANNED, BigDecimal.valueOf(50), null, null, null, null, "SomeNewDescription");
+    assertThat(visitService.updateVisit(1, updateReq)).isEqualTo(updatedVisit);
+    verify(visitRepository, Mockito.times(1)).save(updatedVisit);
   }
 
   @Test
   void updateVisit_UpdateDescriptionAndStatus_Returns_UpdatedVisit() {
+    VisitUpdateRequestDto updateReq = new VisitUpdateRequestDto(VisitStatus.NOT_APPEARED, "SomeMoreNewDescription");
+    given(visitRepository.findById(1)).willReturn(Optional.of(visit));
+    Visit updatedVisit = new Visit(1, LocalDateTime.of(2021, 7,21, 15, 20), Duration.ofMinutes(15),
+        VisitStatus.NOT_APPEARED, BigDecimal.valueOf(50), null, null, null, null, "SomeMoreNewDescription");
+    assertThat(visitService.updateVisit(1, updateReq)).isEqualTo(updatedVisit);
+    verify(visitRepository, Mockito.times(1)).save(updatedVisit);
   }
 
   @Test
   void updateVisit_UpdateOtherField_Returns_NotUpdatedVisit() {
+    VisitUpdateRequestDto updateReq = new VisitUpdateRequestDto(null, null);
+    given(visitRepository.findById(1)).willReturn(Optional.of(visit));
+    assertThat(visitService.updateVisit(1, updateReq)).isEqualTo(visit);
+    verify(visitRepository, Mockito.times(1)).save(visit);
   }
 
   @Test

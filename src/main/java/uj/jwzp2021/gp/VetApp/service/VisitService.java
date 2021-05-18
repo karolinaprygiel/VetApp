@@ -93,6 +93,10 @@ public class VisitService {
     var vet = vetService.getVetById(req.getVetId());
     var office = officeService.getOfficeById(req.getOfficeId());
 
+    if (animal.getOwner().getId() != client.getId()) {
+      throw new WrongOwnerException("This person does not own this animal.");
+    }
+
     if (dateInPast(req.getStartTime())) {
       throw new VisitStartsInPastException("Visit can not start in the past.");
     }
@@ -107,10 +111,6 @@ public class VisitService {
     if (!dateAvailable(req.getStartTime(), req.getDuration(), req.getVetId(), req.getOfficeId())) {
       throw new VisitOverlapsException(
           "Visit would overlap with another visit. Try to change, date, vet or office.");
-    }
-
-    if (animal.getOwner().getId() != client.getId()) {
-      throw new WrongOwnerException("This person does not own this animal.");
     }
 
     Visit visit;
