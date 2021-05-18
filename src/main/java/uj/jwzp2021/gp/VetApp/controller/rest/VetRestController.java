@@ -22,12 +22,10 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class VetRestController {
 
   private final VetService vetService;
-  private final VisitService visitService;
 
   @Autowired
-  public VetRestController(VetService vetService, VisitService visitService) {
+  public VetRestController(VetService vetService) {
     this.vetService = vetService;
-    this.visitService = visitService;
   }
 
   @GetMapping(path = "{id}")
