@@ -1,5 +1,6 @@
 package uj.jwzp2021.gp.VetApp.controller.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -7,6 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import uj.jwzp2021.gp.VetApp.model.dto.Requests.AnimalRequestDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Animal;
 import uj.jwzp2021.gp.VetApp.model.entity.AnimalType;
 import uj.jwzp2021.gp.VetApp.model.entity.Client;
@@ -18,7 +20,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.Is.isA;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -31,6 +33,8 @@ class AnimalRestControllerTest {
 
   @MockBean private AnimalService animalService;
 
+  @Autowired private ObjectMapper mapper;
+
   @Test
   void getAnimal() {}
 
@@ -38,12 +42,13 @@ class AnimalRestControllerTest {
   void getAllAnimals() throws Exception {
 
     Client jola = new Client(0, "Jola", "Jola");
+    Client ola = new Client(5, "Ola", "Ola");
 
-    Animal animal1 = new Animal(0, AnimalType.HAMSTER, "Klemens", 2019, jola);
-    Animal animal2 = new Animal(1, AnimalType.DOG, "Pieseł", 2010, new Client());
-    Animal animal3 = new Animal(2, AnimalType.CAT, "NyanCat", 2014, new Client());
+    Animal animal0 = new Animal(0, AnimalType.HAMSTER, "Klemens", 2019, jola);
+    Animal animal1 = new Animal(1, AnimalType.DOG, "Pieseł", 2010, ola);
+    Animal animal2 = new Animal(2, AnimalType.CAT, "NyanCat", 2014, new Client());
 
-    given(animalService.getAllAnimals()).willReturn(List.of(animal1, animal2, animal3));
+    given(animalService.getAllAnimals()).willReturn(List.of(animal0, animal1, animal2));
 
     mockMvc
         .perform(get(PATH).contentType(MediaType.APPLICATION_JSON))
@@ -51,15 +56,56 @@ class AnimalRestControllerTest {
         .andDo(MockMvcResultHandlers.print())
         .andExpect(jsonPath("$", hasSize(3)))
         .andExpect(jsonPath("$", isA(List.class)))
-        .andExpect(jsonPath("$[0].name", is("Klemens")))
-        .andExpect(jsonPath("$[0].ownerId", is(0)))
-        .andExpect(jsonPath("$[1].name", is("Pieseł")))
-        .andExpect(jsonPath("$[2].name", is("NyanCat")));
+        .andExpect(jsonPath("$[0].name", is(animal0.getName())))
+        .andExpect(jsonPath("$[0].animalType", is(animal0.getType().toString())))
+        .andExpect(jsonPath("$[0].ownerId", is(animal0.getOwner().getId())))
+        .andExpect(jsonPath("$[1].name", is(animal1.getName())))
+        .andExpect(jsonPath("$[1].animalType", is(animal1.getType().toString())))
+        .andExpect(jsonPath("$[1].ownerId", is(animal1.getOwner().getId())))
+        .andExpect(jsonPath("$[2].name", is(animal2.getName())))
+        .andExpect(jsonPath("$[2].animalType", is(animal2.getType().toString())))
+        .andExpect(jsonPath("$[2].ownerId", is(animal2.getOwner().getId())));
   }
 
   @Test
-  void createAnimal() {}
+  void createAnimal() throws Exception {
+    Client wladek = new Client(3, "Władek", "Oak");
+
+    AnimalRequestDto fafReq = new AnimalRequestDto(AnimalType.DOG, "Fafik", 1985, 3);
+
+    Animal fafik = new Animal(45, AnimalType.DOG, "Fafik", 1985, wladek);
+
+    given(animalService.createAnimal(fafReq)).willReturn(fafik);
+
+    mockMvc
+        .perform(
+            post(PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept("application/json")
+                .content(mapper.writeValueAsString(fafReq)))
+        .andExpect(status().isCreated())
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(jsonPath("$.name", is(fafReq.getName())))
+        .andExpect(jsonPath("$.animalType", is(fafReq.getType().toString())))
+        .andExpect(jsonPath("$.yearOfBirth", is(fafReq.getYearOfBirth())))
+        .andExpect(jsonPath("$.ownerId", is(fafReq.getOwnerId())));
+  }
 
   @Test
-  void deleteAnimal() {}
+  void deleteAnimal() throws Exception {
+    final int FAFID = 45;
+    Client wladek = new Client(3, "Władek", "Oak");
+    AnimalRequestDto fafReq = new AnimalRequestDto(AnimalType.DOG, "Fafik", 1985, 3);
+    Animal fafik = new Animal(FAFID, AnimalType.DOG, "Fafik", 1985, wladek);
+    given(animalService.deleteAnimal(FAFID)).willReturn(fafik);
+
+    mockMvc
+        .perform(delete(PATH + '/' + FAFID).contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(jsonPath("$.name", is(fafReq.getName())))
+        .andExpect(jsonPath("$.animalType", is(fafReq.getType().toString())))
+        .andExpect(jsonPath("$.yearOfBirth", is(fafReq.getYearOfBirth())))
+        .andExpect(jsonPath("$.ownerId", is(fafReq.getOwnerId())));
+  }
 }
