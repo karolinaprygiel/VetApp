@@ -8,7 +8,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uj.jwzp2021.gp.VetApp.exception.VeterinaryAppException;
+import uj.jwzp2021.gp.VetApp.exception.animal.AnimalNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.client.ClientNotFoundException;
+import uj.jwzp2021.gp.VetApp.exception.vet.VetNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.visit.VisitNotFoundException;
 import uj.jwzp2021.gp.VetApp.mapper.VisitMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitRequestDto;
@@ -121,15 +123,26 @@ class VisitServiceTest {
         assertThrows(ClientNotFoundException.class, () -> visitService.createVisit(visitReq));
     assertEquals("Client with id: 1  not found", exception.getMessage());
     verifyNoInteractions(visitRepository);
-
   }
 
   @Test
   void createVisit_AnimalNotExists_Throws_AnimalNotFoundException() {
+    given(animalService.getAnimalById(2))
+        .willThrow(new AnimalNotFoundException("Animal with id: 2  not found"));
+    VeterinaryAppException exception =
+        assertThrows(AnimalNotFoundException.class, () -> visitService.createVisit(visitReq));
+    assertEquals("Animal with id: 2  not found", exception.getMessage());
+    verifyNoInteractions(visitRepository);
   }
 
   @Test
   void createVisit_VetNotExists_Throws_VetNotFoundException() {
+    given(vetService.getVetById(4))
+        .willThrow(new VetNotFoundException("Vet with id: 4  not found"));
+    VeterinaryAppException exception =
+        assertThrows(VetNotFoundException.class, () -> visitService.createVisit(visitReq));
+    assertEquals("Vet with id: 4  not found", exception.getMessage());
+    verifyNoInteractions(visitRepository);
   }
 
   @Test
