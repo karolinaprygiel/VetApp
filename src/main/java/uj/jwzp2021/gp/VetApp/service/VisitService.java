@@ -34,6 +34,7 @@ public class VisitService {
   private final ClientService clientService;
   private final VetService vetService;
   private final OfficeService officeService;
+  private final VisitMapper visitMapper;
   private final Clock clock;
 
   @Autowired
@@ -43,12 +44,14 @@ public class VisitService {
       ClientService clientService,
       VetService vetService,
       OfficeService officeService,
+      VisitMapper visitMapper,
       Clock clock) {
     this.visitRepository = visitRepository;
     this.animalService = animalService;
     this.clientService = clientService;
     this.vetService = vetService;
     this.officeService = officeService;
+    this.visitMapper = visitMapper;
     this.clock = clock;
   }
 
@@ -58,7 +61,7 @@ public class VisitService {
     var visit = visitRepository.findById(id);
     return visit.orElseThrow(
         () -> {
-          throw new VisitNotFoundException("Visit with id:" + id + " not found.");
+          throw new VisitNotFoundException("Visit with id=" + id + " not found");
         });
   }
 
@@ -112,7 +115,7 @@ public class VisitService {
 
     Visit visit;
     try{
-     visit = visitRepository.save(VisitMapper.toVisit(req, animal, client, vet, office));
+     visit = visitRepository.save(visitMapper.toVisit(req, animal, client, vet, office));
     } catch(DataAccessException ex){
       log.error("Repository problem while saving visit for request: " + req);
       throw ex;

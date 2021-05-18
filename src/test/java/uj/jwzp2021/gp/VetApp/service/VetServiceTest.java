@@ -122,13 +122,13 @@ class VetServiceTest {
   }
 
   @ParameterizedTest
-  @MethodSource("isVetAtWorkDataProvider")
+  @MethodSource("isVetAtWorkInput")
   void isVetAtWork(LocalDateTime startTime, Duration duration, Vet vet, Boolean result) {
     assertThat(vetService.isVetAtWork(startTime, duration, vet)).isEqualTo(result);
 
   }
 
-  private static Stream<Arguments> isVetAtWorkDataProvider(){
+  private static Stream<Arguments> isVetAtWorkInput(){
     return Stream.of(
         Arguments.of(LocalDateTime.of(2021, 4, 15, 20, 0),
             Duration.ofMinutes(20), vet2, true),

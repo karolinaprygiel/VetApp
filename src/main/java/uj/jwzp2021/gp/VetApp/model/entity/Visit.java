@@ -50,4 +50,6 @@ public class Visit {
   private Office office;
 
   private String description;
+
+
 }
