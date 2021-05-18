@@ -17,10 +17,12 @@ import java.util.List;
 @Slf4j
 public class ClientService {
   private final ClientRepository clientRepository;
+  private final ClientMapper clientMapper;
 
   @Autowired
-  public ClientService(ClientRepository clientRepository) {
+  public ClientService(ClientRepository clientRepository, ClientMapper clientMapper) {
     this.clientRepository = clientRepository;
+    this.clientMapper = clientMapper;
   }
 
   public Client getClientById(int id) {
@@ -52,7 +54,7 @@ public class ClientService {
   public Client createClient(ClientRequestDto clientRequestDto) {
     Client client;
     try{
-      client = clientRepository.save(ClientMapper.toClient(clientRequestDto));
+      client = clientRepository.save(clientMapper.toClient(clientRequestDto));
     }catch (DataAccessException ex){
       log.error("Repository problem while saving client for request: " + clientRequestDto);
       throw ex;
