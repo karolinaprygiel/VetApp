@@ -11,6 +11,7 @@ import uj.jwzp2021.gp.VetApp.exception.VeterinaryAppException;
 import uj.jwzp2021.gp.VetApp.exception.client.ClientNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.visit.VisitNotFoundException;
 import uj.jwzp2021.gp.VetApp.mapper.VisitMapper;
+import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitRequestDto;
 import uj.jwzp2021.gp.VetApp.model.entity.*;
 import uj.jwzp2021.gp.VetApp.repository.VisitRepository;
 
@@ -22,9 +23,9 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class VisitServiceTest {
@@ -48,6 +49,7 @@ class VisitServiceTest {
   private static Clock fixedClock;
   private static Visit visit;
   private static Visit visit2;
+  private static VisitRequestDto visitReq;
   private static Animal animal;
   private static Client client;
   private static Vet vet;
@@ -60,6 +62,8 @@ class VisitServiceTest {
         VisitStatus.PLANNED, BigDecimal.valueOf(50), null, null, null, null, "SomeDescriptiom");
     visit2 = new Visit(2, LocalDateTime.of(2018, 11,20, 12, 0), Duration.ofMinutes(10),
         VisitStatus.FINISHED, BigDecimal.valueOf(10), null, null, null, null, "Another description");
+    visitReq = new VisitRequestDto(LocalDateTime.of(2021, 7,21, 15, 20),
+        Duration.ofMinutes(15),BigDecimal.valueOf(50), 2,3,4,5 );
   }
 
   @Test
@@ -111,6 +115,13 @@ class VisitServiceTest {
 
   @Test
   void createVisit_ClientNotExists_Throws_ClientNotFoundException() {
+    given(clientService.getClientById(3))
+        .willThrow(new ClientNotFoundException("Client with id: 1  not found"));
+    VeterinaryAppException exception =
+        assertThrows(ClientNotFoundException.class, () -> visitService.createVisit(visitReq));
+    assertEquals("Client with id: 1  not found", exception.getMessage());
+    verifyNoInteractions(visitRepository);
+
   }
 
   @Test
