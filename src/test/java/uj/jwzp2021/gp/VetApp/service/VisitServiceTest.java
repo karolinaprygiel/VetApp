@@ -147,14 +147,17 @@ class VisitServiceTest {
 
   @Test
   void createVisit_OfficeNotExists_Throws_OfficeNotFoundException() {
+    //M
   }
 
   @Test
   void createVisit_DateInPast_Throws_VisitStartsInPastException() {
+    //M
   }
 
   @Test
   void createVisit_DateToSoon_Throws_VisitTooSoonException() {
+    // M
   }
 
   @Test
@@ -167,6 +170,7 @@ class VisitServiceTest {
 
   @Test
   void createVisit_WrongOwner_Throws_WrongOwnerException() {
+    //M
 
   }
 
