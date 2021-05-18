@@ -24,7 +24,5 @@ public class Client {
   private String name;
   private String surname;
 
-  public static Client newClient(String name, String surname) {
-    return new Client(-1, name, surname);
-  }
+
 }

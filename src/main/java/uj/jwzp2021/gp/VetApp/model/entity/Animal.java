@@ -29,7 +29,4 @@ public class Animal {
   @JoinColumn(name = "client_id", referencedColumnName = "id", nullable = false)
   private Client owner;
 
-  public static Animal newAnimal(AnimalType type, String name, int yearOfBirth, Client owner) {
-    return new Animal(-1, type, name, yearOfBirth, owner);
-  }
 }

@@ -19,11 +19,13 @@ public class AnimalService {
 
   private final AnimalRepository animalRepository;
   private final ClientService clientService;
+  private final AnimalMapper animalMapper;
 
   @Autowired
-  public AnimalService(AnimalRepository animalRepository, ClientService clientService) {
+  public AnimalService(AnimalRepository animalRepository, ClientService clientService, AnimalMapper animalMapper) {
     this.animalRepository = animalRepository;
     this.clientService = clientService;
+    this.animalMapper = animalMapper;
   }
 
   public Animal getAnimalById(int id) {
@@ -58,7 +60,7 @@ public class AnimalService {
     Animal animal;
     var owner = clientService.getClientById(animalRequestDto.getOwnerId());
     try{
-    animal = animalRepository.save(AnimalMapper.toAnimal(animalRequestDto, owner));
+    animal = animalRepository.save(animalMapper.toAnimal(animalRequestDto, owner));
 
     }catch (DataAccessException ex){
       log.error("Repository problem while saving animal for request: " + animalRequestDto);
