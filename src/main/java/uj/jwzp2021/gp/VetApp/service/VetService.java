@@ -20,10 +20,12 @@ import java.util.List;
 @Service
 public class VetService {
   private final VetRepository vetRepository;
+  private final VetMapper vetMapper;
 
   @Autowired
-  public VetService(VetRepository vetRepository) {
+  public VetService(VetRepository vetRepository, VetMapper vetMapper) {
     this.vetRepository = vetRepository;
+    this.vetMapper = vetMapper;
   }
 
   public Vet getVetById(int id) {
@@ -31,7 +33,7 @@ public class VetService {
     var vet = vetRepository.findById(id);
     return vet.orElseThrow(
         () -> {
-          throw new VetNotFoundException("Vet with id:" + id + " not found.");
+          throw new VetNotFoundException("Vet with id=" + id + " not found");
         });
   }
 
@@ -44,7 +46,7 @@ public class VetService {
     log.info("Creating vet for: " + vetRequestDto);
     Vet vet;
     try {
-      vet = vetRepository.save(VetMapper.toVet(vetRequestDto));
+      vet = vetRepository.save(vetMapper.toVet(vetRequestDto));
     } catch (DataAccessException ex) {
       log.error("Repository problem while saving vet for request: " + vetRequestDto);
       throw ex;
