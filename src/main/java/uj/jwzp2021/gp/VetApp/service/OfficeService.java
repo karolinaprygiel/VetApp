@@ -16,10 +16,12 @@ import java.util.List;
 @Service
 public class OfficeService {
   private final OfficeRepository officeRepository;
+  private final OfficeMapper officeMapper;
 
   @Autowired
-  public OfficeService(OfficeRepository officeRepository) {
+  public OfficeService(OfficeRepository officeRepository, OfficeMapper officeMapper) {
     this.officeRepository = officeRepository;
+    this.officeMapper = officeMapper;
   }
 
   public Office getOfficeById(int id) {
@@ -27,7 +29,7 @@ public class OfficeService {
     var office = officeRepository.findById(id);
     return office.orElseThrow(
         () -> {
-          throw new OfficeNotFoundException("Office with id:" + id + " not found.");
+          throw new OfficeNotFoundException("Office with id=" + id + " not found");
         });
   }
 
@@ -40,7 +42,7 @@ public class OfficeService {
     log.info("Creating office for: " + officeRequestDto);
     Office office;
     try{
-      office = officeRepository.save(OfficeMapper.toOffice(officeRequestDto));
+      office = officeRepository.save(officeMapper.toOffice(officeRequestDto));
     }catch (DataAccessException ex){
       log.error("Repository problem while saving office for request: " + officeRequestDto);
       throw ex;
