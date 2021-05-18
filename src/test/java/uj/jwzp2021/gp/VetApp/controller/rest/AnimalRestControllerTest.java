@@ -36,7 +36,21 @@ class AnimalRestControllerTest {
   @Autowired private ObjectMapper mapper;
 
   @Test
-  void getAnimal() {}
+  void getAnimal() throws Exception {
+    final int ID = 0;
+    Client jola = new Client(0, "Jola", "Jola");
+    Animal animal = new Animal(ID, AnimalType.HAMSTER, "Klemens", 2019, jola);
+    given(animalService.getAnimalById(ID)).willReturn(animal);
+
+    mockMvc
+        .perform(get(PATH + "/" + ID).contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(jsonPath("$.name", is(animal.getName())))
+        .andExpect(jsonPath("$.animalType", is(animal.getType().toString())))
+        .andExpect(jsonPath("$.yearOfBirth", is(animal.getYearOfBirth())))
+        .andExpect(jsonPath("$.ownerId", is(animal.getOwner().getId())));
+  }
 
   @Test
   void getAllAnimals() throws Exception {
@@ -100,7 +114,7 @@ class AnimalRestControllerTest {
     given(animalService.deleteAnimal(FAFID)).willReturn(fafik);
 
     mockMvc
-        .perform(delete(PATH + '/' + FAFID).contentType(MediaType.APPLICATION_JSON))
+        .perform(delete(PATH + "/" + FAFID).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andDo(MockMvcResultHandlers.print())
         .andExpect(jsonPath("$.name", is(fafReq.getName())))
