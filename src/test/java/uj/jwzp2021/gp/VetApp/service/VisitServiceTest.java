@@ -1,6 +1,5 @@
 package uj.jwzp2021.gp.VetApp.service;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,54 +19,67 @@ import uj.jwzp2021.gp.VetApp.model.entity.*;
 import uj.jwzp2021.gp.VetApp.repository.VisitRepository;
 
 import java.math.BigDecimal;
-import java.time.*;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class VisitServiceTest {
 
-  @InjectMocks
-  private VisitService visitService;
-  @Mock
-  private VisitRepository visitRepository;
-  @Mock
-  private AnimalService animalService;
-  @Mock
-  private ClientService clientService;
-  @Mock
-  private VetService vetService;
-  @Mock
-  private OfficeService officeService;
-  @Mock
-  private VisitMapper visitMapper;
-  @Mock
-  private Clock clock;
+  @InjectMocks private VisitService visitService;
+  @Mock private VisitRepository visitRepository;
+  @Mock private AnimalService animalService;
+  @Mock private ClientService clientService;
+  @Mock private VetService vetService;
+  @Mock private OfficeService officeService;
+  @Mock private VisitMapper visitMapper;
+  @Mock private Clock clock;
   private Clock fixedClock;
   private Visit visit;
-  private Visit visit2;
   private VisitRequestDto visitReq;
   private Animal animal;
   private Client client;
   private Vet vet;
   private Office office;
 
-
   @BeforeEach
-   void setUp(){
-    visit = new Visit(1, LocalDateTime.of(2021, 7,21, 15, 20), Duration.ofMinutes(15),
-        VisitStatus.PLANNED, BigDecimal.valueOf(50), null, null, null, null, "SomeDescriptiom");
-    visit2 = new Visit(2, LocalDateTime.of(2018, 11,20, 12, 0), Duration.ofMinutes(10),
-        VisitStatus.FINISHED, BigDecimal.valueOf(10), null, null, null, null, "Another description");
-    visitReq = new VisitRequestDto(LocalDateTime.of(2021, 7,21, 15, 20),
-        Duration.ofMinutes(15),BigDecimal.valueOf(50), 2,3,4,5 );
+  void setUp() {
+    client = new Client(3, "ClientName", "ClientSurname");
+    animal = new Animal(2, AnimalType.RAT, "Fafałek", 2020, client);
+    vet = new Vet(4, "Rafał", "Kawa", LocalTime.parse("09:00"), Duration.ofHours(9));
+    office = new Office(5, "gab1");
+
+    visit =
+        new Visit(
+            1,
+            LocalDateTime.of(2021, 7, 21, 15, 20),
+            Duration.ofMinutes(15),
+            VisitStatus.PLANNED,
+            BigDecimal.valueOf(50),
+            animal,
+            client,
+            vet,
+            office,
+            "SomeDescriptiom");
+    visitReq =
+        new VisitRequestDto(
+            LocalDateTime.of(2021, 7, 21, 15, 20),
+            Duration.ofMinutes(15),
+            BigDecimal.valueOf(50),
+            2,
+            3,
+            4,
+            5);
   }
 
   @Test
@@ -79,20 +91,39 @@ class VisitServiceTest {
   @Test
   void getVisitById_invalidId_Throws_VisitNotFoundException() {
     given(visitRepository.findById(1)).willReturn(Optional.empty());
-    VeterinaryAppException exception = assertThrows(VisitNotFoundException.class, () -> visitService.getVisitById(1));
+    VeterinaryAppException exception =
+        assertThrows(VisitNotFoundException.class, () -> visitService.getVisitById(1));
     assertEquals("Visit with id=1 not found", exception.getMessage());
   }
 
   @Test
   void getAll_Returns_ListOfVisits() {
+    Visit visit2 =
+        new Visit(
+            2,
+            LocalDateTime.of(2018, 11, 20, 12, 0),
+            Duration.ofMinutes(10),
+            VisitStatus.FINISHED,
+            BigDecimal.valueOf(10),
+            null,
+            null,
+            null,
+            null,
+            "Another description");
     given(visitRepository.findAll()).willReturn(List.of(visit2, visit));
-    assertThat(visitService.getAll()).isNotNull().hasSize(2).containsExactlyInAnyOrderElementsOf(List.of(visit, visit2));
+    assertThat(visitService.getAll())
+        .isNotNull()
+        .hasSize(2)
+        .containsExactlyInAnyOrderElementsOf(List.of(visit, visit2));
   }
 
   @Test
   void getAll_Returns_ListOfOneVisit() {
     given(visitRepository.findAll()).willReturn(List.of(visit));
-    assertThat(visitService.getAll()).isNotNull().hasSize(1).containsExactlyInAnyOrderElementsOf(List.of(visit));
+    assertThat(visitService.getAll())
+        .isNotNull()
+        .hasSize(1)
+        .containsExactlyInAnyOrderElementsOf(List.of(visit));
   }
 
   @Test
@@ -112,7 +143,8 @@ class VisitServiceTest {
   @Test
   void deleteVisit_VisitNotExists_Throws_VisitNotFoundException() {
     given(visitRepository.findById(1)).willReturn(Optional.empty());
-    VeterinaryAppException exception = assertThrows(VisitNotFoundException.class, () -> visitService.getVisitById(1));
+    VeterinaryAppException exception =
+        assertThrows(VisitNotFoundException.class, () -> visitService.getVisitById(1));
     assertEquals("Visit with id=1 not found", exception.getMessage());
     verifyNoMoreInteractions(visitRepository);
   }
@@ -148,43 +180,32 @@ class VisitServiceTest {
   }
 
   @Test
-  void createVisit_OfficeNotExists_Throws_OfficeNotFoundException() {
-
-  }
+  void createVisit_OfficeNotExists_Throws_OfficeNotFoundException() {}
 
   @Test
-  void createVisit_DateInPast_Throws_VisitStartsInPastException() {
-
-  }
+  void createVisit_DateInPast_Throws_VisitStartsInPastException() {}
 
   @Test
-  void createVisit_DateToSoon_Throws_VisitTooSoonException() {
-
-  }
+  void createVisit_DateToSoon_Throws_VisitTooSoonException() {}
 
   @Test
-  void createVisit_vetNotAvailable_Throws_VetNotAvailableException() {
-  }
+  void createVisit_vetNotAvailable_Throws_VetNotAvailableException() {}
 
   @Test
-  void createVisit_dateNotAvailable_Throws_VisitOverlapsException() {
-  }
+  void createVisit_dateNotAvailable_Throws_VisitOverlapsException() {}
 
   @Test
-  void createVisit_WrongOwner_Throws_WrongOwnerException() {
-
-  }
+  void createVisit_WrongOwner_Throws_WrongOwnerException() {}
 
   @Test
-  void createVisit_ReturnsAndSave_Visit() {
-
-  }
+  void createVisit_ReturnsAndSave_Visit() {}
 
   @Test
   void updateVisit_VisitNotExists_Throws_VisitNotFoundException() {
     VisitUpdateRequestDto updateReq = new VisitUpdateRequestDto();
     given(visitRepository.findById(1)).willReturn(Optional.empty());
-    VeterinaryAppException exception = assertThrows(VisitNotFoundException.class, () -> visitService.updateVisit(1,updateReq));
+    VeterinaryAppException exception =
+        assertThrows(VisitNotFoundException.class, () -> visitService.updateVisit(1, updateReq));
     assertEquals("Visit with id=1 not found", exception.getMessage());
     verifyNoMoreInteractions(visitRepository);
   }
@@ -193,8 +214,18 @@ class VisitServiceTest {
   void updateVisit_UpdateStatus_Returns_UpdatedVisit() {
     VisitUpdateRequestDto updateReq = new VisitUpdateRequestDto(VisitStatus.CANCELLED, null);
     given(visitRepository.findById(1)).willReturn(Optional.of(visit));
-    Visit updatedVisit = new Visit(1, LocalDateTime.of(2021, 7,21, 15, 20), Duration.ofMinutes(15),
-        VisitStatus.CANCELLED, BigDecimal.valueOf(50), null, null, null, null, "SomeDescriptiom");
+    Visit updatedVisit =
+        new Visit(
+            1,
+            LocalDateTime.of(2021, 7, 21, 15, 20),
+            Duration.ofMinutes(15),
+            VisitStatus.CANCELLED,
+            BigDecimal.valueOf(50),
+            animal,
+            client,
+            null,
+            null,
+            "SomeDescriptiom");
     assertThat(visitService.updateVisit(1, updateReq)).isEqualTo(updatedVisit);
     verify(visitRepository, Mockito.times(1)).save(updatedVisit);
   }
@@ -203,18 +234,39 @@ class VisitServiceTest {
   void updateVisit_UpdateDescription_Returns_UpdatedVisit() {
     VisitUpdateRequestDto updateReq = new VisitUpdateRequestDto(null, "SomeNewDescription");
     given(visitRepository.findById(1)).willReturn(Optional.of(visit));
-    Visit updatedVisit = new Visit(1, LocalDateTime.of(2021, 7,21, 15, 20), Duration.ofMinutes(15),
-        VisitStatus.PLANNED, BigDecimal.valueOf(50), null, null, null, null, "SomeNewDescription");
+    Visit updatedVisit =
+        new Visit(
+            1,
+            LocalDateTime.of(2021, 7, 21, 15, 20),
+            Duration.ofMinutes(15),
+            VisitStatus.PLANNED,
+            BigDecimal.valueOf(50),
+            animal,
+            client,
+            null,
+            null,
+            "SomeNewDescription");
     assertThat(visitService.updateVisit(1, updateReq)).isEqualTo(updatedVisit);
     verify(visitRepository, Mockito.times(1)).save(updatedVisit);
   }
 
   @Test
   void updateVisit_UpdateDescriptionAndStatus_Returns_UpdatedVisit() {
-    VisitUpdateRequestDto updateReq = new VisitUpdateRequestDto(VisitStatus.NOT_APPEARED, "SomeMoreNewDescription");
+    VisitUpdateRequestDto updateReq =
+        new VisitUpdateRequestDto(VisitStatus.NOT_APPEARED, "SomeMoreNewDescription");
     given(visitRepository.findById(1)).willReturn(Optional.of(visit));
-    Visit updatedVisit = new Visit(1, LocalDateTime.of(2021, 7,21, 15, 20), Duration.ofMinutes(15),
-        VisitStatus.NOT_APPEARED, BigDecimal.valueOf(50), null, null, null, null, "SomeMoreNewDescription");
+    Visit updatedVisit =
+        new Visit(
+            1,
+            LocalDateTime.of(2021, 7, 21, 15, 20),
+            Duration.ofMinutes(15),
+            VisitStatus.NOT_APPEARED,
+            BigDecimal.valueOf(50),
+            animal,
+            client,
+            null,
+            null,
+            "SomeMoreNewDescription");
     assertThat(visitService.updateVisit(1, updateReq)).isEqualTo(updatedVisit);
     verify(visitRepository, Mockito.times(1)).save(updatedVisit);
   }
@@ -228,31 +280,23 @@ class VisitServiceTest {
   }
 
   @Test
-  void findVisits_Returns_VisitLists() {
-  }
+  void findVisits_Returns_VisitLists() {}
 
   @Test
-  void findVisits_WithPreferredVet_Returns_VisitLists() {
-  }
+  void findVisits_WithPreferredVet_Returns_VisitLists() {}
 
   @Test
-  void findVisits_InPast_Returns_EmptyList() {
-  }
+  void findVisits_InPast_Returns_EmptyList() {}
 
   @Test
-  void findVisits_BeginInPast_Returns_VisitsList() {
-  }
+  void findVisits_BeginInPast_Returns_VisitsList() {}
 
   @Test
-  void findVisits_NoVetAvailable_Returns_EmptyList() {
-  }
+  void findVisits_NoVetAvailable_Returns_EmptyList() {}
 
   @Test
-  void findVisits_NoOfficeAvailable_Returns_EmptyList() {
-  }
+  void findVisits_NoOfficeAvailable_Returns_EmptyList() {}
 
   @Test
-  void findVisits_NoDatesAvailable_Returns_EmptyList() {
-  }
-
+  void findVisits_NoDatesAvailable_Returns_EmptyList() {}
 }
