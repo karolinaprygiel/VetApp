@@ -174,12 +174,13 @@ public class VisitService {
 
   public List<VisitDatesResponseDto> findVisits(LocalDateTime dateFrom, LocalDateTime dateTo, Duration duration, int vetId) {
     log.info("Finding available visits between {} and {} of duration {} preferred vet id: {}", dateFrom, dateTo, duration, vetId != -1 ? vetId : "Not specified");
+    LocalDateTime startTime = getStartTime(dateFrom, dateTo);
     List<VisitDatesResponseDto> availableVisitTerms = new ArrayList<>();
     List<Vet> vets = getPossibleVets(vetId);
     List<Office> offices = officeService.getAll();
     Collections.shuffle(vets);
     Collections.shuffle(offices);
-    LocalDateTime startTime = getStartTime(dateFrom, dateTo);
+
 
     while (startTime.plusMinutes(duration.toMinutes()).isBefore(dateTo.plusSeconds(1))) {
       boolean isDateAvailable = false;

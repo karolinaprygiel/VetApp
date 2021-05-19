@@ -15,6 +15,7 @@ import uj.jwzp2021.gp.VetApp.exception.vet.VetNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.visit.VisitNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.visit.VisitStartsInPastException;
 import uj.jwzp2021.gp.VetApp.exception.visit.VisitTooSoonException;
+import uj.jwzp2021.gp.VetApp.exception.visit.WrongOwnerException;
 import uj.jwzp2021.gp.VetApp.mapper.VisitMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitUpdateRequestDto;
@@ -60,8 +61,8 @@ class VisitServiceTest {
 
   @BeforeEach
   void setUp() {
-    animal = new Animal(2, AnimalType.RAT, "Rafałek", 2020, client);
     client = new Client(3, "ClientName", "ClientSurname");
+    animal = new Animal(2, AnimalType.RAT, "Rafałek", 2020, client);
     vet = new Vet(4, "Fafał", "Kawa", LocalTime.parse("09:00"), Duration.ofHours(9));
     office = new Office(5, "gab1");
 
@@ -260,10 +261,11 @@ class VisitServiceTest {
 
     fixedClock =
         Clock.fixed(
-            Instant.from(LocalDateTime.of(2020, 1, 1, 1, 1).toInstant(ZoneOffset.UTC)),
-            ZoneId.systemDefault());
+            Instant.from(LocalDateTime.of(2020, 1, 1, 2, 0).toInstant(ZoneOffset.UTC)),
+            ZoneId.of("UTC"));
     doReturn(fixedClock.instant()).when(clock).instant();
     doReturn(fixedClock.getZone()).when(clock).getZone();
+
 
     given(mockVisitReq.getStartTime()).willReturn(LocalDateTime.of(2020, 1, 1, 2, 15));
     VeterinaryAppException exception =
@@ -274,13 +276,35 @@ class VisitServiceTest {
   }
 
   @Test
-  void createVisit_vetNotAvailable_Throws_VetNotAvailableException() {}
+  void createVisit_vetNotAvailable_Throws_VetNotAvailableException() {
+
+  }
 
   @Test
   void createVisit_dateNotAvailable_Throws_VisitOverlapsException() {}
 
   @Test
-  void createVisit_WrongOwner_Throws_WrongOwnerException() {}
+  void createVisit_WrongOwner_Throws_WrongOwnerException() {
+    VisitRequestDto anotherVisitReq = new VisitRequestDto(
+        LocalDateTime.of(2021, 7, 21, 15, 20),
+        Duration.ofMinutes(15),
+        BigDecimal.valueOf(50),
+        2,
+        15,
+        4,
+        5);
+    Client anotherClient = new Client(15, "wrongOwner", "wrongOwnerSurname" );
+    given(clientService.getClientById(anotherVisitReq.getClientId())).willReturn(anotherClient);
+    given(animalService.getAnimalById(anotherVisitReq.getAnimalId())).willReturn(animal);
+    given(vetService.getVetById(anotherVisitReq.getVetId())).willReturn(vet);
+    given(officeService.getOfficeById(anotherVisitReq.getOfficeId())).willReturn(office);
+
+    VeterinaryAppException exception =
+        assertThrows(
+            WrongOwnerException.class, () -> visitService.createVisit(anotherVisitReq));
+    assertEquals("This person does not own this animal.", exception.getMessage());
+    verifyNoInteractions(visitRepository);
+  }
 
   @Test
   void createVisit_ReturnsAndSave_Visit() {
@@ -319,8 +343,8 @@ class VisitServiceTest {
             BigDecimal.valueOf(50),
             animal,
             client,
-            null,
-            null,
+            vet,
+            office,
             "SomeDescriptiom");
     assertThat(visitService.updateVisit(1, updateReq)).isEqualTo(updatedVisit);
     verify(visitRepository, Mockito.times(1)).save(updatedVisit);
@@ -339,8 +363,8 @@ class VisitServiceTest {
             BigDecimal.valueOf(50),
             animal,
             client,
-            null,
-            null,
+            vet,
+            office,
             "SomeNewDescription");
     assertThat(visitService.updateVisit(1, updateReq)).isEqualTo(updatedVisit);
     verify(visitRepository, Mockito.times(1)).save(updatedVisit);
@@ -360,8 +384,8 @@ class VisitServiceTest {
             BigDecimal.valueOf(50),
             animal,
             client,
-            null,
-            null,
+            vet,
+            office,
             "SomeMoreNewDescription");
     assertThat(visitService.updateVisit(1, updateReq)).isEqualTo(updatedVisit);
     verify(visitRepository, Mockito.times(1)).save(updatedVisit);
@@ -373,6 +397,7 @@ class VisitServiceTest {
     given(visitRepository.findById(1)).willReturn(Optional.of(visit));
     assertThat(visitService.updateVisit(1, updateReq)).isEqualTo(visit);
     verify(visitRepository, Mockito.times(1)).save(visit);
+    //clock = n
   }
 
   @Test
