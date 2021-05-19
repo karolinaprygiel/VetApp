@@ -10,8 +10,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uj.jwzp2021.gp.VetApp.exception.VeterinaryAppException;
 import uj.jwzp2021.gp.VetApp.exception.animal.AnimalNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.client.ClientNotFoundException;
+import uj.jwzp2021.gp.VetApp.exception.office.OfficeNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.vet.VetNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.visit.VisitNotFoundException;
+import uj.jwzp2021.gp.VetApp.exception.visit.VisitStartsInPastException;
 import uj.jwzp2021.gp.VetApp.mapper.VisitMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitUpdateRequestDto;
@@ -19,10 +21,7 @@ import uj.jwzp2021.gp.VetApp.model.entity.*;
 import uj.jwzp2021.gp.VetApp.repository.VisitRepository;
 
 import java.math.BigDecimal;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +35,11 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class VisitServiceTest {
 
+  private final int MOCK_ANIMAL_ID = 1234;
+  private final int MOCK_CLIENT_ID = 6789;
+  private final int MOCK_VET_ID = 123423;
+  private final int MOCK_OFFICE_ID = 671289;
+
   @InjectMocks private VisitService visitService;
   @Mock private VisitRepository visitRepository;
   @Mock private AnimalService animalService;
@@ -44,6 +48,11 @@ class VisitServiceTest {
   @Mock private OfficeService officeService;
   @Mock private VisitMapper visitMapper;
   @Mock private Clock clock;
+  @Mock private VisitRequestDto mockVisitReq;
+  @Mock private Animal mockAnimal;
+  @Mock private Client mockClient;
+  @Mock private Vet mockVet;
+  @Mock private Office mockOffice;
   private Clock fixedClock;
   private Visit visit;
   private VisitRequestDto visitReq;
@@ -80,6 +89,22 @@ class VisitServiceTest {
             3,
             4,
             5);
+
+    given(animalService.getAnimalById(MOCK_ANIMAL_ID)).willReturn(mockAnimal);
+
+    given(mockAnimal.getOwner()).willReturn(mockClient);
+
+    given(mockClient.getId()).willReturn(MOCK_CLIENT_ID);
+
+    given(animalService.getAnimalById(MOCK_ANIMAL_ID)).willReturn(mockAnimal);
+    given(clientService.getClientById(MOCK_CLIENT_ID)).willReturn(mockClient);
+    given(vetService.getVetById(MOCK_VET_ID)).willReturn(mockVet);
+    given(officeService.getOfficeById(MOCK_OFFICE_ID)).willReturn(mockOffice);
+
+    given(mockVisitReq.getAnimalId()).willReturn(MOCK_ANIMAL_ID);
+    given(mockVisitReq.getClientId()).willReturn(MOCK_CLIENT_ID);
+    given(mockVisitReq.getVetId()).willReturn(MOCK_VET_ID);
+    given(mockVisitReq.getOfficeId()).willReturn(MOCK_OFFICE_ID);
   }
 
   @Test
@@ -171,19 +196,40 @@ class VisitServiceTest {
 
   @Test
   void createVisit_VetNotExists_Throws_VetNotFoundException() {
-    given(vetService.getVetById(4))
-        .willThrow(new VetNotFoundException("Vet with id: 4  not found"));
+    given(vetService.getVetById(4)).willThrow(new VetNotFoundException("Vet with id=4 not found"));
     VeterinaryAppException exception =
         assertThrows(VetNotFoundException.class, () -> visitService.createVisit(visitReq));
-    assertEquals("Vet with id: 4  not found", exception.getMessage());
+    assertEquals("Vet with id=4 not found", exception.getMessage());
     verifyNoInteractions(visitRepository);
   }
 
   @Test
-  void createVisit_OfficeNotExists_Throws_OfficeNotFoundException() {}
+  void createVisit_OfficeNotExists_Throws_OfficeNotFoundException() {
+    final int ID = 5;
+    given(officeService.getOfficeById(ID))
+        .willThrow(new OfficeNotFoundException("Office with id=" + ID + " not found"));
+    VeterinaryAppException exception =
+        assertThrows(OfficeNotFoundException.class, () -> visitService.createVisit(visitReq));
+    assertEquals("Office with id=" + ID + " not found", exception.getMessage());
+    verifyNoInteractions(visitRepository);
+  }
 
   @Test
-  void createVisit_DateInPast_Throws_VisitStartsInPastException() {}
+  void createVisit_DateInPast_Throws_VisitStartsInPastException() {
+    fixedClock =
+        Clock.fixed(
+            Instant.from(LocalDateTime.of(2020, 1, 1, 1, 1).toInstant(ZoneOffset.UTC)),
+            ZoneId.systemDefault());
+    doReturn(fixedClock.instant()).when(clock).instant();
+    doReturn(fixedClock.getZone()).when(clock).getZone();
+
+    given(mockVisitReq.getStartTime()).willReturn(LocalDateTime.of(2020, 1, 1, 1, 1));
+    VeterinaryAppException exception =
+        assertThrows(
+            VisitStartsInPastException.class, () -> visitService.createVisit(mockVisitReq));
+    assertEquals("Visit can not start in the past.", exception.getMessage());
+    verifyNoInteractions(visitRepository);
+  }
 
   @Test
   void createVisit_DateToSoon_Throws_VisitTooSoonException() {}
