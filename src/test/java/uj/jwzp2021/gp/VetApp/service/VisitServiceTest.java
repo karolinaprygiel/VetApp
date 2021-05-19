@@ -11,11 +11,9 @@ import uj.jwzp2021.gp.VetApp.exception.VeterinaryAppException;
 import uj.jwzp2021.gp.VetApp.exception.animal.AnimalNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.client.ClientNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.office.OfficeNotFoundException;
+import uj.jwzp2021.gp.VetApp.exception.vet.VetNotAvailableException;
 import uj.jwzp2021.gp.VetApp.exception.vet.VetNotFoundException;
-import uj.jwzp2021.gp.VetApp.exception.visit.VisitNotFoundException;
-import uj.jwzp2021.gp.VetApp.exception.visit.VisitStartsInPastException;
-import uj.jwzp2021.gp.VetApp.exception.visit.VisitTooSoonException;
-import uj.jwzp2021.gp.VetApp.exception.visit.WrongOwnerException;
+import uj.jwzp2021.gp.VetApp.exception.visit.*;
 import uj.jwzp2021.gp.VetApp.mapper.VisitMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitUpdateRequestDto;
@@ -144,7 +142,7 @@ class VisitServiceTest {
     given(visitRepository.findById(1)).willReturn(Optional.of(visit));
     assertThat(visitService.delete(1)).isEqualTo(visit);
     verify(visitRepository, Mockito.times(1)).delete(visit);
-    verify(visitRepository, Mockito.times(1)).findById(1);
+    verify(visitRepository, Mockito.times(1)).findById(anyInt());
   }
 
   @Test
@@ -202,7 +200,7 @@ class VisitServiceTest {
     final int MOCK_CLIENT_ID = 6789;
     final int MOCK_VET_ID = 123423;
     final int MOCK_OFFICE_ID = 671289;
-        given(mockAnimal.getOwner()).willReturn(mockClient);
+    given(mockAnimal.getOwner()).willReturn(mockClient);
 
     given(mockClient.getId()).willReturn(MOCK_CLIENT_ID);
 
@@ -218,10 +216,10 @@ class VisitServiceTest {
     given(mockVisitReq.getVetId()).willReturn(MOCK_VET_ID);
     given(mockVisitReq.getOfficeId()).willReturn(MOCK_OFFICE_ID);
 
-//    given(animalService.getAnimalById(visitReq.getAnimalId())).willReturn(animal);
-//    given(clientService.getClientById(visitReq.getClientId())).willReturn(client);
-//    given(vetService.getVetById(visitReq.getVetId())).willReturn(vet);
-//    given(officeService.getOfficeById(visitReq.getOfficeId())).willReturn(office);
+    //    given(animalService.getAnimalById(visitReq.getAnimalId())).willReturn(animal);
+    //    given(clientService.getClientById(visitReq.getClientId())).willReturn(client);
+    //    given(vetService.getVetById(visitReq.getVetId())).willReturn(vet);
+    //    given(officeService.getOfficeById(visitReq.getOfficeId())).willReturn(office);
     fixedClock =
         Clock.fixed(
             Instant.from(LocalDateTime.of(2020, 1, 1, 1, 1).toInstant(ZoneOffset.UTC)),
@@ -266,42 +264,111 @@ class VisitServiceTest {
     doReturn(fixedClock.instant()).when(clock).instant();
     doReturn(fixedClock.getZone()).when(clock).getZone();
 
-
     given(mockVisitReq.getStartTime()).willReturn(LocalDateTime.of(2020, 1, 1, 2, 15));
     VeterinaryAppException exception =
-        assertThrows(
-            VisitTooSoonException.class, () -> visitService.createVisit(mockVisitReq));
+        assertThrows(VisitTooSoonException.class, () -> visitService.createVisit(mockVisitReq));
     assertEquals("Visit cannot be scheduled for less an hour from now on.", exception.getMessage());
     verifyNoInteractions(visitRepository);
   }
 
   @Test
   void createVisit_vetNotAvailable_Throws_VetNotAvailableException() {
+    final int MOCK_ANIMAL_ID = 1234;
+    final int MOCK_CLIENT_ID = 6789;
+    final int MOCK_VET_ID = 123423;
+    final int MOCK_OFFICE_ID = 671289;
+    given(mockAnimal.getOwner()).willReturn(mockClient);
 
+    given(mockClient.getId()).willReturn(MOCK_CLIENT_ID);
+
+    /* Services */
+    given(animalService.getAnimalById(MOCK_ANIMAL_ID)).willReturn(mockAnimal);
+    given(clientService.getClientById(MOCK_CLIENT_ID)).willReturn(mockClient);
+    given(vetService.getVetById(MOCK_VET_ID)).willReturn(mockVet);
+    given(officeService.getOfficeById(MOCK_OFFICE_ID)).willReturn(mockOffice);
+
+    /* Visit Request */
+    given(mockVisitReq.getAnimalId()).willReturn(MOCK_ANIMAL_ID);
+    given(mockVisitReq.getClientId()).willReturn(MOCK_CLIENT_ID);
+    given(mockVisitReq.getVetId()).willReturn(MOCK_VET_ID);
+    given(mockVisitReq.getOfficeId()).willReturn(MOCK_OFFICE_ID);
+
+    given(vetService.isVetAtWork(any(), any(), any())).willReturn(false);
+
+    fixedClock =
+        Clock.fixed(
+            Instant.from(LocalDateTime.of(2020, 1, 1, 2, 0).toInstant(ZoneOffset.UTC)),
+            ZoneId.of("UTC"));
+    doReturn(fixedClock.instant()).when(clock).instant();
+    doReturn(fixedClock.getZone()).when(clock).getZone();
+
+    given(mockVisitReq.getStartTime()).willReturn(LocalDateTime.of(2020, 1, 1, 5, 15));
+    VeterinaryAppException exception =
+        assertThrows(VetNotAvailableException.class, () -> visitService.createVisit(mockVisitReq));
+    assertEquals("Visit not in the working hours of the chosen vet.", exception.getMessage());
+    verifyNoInteractions(visitRepository);
   }
 
   @Test
-  void createVisit_dateNotAvailable_Throws_VisitOverlapsException() {}
+  void createVisit_dateNotAvailable_Throws_VisitOverlapsException() {
+    final int MOCK_ANIMAL_ID = 1234;
+    final int MOCK_CLIENT_ID = 6789;
+    final int MOCK_VET_ID = 123423;
+    final int MOCK_OFFICE_ID = 671289;
+    given(mockAnimal.getOwner()).willReturn(mockClient);
+
+    given(mockClient.getId()).willReturn(MOCK_CLIENT_ID);
+
+    /* Services */
+    given(animalService.getAnimalById(MOCK_ANIMAL_ID)).willReturn(mockAnimal);
+    given(clientService.getClientById(MOCK_CLIENT_ID)).willReturn(mockClient);
+    given(vetService.getVetById(MOCK_VET_ID)).willReturn(mockVet);
+    given(officeService.getOfficeById(MOCK_OFFICE_ID)).willReturn(mockOffice);
+
+    /* Visit Request */
+    given(mockVisitReq.getAnimalId()).willReturn(MOCK_ANIMAL_ID);
+    given(mockVisitReq.getClientId()).willReturn(MOCK_CLIENT_ID);
+    given(mockVisitReq.getVetId()).willReturn(MOCK_VET_ID);
+    given(mockVisitReq.getOfficeId()).willReturn(MOCK_OFFICE_ID);
+
+    given(vetService.isVetAtWork(any(), any(), any())).willReturn(true);
+    given(visitRepository.overlaps(any(), any(), anyInt(), anyInt())).willReturn(List.of(visit));
+
+    fixedClock =
+        Clock.fixed(
+            Instant.from(LocalDateTime.of(2020, 1, 1, 2, 0).toInstant(ZoneOffset.UTC)),
+            ZoneId.of("UTC"));
+    doReturn(fixedClock.instant()).when(clock).instant();
+    doReturn(fixedClock.getZone()).when(clock).getZone();
+
+    given(mockVisitReq.getStartTime()).willReturn(LocalDateTime.of(2020, 1, 1, 5, 15));
+    VeterinaryAppException exception =
+        assertThrows(VisitOverlapsException.class, () -> visitService.createVisit(mockVisitReq));
+    assertEquals(
+        "Visit would overlap with another visit. Try to change, date, vet or office.",
+        exception.getMessage());
+    verify(visitRepository, Mockito.times(1)).overlaps(any(), any(), anyInt(), anyInt());
+  }
 
   @Test
   void createVisit_WrongOwner_Throws_WrongOwnerException() {
-    VisitRequestDto anotherVisitReq = new VisitRequestDto(
-        LocalDateTime.of(2021, 7, 21, 15, 20),
-        Duration.ofMinutes(15),
-        BigDecimal.valueOf(50),
-        2,
-        15,
-        4,
-        5);
-    Client anotherClient = new Client(15, "wrongOwner", "wrongOwnerSurname" );
+    VisitRequestDto anotherVisitReq =
+        new VisitRequestDto(
+            LocalDateTime.of(2021, 7, 21, 15, 20),
+            Duration.ofMinutes(15),
+            BigDecimal.valueOf(50),
+            2,
+            15,
+            4,
+            5);
+    Client anotherClient = new Client(15, "wrongOwner", "wrongOwnerSurname");
     given(clientService.getClientById(anotherVisitReq.getClientId())).willReturn(anotherClient);
     given(animalService.getAnimalById(anotherVisitReq.getAnimalId())).willReturn(animal);
     given(vetService.getVetById(anotherVisitReq.getVetId())).willReturn(vet);
     given(officeService.getOfficeById(anotherVisitReq.getOfficeId())).willReturn(office);
 
     VeterinaryAppException exception =
-        assertThrows(
-            WrongOwnerException.class, () -> visitService.createVisit(anotherVisitReq));
+        assertThrows(WrongOwnerException.class, () -> visitService.createVisit(anotherVisitReq));
     assertEquals("This person does not own this animal.", exception.getMessage());
     verifyNoInteractions(visitRepository);
   }
@@ -314,10 +381,18 @@ class VisitServiceTest {
             ZoneId.systemDefault());
     doReturn(fixedClock.instant()).when(clock).instant();
     doReturn(fixedClock.getZone()).when(clock).getZone();
-    given(vetService.isVetAtWork(any(),any(),any())).willReturn(true);
+    given(vetService.isVetAtWork(any(), any(), any())).willReturn(true);
+
+    given(animalService.getAnimalById(visitReq.getAnimalId())).willReturn(animal);
+    given(clientService.getClientById(visitReq.getClientId())).willReturn(client);
+    given(vetService.getVetById(visitReq.getVetId())).willReturn(vet);
+    given(officeService.getOfficeById(visitReq.getOfficeId())).willReturn(office);
+
+    given(visitMapper.toVisit(any(), any(), any(), any(), any())).willReturn(visit);
+    given(visitRepository.save(visit)).willReturn(visit);
 
     assertThat(visitService.createVisit(visitReq)).isNotNull().isEqualTo(visit);
-    verify(visitRepository, Mockito.times(1)).save(mockVisit);
+    verify(visitRepository, Mockito.times(1)).save(visit);
   }
 
   @Test
@@ -397,7 +472,7 @@ class VisitServiceTest {
     given(visitRepository.findById(1)).willReturn(Optional.of(visit));
     assertThat(visitService.updateVisit(1, updateReq)).isEqualTo(visit);
     verify(visitRepository, Mockito.times(1)).save(visit);
-    //clock = n
+    // clock = n
   }
 
   @Test
