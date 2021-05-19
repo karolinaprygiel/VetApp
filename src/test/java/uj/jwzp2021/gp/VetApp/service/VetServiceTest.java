@@ -101,7 +101,7 @@ class VetServiceTest {
     verifyNoMoreInteractions(vetRepository);
   }
 
-
+  @Test
   void createVet_ReturnsAndSave_Animal() {
     VetRequestDto vetReq = new VetRequestDto("Piotr", "Weterynaryjny", "09:00", Duration.ofHours(9));
     given(vetMapper.toVet(vetReq)).willReturn(vet);

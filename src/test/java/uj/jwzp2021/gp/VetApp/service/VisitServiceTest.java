@@ -14,6 +14,7 @@ import uj.jwzp2021.gp.VetApp.exception.office.OfficeNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.vet.VetNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.visit.VisitNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.visit.VisitStartsInPastException;
+import uj.jwzp2021.gp.VetApp.exception.visit.VisitTooSoonException;
 import uj.jwzp2021.gp.VetApp.mapper.VisitMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitUpdateRequestDto;
@@ -35,11 +36,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class VisitServiceTest {
 
-  private final int MOCK_ANIMAL_ID = 1234;
-  private final int MOCK_CLIENT_ID = 6789;
-  private final int MOCK_VET_ID = 123423;
-  private final int MOCK_OFFICE_ID = 671289;
-
   @InjectMocks private VisitService visitService;
   @Mock private VisitRepository visitRepository;
   @Mock private AnimalService animalService;
@@ -53,6 +49,7 @@ class VisitServiceTest {
   @Mock private Client mockClient;
   @Mock private Vet mockVet;
   @Mock private Office mockOffice;
+  @Mock private Visit mockVisit;
   private Clock fixedClock;
   private Visit visit;
   private VisitRequestDto visitReq;
@@ -63,9 +60,9 @@ class VisitServiceTest {
 
   @BeforeEach
   void setUp() {
+    animal = new Animal(2, AnimalType.RAT, "Rafałek", 2020, client);
     client = new Client(3, "ClientName", "ClientSurname");
-    animal = new Animal(2, AnimalType.RAT, "Fafałek", 2020, client);
-    vet = new Vet(4, "Rafał", "Kawa", LocalTime.parse("09:00"), Duration.ofHours(9));
+    vet = new Vet(4, "Fafał", "Kawa", LocalTime.parse("09:00"), Duration.ofHours(9));
     office = new Office(5, "gab1");
 
     visit =
@@ -89,22 +86,6 @@ class VisitServiceTest {
             3,
             4,
             5);
-
-    given(animalService.getAnimalById(MOCK_ANIMAL_ID)).willReturn(mockAnimal);
-
-    given(mockAnimal.getOwner()).willReturn(mockClient);
-
-    given(mockClient.getId()).willReturn(MOCK_CLIENT_ID);
-
-    given(animalService.getAnimalById(MOCK_ANIMAL_ID)).willReturn(mockAnimal);
-    given(clientService.getClientById(MOCK_CLIENT_ID)).willReturn(mockClient);
-    given(vetService.getVetById(MOCK_VET_ID)).willReturn(mockVet);
-    given(officeService.getOfficeById(MOCK_OFFICE_ID)).willReturn(mockOffice);
-
-    given(mockVisitReq.getAnimalId()).willReturn(MOCK_ANIMAL_ID);
-    given(mockVisitReq.getClientId()).willReturn(MOCK_CLIENT_ID);
-    given(mockVisitReq.getVetId()).willReturn(MOCK_VET_ID);
-    given(mockVisitReq.getOfficeId()).willReturn(MOCK_OFFICE_ID);
   }
 
   @Test
@@ -216,6 +197,30 @@ class VisitServiceTest {
 
   @Test
   void createVisit_DateInPast_Throws_VisitStartsInPastException() {
+    final int MOCK_ANIMAL_ID = 1234;
+    final int MOCK_CLIENT_ID = 6789;
+    final int MOCK_VET_ID = 123423;
+    final int MOCK_OFFICE_ID = 671289;
+        given(mockAnimal.getOwner()).willReturn(mockClient);
+
+    given(mockClient.getId()).willReturn(MOCK_CLIENT_ID);
+
+    /* Services */
+    given(animalService.getAnimalById(MOCK_ANIMAL_ID)).willReturn(mockAnimal);
+    given(clientService.getClientById(MOCK_CLIENT_ID)).willReturn(mockClient);
+    given(vetService.getVetById(MOCK_VET_ID)).willReturn(mockVet);
+    given(officeService.getOfficeById(MOCK_OFFICE_ID)).willReturn(mockOffice);
+
+    /* Visit Request */
+    given(mockVisitReq.getAnimalId()).willReturn(MOCK_ANIMAL_ID);
+    given(mockVisitReq.getClientId()).willReturn(MOCK_CLIENT_ID);
+    given(mockVisitReq.getVetId()).willReturn(MOCK_VET_ID);
+    given(mockVisitReq.getOfficeId()).willReturn(MOCK_OFFICE_ID);
+
+//    given(animalService.getAnimalById(visitReq.getAnimalId())).willReturn(animal);
+//    given(clientService.getClientById(visitReq.getClientId())).willReturn(client);
+//    given(vetService.getVetById(visitReq.getVetId())).willReturn(vet);
+//    given(officeService.getOfficeById(visitReq.getOfficeId())).willReturn(office);
     fixedClock =
         Clock.fixed(
             Instant.from(LocalDateTime.of(2020, 1, 1, 1, 1).toInstant(ZoneOffset.UTC)),
@@ -223,7 +228,7 @@ class VisitServiceTest {
     doReturn(fixedClock.instant()).when(clock).instant();
     doReturn(fixedClock.getZone()).when(clock).getZone();
 
-    given(mockVisitReq.getStartTime()).willReturn(LocalDateTime.of(2020, 1, 1, 1, 1));
+    given(mockVisitReq.getStartTime()).willReturn(LocalDateTime.of(2010, 1, 1, 1, 1));
     VeterinaryAppException exception =
         assertThrows(
             VisitStartsInPastException.class, () -> visitService.createVisit(mockVisitReq));
@@ -232,7 +237,41 @@ class VisitServiceTest {
   }
 
   @Test
-  void createVisit_DateToSoon_Throws_VisitTooSoonException() {}
+  void createVisit_DateToSoon_Throws_VisitTooSoonException() {
+    final int MOCK_ANIMAL_ID = 1234;
+    final int MOCK_CLIENT_ID = 6789;
+    final int MOCK_VET_ID = 123423;
+    final int MOCK_OFFICE_ID = 671289;
+    given(mockAnimal.getOwner()).willReturn(mockClient);
+
+    given(mockClient.getId()).willReturn(MOCK_CLIENT_ID);
+
+    /* Services */
+    given(animalService.getAnimalById(MOCK_ANIMAL_ID)).willReturn(mockAnimal);
+    given(clientService.getClientById(MOCK_CLIENT_ID)).willReturn(mockClient);
+    given(vetService.getVetById(MOCK_VET_ID)).willReturn(mockVet);
+    given(officeService.getOfficeById(MOCK_OFFICE_ID)).willReturn(mockOffice);
+
+    /* Visit Request */
+    given(mockVisitReq.getAnimalId()).willReturn(MOCK_ANIMAL_ID);
+    given(mockVisitReq.getClientId()).willReturn(MOCK_CLIENT_ID);
+    given(mockVisitReq.getVetId()).willReturn(MOCK_VET_ID);
+    given(mockVisitReq.getOfficeId()).willReturn(MOCK_OFFICE_ID);
+
+    fixedClock =
+        Clock.fixed(
+            Instant.from(LocalDateTime.of(2020, 1, 1, 1, 1).toInstant(ZoneOffset.UTC)),
+            ZoneId.systemDefault());
+    doReturn(fixedClock.instant()).when(clock).instant();
+    doReturn(fixedClock.getZone()).when(clock).getZone();
+
+    given(mockVisitReq.getStartTime()).willReturn(LocalDateTime.of(2020, 1, 1, 2, 15));
+    VeterinaryAppException exception =
+        assertThrows(
+            VisitTooSoonException.class, () -> visitService.createVisit(mockVisitReq));
+    assertEquals("Visit cannot be scheduled for less an hour from now on.", exception.getMessage());
+    verifyNoInteractions(visitRepository);
+  }
 
   @Test
   void createVisit_vetNotAvailable_Throws_VetNotAvailableException() {}
@@ -244,7 +283,18 @@ class VisitServiceTest {
   void createVisit_WrongOwner_Throws_WrongOwnerException() {}
 
   @Test
-  void createVisit_ReturnsAndSave_Visit() {}
+  void createVisit_ReturnsAndSave_Visit() {
+    fixedClock =
+        Clock.fixed(
+            Instant.from(LocalDateTime.of(2020, 1, 1, 1, 1).toInstant(ZoneOffset.UTC)),
+            ZoneId.systemDefault());
+    doReturn(fixedClock.instant()).when(clock).instant();
+    doReturn(fixedClock.getZone()).when(clock).getZone();
+    given(vetService.isVetAtWork(any(),any(),any())).willReturn(true);
+
+    assertThat(visitService.createVisit(visitReq)).isNotNull().isEqualTo(visit);
+    verify(visitRepository, Mockito.times(1)).save(mockVisit);
+  }
 
   @Test
   void updateVisit_VisitNotExists_Throws_VisitNotFoundException() {
