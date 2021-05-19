@@ -179,8 +179,6 @@ public class VisitService {
     List<Vet> vets = getPossibleVets(vetId);
     List<Office> offices = officeService.getAll();
     Collections.shuffle(vets);
-    Collections.shuffle(offices);
-
 
     while (startTime.plusMinutes(duration.toMinutes()).isBefore(dateTo.plusSeconds(1))) {
       boolean isDateAvailable = false;
@@ -228,3 +226,14 @@ public class VisitService {
     }
   }
 }
+
+// 16
+//16:15 - nie
+// 16:20 tak
+// 16:35 - nie
+//16:40 - nie
+//16:45 - nie
+//16:50 - nie
+//16:55 - tak
+//17:10 - nie
+//17:20 - tak

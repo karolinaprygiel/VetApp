@@ -6,7 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Answer;
 import uj.jwzp2021.gp.VetApp.exception.VeterinaryAppException;
 import uj.jwzp2021.gp.VetApp.exception.animal.AnimalNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.client.ClientNotFoundException;
@@ -17,14 +19,17 @@ import uj.jwzp2021.gp.VetApp.exception.visit.*;
 import uj.jwzp2021.gp.VetApp.mapper.VisitMapper;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitRequestDto;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.VisitUpdateRequestDto;
+import uj.jwzp2021.gp.VetApp.model.dto.Responses.VisitDatesResponseDto;
 import uj.jwzp2021.gp.VetApp.model.entity.*;
 import uj.jwzp2021.gp.VetApp.repository.VisitRepository;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.math.BigDecimal;
 import java.time.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -119,7 +124,7 @@ class VisitServiceTest {
     assertThat(visitService.getAll())
         .isNotNull()
         .hasSize(2)
-        .containsExactlyInAnyOrderElementsOf(List.of(visit, visit2));
+        .containsExactlyElementsOf(List.of(visit2, visit));
   }
 
   @Test
@@ -223,7 +228,7 @@ class VisitServiceTest {
     fixedClock =
         Clock.fixed(
             Instant.from(LocalDateTime.of(2020, 1, 1, 1, 1).toInstant(ZoneOffset.UTC)),
-            ZoneId.systemDefault());
+            ZoneId.of("UTC"));
     doReturn(fixedClock.instant()).when(clock).instant();
     doReturn(fixedClock.getZone()).when(clock).getZone();
 
@@ -378,7 +383,7 @@ class VisitServiceTest {
     fixedClock =
         Clock.fixed(
             Instant.from(LocalDateTime.of(2020, 1, 1, 1, 1).toInstant(ZoneOffset.UTC)),
-            ZoneId.systemDefault());
+            ZoneId.of("UTC"));
     doReturn(fixedClock.instant()).when(clock).instant();
     doReturn(fixedClock.getZone()).when(clock).getZone();
     given(vetService.isVetAtWork(any(), any(), any())).willReturn(true);
@@ -404,6 +409,7 @@ class VisitServiceTest {
     assertEquals("Visit with id=1 not found", exception.getMessage());
     verifyNoMoreInteractions(visitRepository);
   }
+
 
   @Test
   void updateVisit_UpdateStatus_Returns_UpdatedVisit() {
@@ -476,23 +482,233 @@ class VisitServiceTest {
   }
 
   @Test
-  void findVisits_Returns_VisitLists() {}
+  void findVisits_everythingAvailable_Returns_VisitLists() {
+    LocalDateTime dateFrom = LocalDateTime.of(2021,5, 20, 16, 45);
+    LocalDateTime dateTo = LocalDateTime.of(2021,5, 20, 17, 30);
+    Duration duration = Duration.ofMinutes(15);
+    int vetId = -1;
+
+    fixedClock =
+        Clock.fixed(
+            Instant.from(LocalDateTime.of(2021, 5, 19, 13, 0).toInstant(ZoneOffset.UTC)),
+            ZoneId.of("UTC"));
+    doReturn(fixedClock.instant()).when(clock).instant();
+    doReturn(fixedClock.getZone()).when(clock).getZone();
+
+    Vet vet2 = new Vet(44, "Edward", "Szybka", LocalTime.parse("16:30"), Duration.ofHours(10));
+    Office office2 = new Office(55, "gab2");
+    List<Vet> vets = List.of(vet, vet2);
+    List<Office> offices = List.of(office, office2);
+    given(vetService.getAll()).willReturn(vets);
+    given(officeService.getAll()).willReturn(offices);
+    given(visitRepository.overlaps(any(), any(), anyInt(), anyInt())).willReturn(Collections.emptyList());
+    given(vetService.isVetAtWork(any(), any(), any())).willReturn(true);
+    assertThat(visitService.findVisits(dateFrom, dateTo, duration, vetId))
+        .isNotNull()
+        .hasSize(3)
+        .allMatch(response-> isDurationVetOfficeValid(response, duration, vets, offices))
+        .extracting(VisitDatesResponseDto::getStartTime)
+        .isEqualTo(List.of(LocalDateTime.of(2021,5, 20, 16, 45),
+            LocalDateTime.of(2021,5, 20, 17, 0),
+            LocalDateTime.of(2021,5, 20, 17, 15)));
+
+  }
 
   @Test
-  void findVisits_WithPreferredVet_Returns_VisitLists() {}
+  void findVisits_someDatesAvailable_Returns_VisitLists() {
+    LocalDateTime dateFrom = LocalDateTime.of(2021,5, 20, 16, 0);
+    LocalDateTime dateTo = LocalDateTime.of(2021,5, 20, 17, 30);
+    Duration duration = Duration.ofMinutes(15);
+    int vetId = -1;
+
+    fixedClock =
+        Clock.fixed(
+            Instant.from(LocalDateTime.of(2021, 5, 19, 13, 0).toInstant(ZoneOffset.UTC)),
+            ZoneId.of("UTC"));
+    doReturn(fixedClock.instant()).when(clock).instant();
+    doReturn(fixedClock.getZone()).when(clock).getZone();
+
+    Vet vet2 = new Vet(44, "Edward", "Szybka", LocalTime.parse("16:30"), Duration.ofHours(10));
+    Office office2 = new Office(55, "gab2");
+    List<Vet> vets = List.of(vet, vet2);
+    List<Office> offices = List.of(office, office2);
+    given(vetService.getAll()).willReturn(vets);
+    given(officeService.getAll()).willReturn(offices);
+    when(visitRepository.overlaps(any(LocalDateTime.class), any(LocalDateTime.class), anyInt(), anyInt())).thenAnswer(
+        (Answer<List<Visit>>) invocation -> {
+          LocalDateTime startTime = invocation.getArgument(0);
+          if (startTime.toLocalTime().equals(LocalTime.parse("16:00"))
+              || startTime.toLocalTime().equals(LocalTime.parse("16:20"))
+          || startTime.toLocalTime().equals(LocalTime.parse("16:55"))) {
+            return Collections.emptyList();
+          } else {
+            return List.of(new Visit());
+          }});
+
+    when(vetService.isVetAtWork(any(LocalDateTime.class), any(Duration.class), any(Vet.class))).thenAnswer(
+        (Answer<Boolean>) invocation -> {
+      LocalDateTime startTime = invocation.getArgument(0);
+          return !startTime.toLocalTime().equals(LocalTime.parse("16:00"));
+        });
+    assertThat(visitService.findVisits(dateFrom, dateTo, duration, vetId))
+        .isNotNull()
+        .hasSize(2)
+        .allMatch(response-> isDurationVetOfficeValid(response, duration, vets, offices))
+        .extracting(VisitDatesResponseDto::getStartTime)
+        .isEqualTo(List.of(LocalDateTime.of(2021,5, 20, 16, 20),
+            LocalDateTime.of(2021,5, 20, 16, 55)));
+
+  }
+
+  public boolean isDurationVetOfficeValid (VisitDatesResponseDto response, Duration d, List<Vet> vets, List<Office> offices){
+    return response.getDuration().equals(d)
+        && vets.stream().anyMatch(vet -> vet.getId() == response.getVetId())
+        && offices.stream().anyMatch(office -> office.getId() == response.getOfficeId());
+  }
+
 
   @Test
-  void findVisits_InPast_Returns_EmptyList() {}
+  void findVisits_WithPreferredVet_Returns_VisitLists() {
+    LocalDateTime dateFrom = LocalDateTime.of(2021,5, 20, 16, 45);
+    LocalDateTime dateTo = LocalDateTime.of(2021,5, 20, 17, 30);
+    Duration duration = Duration.ofMinutes(15);
+    int vetId = 4;
+
+    fixedClock =
+        Clock.fixed(
+            Instant.from(LocalDateTime.of(2021, 5, 19, 13, 0).toInstant(ZoneOffset.UTC)),
+            ZoneId.of("UTC"));
+    doReturn(fixedClock.instant()).when(clock).instant();
+    doReturn(fixedClock.getZone()).when(clock).getZone();
+
+    Office office2 = new Office(55, "gab2");
+    List<Vet> vets = List.of(vet);
+    List<Office> offices = List.of(office, office2);
+    given(vetService.getVetById(vetId)).willReturn(vet);
+    given(officeService.getAll()).willReturn(offices);
+    given(vetService.isVetAtWork(any(), any(), any())).willReturn(true);
+    given(visitRepository.overlaps(any(), any(), anyInt(), anyInt())).willReturn(Collections.emptyList());
+    verify(vetService, Mockito.times(0)).getAll();
+    assertThat(visitService.findVisits(dateFrom, dateTo, duration, vetId))
+        .isNotNull()
+        .hasSize(3)
+        .allMatch(response-> isDurationVetOfficeValid(response, duration, vets, offices))
+        .extracting(VisitDatesResponseDto::getStartTime)
+        .isEqualTo(List.of(LocalDateTime.of(2021,5, 20, 16, 45),
+            LocalDateTime.of(2021,5, 20, 17, 0),
+            LocalDateTime.of(2021,5, 20, 17, 15)));
+  }
 
   @Test
-  void findVisits_BeginInPast_Returns_VisitsList() {}
+  void findVisits_InPast_Throws_VisitStartsInPastException() {
+    fixedClock =
+        Clock.fixed(
+            Instant.from(LocalDateTime.of(2021, 1, 1, 1, 1).toInstant(ZoneOffset.UTC)),
+            ZoneId.of("UTC"));
+    doReturn(fixedClock.instant()).when(clock).instant();
+    doReturn(fixedClock.getZone()).when(clock).getZone();
+
+    VeterinaryAppException exception =
+        assertThrows(VisitStartsInPastException.class, () -> visitService.
+            findVisits(LocalDateTime.of(2020, 10, 15, 13, 30),
+                LocalDateTime.of(2020, 10, 15, 16, 30),
+                Duration.ofMinutes(20), 4));
+    assertEquals("Cannot book visits in past", exception.getMessage());
+  }
 
   @Test
-  void findVisits_NoVetAvailable_Returns_EmptyList() {}
+  void findVisits_BeginInPast_Returns_VisitsList() {
+    LocalDateTime dateFrom = LocalDateTime.of(2021,5, 20, 13, 0);
+    LocalDateTime dateTo = LocalDateTime.of(2021,5, 20, 15, 30);
+    Duration duration = Duration.ofMinutes(15);
+    int vetId = -1;
+
+    fixedClock =
+        Clock.fixed(
+            Instant.from(LocalDateTime.of(2021, 5, 20, 14, 0).toInstant(ZoneOffset.UTC)),
+            ZoneId.of("UTC"));
+    doReturn(fixedClock.instant()).when(clock).instant();
+    doReturn(fixedClock.getZone()).when(clock).getZone();
+
+    List<Vet> vets = List.of(vet);
+    List<Office> offices = List.of(office);
+    given(vetService.getAll()).willReturn(vets);
+    given(officeService.getAll()).willReturn(offices);
+    given(visitRepository.overlaps(any(), any(), anyInt(), anyInt())).willReturn(Collections.emptyList());
+    given(vetService.isVetAtWork(any(), any(), any())).willReturn(true);
+    assertThat(visitService.findVisits(dateFrom, dateTo, duration, vetId))
+        .isNotNull()
+        .hasSize(2)
+        .allMatch(response-> isDurationVetOfficeValid(response, duration, vets, offices))
+        .extracting(VisitDatesResponseDto::getStartTime)
+        .isEqualTo(List.of(LocalDateTime.of(2021,5, 20, 15, 0),
+            LocalDateTime.of(2021,5, 20, 15, 15)));
+  }
 
   @Test
-  void findVisits_NoOfficeAvailable_Returns_EmptyList() {}
+  void findVisits_NoVetAvailable_Returns_EmptyList() {
+    LocalDateTime dateFrom = LocalDateTime.of(2021,5, 20, 13, 0);
+    LocalDateTime dateTo = LocalDateTime.of(2021,5, 20, 15, 30);
+    Duration duration = Duration.ofMinutes(15);
+    int vetId = -1;
+
+    fixedClock =
+        Clock.fixed(
+            Instant.from(LocalDateTime.of(2021, 5, 19, 14, 0).toInstant(ZoneOffset.UTC)),
+            ZoneId.of("UTC"));
+    doReturn(fixedClock.instant()).when(clock).instant();
+    doReturn(fixedClock.getZone()).when(clock).getZone();
+
+    List<Vet> vets = List.of(vet);
+    List<Office> offices = List.of(office);
+    given(vetService.getAll()).willReturn(vets);
+    given(officeService.getAll()).willReturn(offices);
+    given(vetService.isVetAtWork(any(), any(), any())).willReturn(false);
+    assertThat(visitService.findVisits(dateFrom, dateTo, duration, vetId)).isNotNull().isEmpty();
+  }
 
   @Test
-  void findVisits_NoDatesAvailable_Returns_EmptyList() {}
+  void findVisits_NoOfficeAvailable_Returns_EmptyList() {
+    LocalDateTime dateFrom = LocalDateTime.of(2021,5, 20, 13, 0);
+    LocalDateTime dateTo = LocalDateTime.of(2021,5, 20, 15, 30);
+    Duration duration = Duration.ofMinutes(15);
+    int vetId = -1;
+
+    fixedClock =
+        Clock.fixed(
+            Instant.from(LocalDateTime.of(2021, 5, 19, 14, 0).toInstant(ZoneOffset.UTC)),
+            ZoneId.of("UTC"));
+    doReturn(fixedClock.instant()).when(clock).instant();
+    doReturn(fixedClock.getZone()).when(clock).getZone();
+
+    List<Vet> vets = List.of(vet);
+    List<Office> offices = List.of(office);
+    given(vetService.getAll()).willReturn(vets);
+    given(officeService.getAll()).willReturn(Collections.emptyList());
+    given(vetService.isVetAtWork(any(), any(), any())).willReturn(true);
+    assertThat(visitService.findVisits(dateFrom, dateTo, duration, vetId)).isNotNull().isEmpty();
+  }
+
+  @Test
+  void findVisits_NoDatesAvailable_Returns_EmptyList() {
+    LocalDateTime dateFrom = LocalDateTime.of(2021,5, 20, 13, 0);
+    LocalDateTime dateTo = LocalDateTime.of(2021,5, 20, 15, 30);
+    Duration duration = Duration.ofMinutes(15);
+    int vetId = -1;
+
+    fixedClock =
+        Clock.fixed(
+            Instant.from(LocalDateTime.of(2021, 5, 19, 14, 0).toInstant(ZoneOffset.UTC)),
+            ZoneId.of("UTC"));
+    doReturn(fixedClock.instant()).when(clock).instant();
+    doReturn(fixedClock.getZone()).when(clock).getZone();
+    List<Vet> vets = List.of(vet);
+    List<Office> offices = List.of(office);
+    given(vetService.getAll()).willReturn(vets);
+    given(officeService.getAll()).willReturn(offices);
+    given(vetService.isVetAtWork(any(), any(), any())).willReturn(true);
+    given(visitRepository.overlaps(any(), any(), anyInt(), anyInt())).willReturn(List.of(new Visit()));
+    assertThat(visitService.findVisits(dateFrom, dateTo, duration, vetId)).isNotNull().isEmpty();
+  }
+
 }
