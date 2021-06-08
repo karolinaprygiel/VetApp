@@ -1,6 +1,7 @@
 package uj.jwzp2021.gp.VetApp.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -40,6 +41,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class VisitServiceTest {
 
+//  todo: remove annotation below
   @InjectMocks private VisitService visitService;
   @Mock private VisitRepository visitRepository;
   @Mock private AnimalService animalService;
@@ -99,6 +101,7 @@ class VisitServiceTest {
   }
 
   @Test
+  @DisplayName("Visit with id=1 should not be found.")
   void getVisitById_invalidId_Throws_VisitNotFoundException() {
     given(visitRepository.findById(1)).willReturn(Optional.empty());
     VeterinaryAppException exception =
