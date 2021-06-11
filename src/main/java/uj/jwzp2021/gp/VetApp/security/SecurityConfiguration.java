@@ -13,7 +13,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     auth.inMemoryAuthentication()
         .withUser("user")
         .password("password")
-        .roles(String.valueOf(UserType.CLIENT));
+        .roles(String.valueOf(Role.CLIENT));
   }
 
   @Bean
@@ -25,11 +25,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     http.authorizeRequests()
         .antMatchers("/api/users")
-        .hasRole(UserType.ADMIN.name())
+        .hasRole(Role.ADMIN.name())
         .antMatchers("/api/visits")
-        .hasAnyRole(UserType.CLIENT.name(), UserType.ADMIN.name())
+        .hasAnyRole(Role.CLIENT.name(), Role.ADMIN.name())
         .antMatchers("/ui/visits")
-        .hasRole(UserType.CLIENT.name())
+        .hasRole(Role.CLIENT.name())
         .and()
         .formLogin();
   }
