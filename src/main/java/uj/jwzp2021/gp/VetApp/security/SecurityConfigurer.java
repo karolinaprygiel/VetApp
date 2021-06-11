@@ -43,9 +43,20 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     http.csrf().disable();
     http.authorizeRequests()
-        .antMatchers(HttpMethod.POST,"/api/users/**").permitAll()
+        .antMatchers(HttpMethod.POST,"/api/users/**").permitAll()  // anyone can create a user - register
         .antMatchers("/api/users/**").hasAuthority("ADMIN")
+        .antMatchers(HttpMethod.POST, "/api/visits/**").hasAnyAuthority("ADMIN", "CLIENT", "VET")
+        .antMatchers(HttpMethod.PATCH, "/api/visits/**").hasAnyAuthority("ADMIN", "VET")
+        .antMatchers(HttpMethod.DELETE, "/api/visits/**").hasAnyAuthority("ADMIN")
         .antMatchers("/api/clients/**").hasAuthority("ADMIN")
+        .antMatchers(HttpMethod.GET,"/api/vets/**").hasAnyAuthority("ADMIN", "VET", "CLIENT")
+        .antMatchers(HttpMethod.POST,"/api/vets/**").hasAnyAuthority("ADMIN")
+        .antMatchers(HttpMethod.PATCH,"/api/vets/**").hasAnyAuthority("ADMIN", "VET")
+        .antMatchers(HttpMethod.DELETE,"/api/vets/**").hasAnyAuthority("ADMIN")
+        .antMatchers("/hello").permitAll()
+        .antMatchers("/hello-admin").hasAuthority("ADMIN")
+        .antMatchers("/hello-vet").hasAuthority("VET")
+        .antMatchers("/hello-client").hasAuthority("CLIENT")
         .antMatchers("/authenticate").permitAll()
         .anyRequest().authenticated();
     http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

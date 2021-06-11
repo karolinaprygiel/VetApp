@@ -24,8 +24,23 @@ public class AuthenticationController {
   @Autowired MyUserDetailsService myUserDetailsService;
 
   @GetMapping("/hello")
-  public String hello() {
-    return "Hello World!";
+  public ResponseEntity<?> hello() {
+    return ResponseEntity.ok("Hello World! This endpoint is available to everyone!");
+  }
+
+  @GetMapping("/hello-vet")
+  public ResponseEntity<?> helloVet() {
+    return ResponseEntity.ok("Hello World! This endpoint is only available to vets.");
+  }
+
+  @GetMapping("/hello-admin")
+  public ResponseEntity<?> helloAdmin() {
+    return ResponseEntity.ok("Hello World! This endpoint is only available to admins.");
+  }
+
+  @GetMapping("/hello-client")
+  public ResponseEntity<?> helloClient() {
+    return ResponseEntity.ok("Hello World! This endpoint is only available to clients.");
   }
 
   @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
