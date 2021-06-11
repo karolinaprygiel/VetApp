@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import uj.jwzp2021.gp.VetApp.exception.VeterinaryAppException;
+import uj.jwzp2021.gp.VetApp.exception.user.UserAlreadyExistsException;
 import uj.jwzp2021.gp.VetApp.exception.user.UserNotFoundException;
 import uj.jwzp2021.gp.VetApp.model.dto.Requests.UserCreationRequestDto;
 import uj.jwzp2021.gp.VetApp.model.entity.User;
@@ -47,7 +48,17 @@ public class UserService {
   }
 
   public User createUser(UserCreationRequestDto request) {
-    log.info("Creating user for: " + request);
+    boolean userExists = true;
+    System.out.println(request.getUsername());
+    try {
+      getUserByName(request.getUsername());
+    } catch (UserNotFoundException e) {
+      userExists = false;
+    }
+    if (userExists) {
+      throw new UserAlreadyExistsException("User with username " + request.getUsername() + " already exists.");
+    }
+    log.info("Creating user for request: " + request);
     String salt = saltService.generateSalt();
     String password = request.getPassword();
     String hashedPassword = combineAndHash(salt, password);
@@ -78,7 +89,7 @@ public class UserService {
   }
 
   public User getUserByName(String name) {
-    return userRepository.findUserByUsername(name).orElseThrow();
+    return userRepository.findUserByUsername(name).orElseThrow(() -> new UserNotFoundException("User "+name+" not found"));
   }
 
   public List<User> getAll() {

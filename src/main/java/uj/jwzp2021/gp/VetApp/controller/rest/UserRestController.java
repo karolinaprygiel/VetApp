@@ -21,7 +21,7 @@ public class UserRestController {
 
   @PostMapping
   public ResponseEntity<?> createUser(@RequestBody UserCreationRequestDto request) {
-    return ResponseEntity.ok(userService.createUser(request));
+    return ResponseEntity.ok(UserRepresentation.fromUser(userService.createUser(request)));
   }
 
   @GetMapping
@@ -37,7 +37,7 @@ public class UserRestController {
     return ResponseEntity.ok(user);
   }
 
-  @GetMapping("/login")
+  @GetMapping("/validate")
   public ResponseEntity<?> authenticateUser(
       @RequestParam("username") String username, @RequestParam("password") String password) {
     return ResponseEntity.ok(userService.checkPassword(username, password) ? "VALID" : "INVALID");

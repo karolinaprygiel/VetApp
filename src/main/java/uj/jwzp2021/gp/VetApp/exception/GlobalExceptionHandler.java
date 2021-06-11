@@ -11,6 +11,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import uj.jwzp2021.gp.VetApp.exception.animal.AnimalNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.client.ClientNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.office.OfficeNotFoundException;
+import uj.jwzp2021.gp.VetApp.exception.user.UserAlreadyExistsException;
 import uj.jwzp2021.gp.VetApp.exception.vet.VetNotAvailableException;
 import uj.jwzp2021.gp.VetApp.exception.vet.VetNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.visit.VisitNotFoundException;
@@ -140,5 +141,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         new HttpHeaders(),
         HttpStatus.NOT_ACCEPTABLE,
         request);
+  }
+
+  @ExceptionHandler(UserAlreadyExistsException.class)
+  protected ResponseEntity<?> handleUserAlreadyExistsException(
+          UserAlreadyExistsException ex, WebRequest request) {
+    log.error("Returning httpStatus=406. Reason: " + ex.getMessage());
+    return handleExceptionInternal(
+            ex,
+            JsonFormatter.toResponseJson(ex.getMessage()),
+            new HttpHeaders(),
+            HttpStatus.NOT_ACCEPTABLE,
+            request);
   }
 }
