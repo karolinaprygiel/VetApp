@@ -45,20 +45,32 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     http.authorizeRequests()
         .antMatchers(HttpMethod.POST,"/api/users/**").permitAll()  // anyone can create a user - register
         .antMatchers("/api/users/**").hasAuthority("ADMIN")
+
         .antMatchers(HttpMethod.POST, "/api/visits/**").hasAnyAuthority("ADMIN", "CLIENT", "VET")
         .antMatchers(HttpMethod.PATCH, "/api/visits/**").hasAnyAuthority("ADMIN", "VET")
         .antMatchers(HttpMethod.DELETE, "/api/visits/**").hasAnyAuthority("ADMIN")
+
+        .antMatchers("/api/animals/**").hasAnyAuthority("ADMIN", "VET", "CLIENT")
+
+        .antMatchers(HttpMethod.DELETE, "/api/offices/**").hasAuthority("ADMIN")
+        .antMatchers(HttpMethod.POST, "/api/offices/**").hasAuthority("ADMIN")
+        .antMatchers(HttpMethod.PATCH, "/api/offices/**").hasAuthority("ADMIN")
+
         .antMatchers("/api/clients/**").hasAuthority("ADMIN")
+
         .antMatchers(HttpMethod.GET,"/api/vets/**").hasAnyAuthority("ADMIN", "VET", "CLIENT")
         .antMatchers(HttpMethod.POST,"/api/vets/**").hasAnyAuthority("ADMIN")
         .antMatchers(HttpMethod.PATCH,"/api/vets/**").hasAnyAuthority("ADMIN", "VET")
         .antMatchers(HttpMethod.DELETE,"/api/vets/**").hasAnyAuthority("ADMIN")
+
         .antMatchers("/hello").permitAll()
         .antMatchers("/hello-admin").hasAuthority("ADMIN")
         .antMatchers("/hello-vet").hasAuthority("VET")
         .antMatchers("/hello-client").hasAuthority("CLIENT")
         .antMatchers("/authenticate").permitAll()
+
         .anyRequest().authenticated();
+
     http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
   }

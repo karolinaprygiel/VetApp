@@ -32,8 +32,15 @@ public class UserRestController {
 
   @GetMapping(path = "{id}")
   public ResponseEntity<?> getUser(@PathVariable int id) {
-    log.info("Received GET request for api/users/" + id);
+    log.info("Received GET request for /api/users/" + id);
     var user = userService.getUserById(id);
+    return ResponseEntity.ok(user);
+  }
+
+  @DeleteMapping(path = "{id}")
+  public ResponseEntity<?> deleteUser(@PathVariable int id) {
+    log.info("Received DELETE request for /api/users/" + id);
+    var user = userService.deleteUser(id);
     return ResponseEntity.ok(user);
   }
 

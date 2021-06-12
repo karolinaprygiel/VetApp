@@ -47,6 +47,12 @@ public class UserService {
         });
   }
 
+  public User deleteUser(int id) {
+    var user = getUserById(id);
+    userRepository.delete(user);
+    return user;
+  }
+
   public User createUser(UserCreationRequestDto request) {
     boolean userExists = true;
     System.out.println(request.getUsername());
