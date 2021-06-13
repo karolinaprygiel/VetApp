@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import uj.jwzp2021.gp.VetApp.exception.animal.AnimalNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.vet.VetNotAvailableException;
 import uj.jwzp2021.gp.VetApp.exception.visit.*;
 import uj.jwzp2021.gp.VetApp.mapper.VisitMapper;
@@ -15,12 +14,12 @@ import uj.jwzp2021.gp.VetApp.model.dto.Responses.VisitDatesResponseDto;
 import uj.jwzp2021.gp.VetApp.model.entity.Office;
 import uj.jwzp2021.gp.VetApp.model.entity.Vet;
 import uj.jwzp2021.gp.VetApp.model.entity.Visit;
+import uj.jwzp2021.gp.VetApp.model.entity.VisitStatus;
 import uj.jwzp2021.gp.VetApp.repository.VisitRepository;
 
 import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -158,6 +157,9 @@ public class VisitService {
     log.info("Updating visit with id=" + id +" for: " + visitReq);
     var visit = getVisitById(id);
     if (visitReq.getVisitStatus() != null) {
+      if (!visitReq.getVisitStatus().equals(VisitStatus.FINISHED) && !visitReq.getVisitStatus().equals(VisitStatus.NOT_APPEARED)){
+        throw new IllegalStausValueException("You can change visit status only to NOT APPEARED and FINISHED");
+      }
       visit.setVisitStatus(visitReq.getVisitStatus());
     }
     if (visitReq.getDescription() != null) {
@@ -226,14 +228,3 @@ public class VisitService {
     }
   }
 }
-
-// 16
-//16:15 - nie
-// 16:20 tak
-// 16:35 - nie
-//16:40 - nie
-//16:45 - nie
-//16:50 - nie
-//16:55 - tak
-//17:10 - nie
-//17:20 - tak

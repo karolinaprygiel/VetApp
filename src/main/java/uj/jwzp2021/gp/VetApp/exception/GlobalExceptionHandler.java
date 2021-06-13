@@ -14,10 +14,7 @@ import uj.jwzp2021.gp.VetApp.exception.office.OfficeNotFoundException;
 import uj.jwzp2021.gp.VetApp.exception.user.UserAlreadyExistsException;
 import uj.jwzp2021.gp.VetApp.exception.vet.VetNotAvailableException;
 import uj.jwzp2021.gp.VetApp.exception.vet.VetNotFoundException;
-import uj.jwzp2021.gp.VetApp.exception.visit.VisitNotFoundException;
-import uj.jwzp2021.gp.VetApp.exception.visit.VisitOverlapsException;
-import uj.jwzp2021.gp.VetApp.exception.visit.VisitStartsInPastException;
-import uj.jwzp2021.gp.VetApp.exception.visit.VisitTooSoonException;
+import uj.jwzp2021.gp.VetApp.exception.visit.*;
 
 @Slf4j
 @ControllerAdvice
@@ -154,4 +151,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatus.NOT_ACCEPTABLE,
             request);
   }
+
+  @ExceptionHandler(IllegalStausValueException.class)
+  protected ResponseEntity<?> handleIllegalDescriptionValueException(
+      IllegalStausValueException ex, WebRequest request) {
+    log.error("Returning httpStatus=406. Reason: " + ex.getMessage());
+    return handleExceptionInternal(
+        ex,
+        JsonFormatter.toResponseJson(ex.getMessage()),
+        new HttpHeaders(),
+        HttpStatus.NOT_ACCEPTABLE,
+        request);
+  }
+
 }

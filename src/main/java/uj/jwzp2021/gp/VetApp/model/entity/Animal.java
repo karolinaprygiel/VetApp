@@ -22,9 +22,6 @@ public class Animal {
   private AnimalType type;
   private String name;
   private int yearOfBirth;
-  // private int monthOfBirth;
-  // private int dayOfBirth;
-  // private LocalDateTime birthDate;
   @ManyToOne
   @JoinColumn(name = "client_id", referencedColumnName = "id", nullable = false)
   private Client owner;
