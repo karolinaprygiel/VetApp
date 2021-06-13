@@ -12,6 +12,5 @@ import uj.jwzp2021.gp.VetApp.model.entity.VisitStatus;
 public class VisitUpdateRequestDto {
   @JsonProperty("status")
   private VisitStatus visitStatus;
-
   private String description;
 }

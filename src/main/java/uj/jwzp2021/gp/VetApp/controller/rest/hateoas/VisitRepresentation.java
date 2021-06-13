@@ -25,6 +25,7 @@ public class VisitRepresentation extends RepresentationModel<VisitRepresentation
   private final Duration duration;
   private final VisitStatus status;
   private final BigDecimal price;
+  private final String description;
 
   public static VisitRepresentation fromVisit(Visit v) {
     log.debug("Creating new VisitRepresentation");
@@ -36,6 +37,7 @@ public class VisitRepresentation extends RepresentationModel<VisitRepresentation
         v.getStartTime(),
         v.getDuration(),
         v.getVisitStatus(),
-        v.getPrice());
+        v.getPrice(),
+        v.getDescription());
   }
 }

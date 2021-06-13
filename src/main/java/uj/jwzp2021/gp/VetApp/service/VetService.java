@@ -76,14 +76,6 @@ public class VetService {
 
   public boolean isVetAtWork(LocalDateTime startTime, Duration duration, Vet vet) {
 
-    // vet 15.04 20:00 - 16.04 4:00
-    // wizyty:
-    // 15.04 21:00 - 15 MIN
-    // 15.04 23:55 - 15 MIN koniec 16.04
-    // 16.04 02:22 - 15 MIN
-    // Vet - start datetime i duration
-    // Wizyta - start time i duration
-
     var worksAtMidnight = worksAtMidnight(vet);
 
     if (!worksAtMidnight) {
