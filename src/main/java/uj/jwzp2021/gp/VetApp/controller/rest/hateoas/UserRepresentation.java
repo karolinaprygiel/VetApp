@@ -11,11 +11,11 @@ import uj.jwzp2021.gp.VetApp.security.Role;
 @Data
 @AllArgsConstructor
 public class UserRepresentation extends RepresentationModel<UserRepresentation> {
-    private final int id;
-    private final String username;
-    private final Role role;
+  private final int id;
+  private final String username;
+  private final Role role;
 
-    public static UserRepresentation fromUser(User user) {
-        return new UserRepresentation(user.getId(), user.getUsername(), user.getRole());
-    }
+  public static UserRepresentation fromUser(User user) {
+    return new UserRepresentation(user.getId(), user.getUsername(), user.getRole());
+  }
 }
